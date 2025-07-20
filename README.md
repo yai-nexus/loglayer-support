@@ -1,147 +1,321 @@
 # @yai-nexus/loglayer-support
 
-[![npm version](https://badge.fury.io/js/@yai-nexus%2Floglayer-support.svg)](https://badge.fury.io/js/@yai-nexus%2Floglayer-support)
+🚀 **基于 LogLayer 的统一日志解决方案** - 专为 Next.js 和现代 JavaScript 应用设计
+
+[![npm version](https://badge.fury.io/js/@yai-nexus%2Floglayer-support.svg)](https://www.npmjs.com/package/@yai-nexus/loglayer-support)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-`@yai-nexus/loglayer-support` 是一个基于 [LogLayer](https://loglayer.dev) 构建的、生产就绪的日志解决方案，专为现代 TypeScript/JavaScript 项目（尤其是 Next.js）设计。它提供了一个统一、可靠且可插拔的日志记录接口。
+## 🎯 为什么选择这个库？
 
-## 🌟 核心价值
+**解决 Next.js 日志痛点**：在 Next.js 的 Edge Runtime 和 Serverless 环境中，传统日志库经常出现兼容性问题。本库提供开箱即用的解决方案。
 
-- ✅ **完美兼容 Next.js**：从根本上解决了在 Next.js Edge 和 Serverless 环境中常见的 Webpack 打包和运行时问题。
-- ✅ **架构解耦**：将您的业务代码与底层的日志实现（如 Pino, Winston）完全解耦。您可以随时切换日志库，而无需修改一行业务代码。
-- ✅ **零配置启动**：提供专为 Next.js 优化的同步创建函数，真正实现"一行代码，即可拥有"的开发体验。
-- ✅ **环境自适应**：自动检测运行环境（服务器、浏览器、边缘函数），并选择最高效、最兼容的日志传输器。
+**架构解耦设计**：您的代码与具体日志实现完全分离，可以随时无缝切换底层日志库，无需修改业务代码。
 
-## 💿 安装
+**零配置启动**：一行代码即可开始使用，同时保留完全的自定义能力。
 
-1.  **核心库**:
-    ```bash
-    pnpm add @yai-nexus/loglayer-support loglayer
-    ```
+## 📦 安装
 
-2.  **安装传输器 (Transports)**:
-    根据您的需求和环境，安装一个或多个日志传输器。
-    ```bash
-    # [推荐] 用于服务端的强大传输器
-    pnpm add @loglayer/transport-pino pino
+```bash
+npm install @yai-nexus/loglayer-support
+```
 
-    # [高兼容性] 适用于各种环境的传输器
-    pnpm add @loglayer/transport-winston winston
-    
-    # [可选] 数据脱敏插件
-    pnpm add @loglayer/plugin-redaction
-    ```
+## 🚀 快速开始
 
-## 🚀 使用指南
+### Next.js 应用（推荐方式）
 
-### 推荐：在 Next.js 中使用
-
-我们提供了专为 Next.js 设计的同步创建函数，它能在应用初始化时安全地创建 logger 实例，并自动处理所有环境兼容性问题。
-
-在您的 `lib/logger.ts` 或类似文件中：
 ```typescript
 import { createNextjsLoggerSync } from '@yai-nexus/loglayer-support';
 
-export const logger = createNextjsLoggerSync('my-nextjs-app');
+// 一行代码创建日志器
+const logger = createNextjsLoggerSync();
 
-// 然后在您的应用中任意位置导入和使用
-// logger.info(...)
+// 立即开始使用
+logger.info('应用启动成功');
+logger.error('发生错误', { error: new Error('示例错误') });
 ```
-`createNextjsLoggerSync` 会在后台异步初始化最高效的传输器（如 Pino），如果失败，则会自动、安全地回退到兼容性更好的传输器（如 Winston 或 Console），确保您的日志系统永不中断。
 
-### 通用用法 (Node.js 服务)
-
-在非 Next.js 的 Node.js 环境中，您可以使用预设来异步创建一个 logger。
+### Node.js 服务
 
 ```typescript
 import { createLoggerWithPreset } from '@yai-nexus/loglayer-support';
 
-async function initializeLogger() {
-  // 根据环境变量自动选择 'development' 或 'production' 预设
-  const logger = await createLoggerWithPreset('my-service');
-  
-  logger.info('服务已启动', { pid: process.pid });
-}
+// 使用预设配置
+const logger = await createLoggerWithPreset('production');
 
-initializeLogger();
+logger.info('服务启动', { port: 3000 });
 ```
 
-### API 特性
+## 📖 使用指南
 
-无论使用何种方式创建，`logger` 实例都拥有强大的功能：
+### 1. 基础日志记录
 
 ```typescript
-// 基础日志
-logger.info('用户登录成功', { userId: '123' });
+import { createNextjsLoggerSync } from '@yai-nexus/loglayer-support';
 
-// 结构化上下文
-const requestLogger = logger.forRequest('req-abc');
-requestLogger.info('处理入站请求');
+const logger = createNextjsLoggerSync();
 
-// 错误记录
+// 不同级别的日志
+logger.debug('调试信息');    // 开发环境详细信息
+logger.info('一般信息');     // 正常业务流程
+logger.warn('警告信息');     // 需要注意但不影响运行
+logger.error('错误信息');    // 错误和异常
+```
+
+### 2. 结构化日志（推荐）
+
+```typescript
+// ✅ 推荐：使用结构化数据
+logger.info('用户登录', {
+  userId: '12345',
+  ip: '192.168.1.1',
+  timestamp: new Date().toISOString(),
+  userAgent: 'Chrome/91.0'
+});
+
+// ✅ 错误日志最佳实践
 try {
-  // ... some code
+  await riskyOperation();
 } catch (error) {
-  logger.logError(error, '处理支付时发生错误');
+  logger.error('操作失败', {
+    operation: 'riskyOperation',
+    error: error.message,
+    stack: error.stack,
+    context: { userId: '12345' }
+  });
 }
 ```
 
-## 📚 示例和文档
+### 3. 上下文绑定
 
-查看 [`examples/`](./examples/) 目录获取详细的使用示例：
+```typescript
+// 创建带上下文的子日志器
+const requestLogger = logger.child({
+  requestId: 'req-12345',
+  userId: 'user-67890'
+});
 
-- **Next.js 示例** - 在 Next.js 项目中的完整使用方案
-- **Node.js 示例** - 服务端应用的集成方案
-- **基础示例** - 所有核心 API 的使用方法
+// 所有后续日志都会自动包含上下文
+requestLogger.info('开始处理请求');
+requestLogger.debug('查询数据库');
+requestLogger.info('请求处理完成');
+
+// 输出示例：
+// {"level":"info","message":"开始处理请求","requestId":"req-12345","userId":"user-67890"}
+```
+
+### 4. Next.js API 路由完整示例
+
+```typescript
+// app/api/users/route.ts
+import { createNextjsLoggerSync } from '@yai-nexus/loglayer-support';
+
+const logger = createNextjsLoggerSync({
+  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+  enableFileLogging: true
+});
+
+export async function GET(request: Request) {
+  // 为每个请求创建独立的日志上下文
+  const requestLogger = logger.child({
+    requestId: crypto.randomUUID(),
+    method: 'GET',
+    path: '/api/users'
+  });
+
+  requestLogger.info('API 请求开始');
+
+  try {
+    requestLogger.debug('开始查询用户数据');
+    const users = await getUsersFromDatabase();
+    
+    requestLogger.info('查询成功', {
+      userCount: users.length,
+      duration: '150ms'
+    });
+
+    return Response.json(users);
+    
+  } catch (error) {
+    requestLogger.error('查询失败', {
+      error: error.message,
+      stack: error.stack
+    });
+
+    return Response.json(
+      { error: '服务器内部错误' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### 5. 环境配置
+
+```typescript
+// 根据环境自动调整配置
+const logger = createNextjsLoggerSync({
+  level: process.env.LOG_LEVEL || 'info',
+  enableFileLogging: process.env.NODE_ENV === 'production',
+  logDir: process.env.LOG_DIR || './logs'
+});
+
+// 支持的环境变量：
+// LOG_LEVEL=debug|info|warn|error
+// LOG_TO_FILE=true|false
+// LOG_DIR=./custom-logs
+```
+
+## 🔧 API 参考
+
+### `createNextjsLoggerSync(options?)`
+
+**最常用的 API**，适合 Next.js 和需要同步创建的场景。
+
+```typescript
+interface NextjsLoggerOptions {
+  level?: 'debug' | 'info' | 'warn' | 'error';  // 默认: 'info'
+  enableFileLogging?: boolean;                   // 默认: false
+  logDir?: string;                              // 默认: './logs'
+  enableConsole?: boolean;                      // 默认: true
+}
+
+const logger = createNextjsLoggerSync({
+  level: 'debug',
+  enableFileLogging: true,
+  logDir: './my-logs'
+});
+```
+
+### `createLoggerWithPreset(preset, options?)`
+
+使用预设配置快速创建日志器。
+
+```typescript
+// 可用预设
+type Preset = 'development' | 'production' | 'nextjsCompatible';
+
+// 开发环境：详细日志 + 控制台输出
+const devLogger = await createLoggerWithPreset('development');
+
+// 生产环境：文件日志 + 性能优化
+const prodLogger = await createLoggerWithPreset('production');
+
+// Next.js 兼容：确保在所有 Next.js 环境中工作
+const nextLogger = await createLoggerWithPreset('nextjsCompatible');
+```
+
+### `createEnhancedLogger(config)`
+
+完全自定义配置。
+
+```typescript
+const logger = await createEnhancedLogger({
+  level: 'info',
+  transports: ['pino', 'console'],  // 可选: 'pino' | 'winston' | 'console'
+  enableFileLogging: true,
+  logDir: './logs',
+  pinoOptions: {
+    // Pino 特定配置
+    formatters: {
+      level: (label) => ({ level: label })
+    }
+  }
+});
+```
+
+## 💡 最佳实践
+
+### 1. 日志级别使用指南
+
+```typescript
+// debug: 开发调试信息
+logger.debug('SQL 查询', { query: 'SELECT * FROM users', params: [1, 2, 3] });
+
+// info: 正常业务流程
+logger.info('用户注册成功', { userId: newUser.id, email: newUser.email });
+
+// warn: 需要关注但不影响功能
+logger.warn('API 响应较慢', { endpoint: '/api/data', duration: 2500 });
+
+// error: 错误和异常
+logger.error('支付处理失败', { orderId: '12345', error: error.message });
+```
+
+### 2. 性能监控
+
+```typescript
+async function processLargeDataset(data: any[]) {
+  const startTime = Date.now();
+  const processLogger = logger.child({ operation: 'processLargeDataset' });
+  
+  processLogger.info('开始处理数据', { recordCount: data.length });
+  
+  try {
+    const result = await heavyProcessing(data);
+    
+    processLogger.info('处理完成', {
+      duration: Date.now() - startTime,
+      inputCount: data.length,
+      outputCount: result.length,
+      successRate: (result.length / data.length * 100).toFixed(2) + '%'
+    });
+    
+    return result;
+  } catch (error) {
+    processLogger.error('处理失败', {
+      duration: Date.now() - startTime,
+      error: error.message,
+      processedCount: 0
+    });
+    throw error;
+  }
+}
+```
+
+### 3. 避免常见错误
+
+```typescript
+// ❌ 避免：字符串拼接
+logger.info(`用户 ${userId} 执行了 ${action} 操作`);
+
+// ✅ 推荐：结构化数据
+logger.info('用户操作', { userId, action });
+
+// ❌ 避免：敏感信息
+logger.info('用户登录', { password: user.password });
+
+// ✅ 推荐：过滤敏感信息
+logger.info('用户登录', { 
+  userId: user.id, 
+  email: user.email.replace(/(.{2}).*(@.*)/, '$1***$2') 
+});
+```
 
 ## 🏗️ 架构优势
 
-使用 `@yai-nexus/loglayer-support` 意味着您的日志架构具备了：
+- **🔄 可移植性**: 底层日志库可随时切换，业务代码无需修改
+- **🛡️ 健壮性**: 自动回退机制，确保在任何环境下都能工作
+- **🎯 专业性**: 专为 Next.js 和现代 JavaScript 应用优化
+- **📈 可扩展**: 支持插件和自定义传输器
 
-- **可移植性**: 您的日志代码与具体实现无关，未来可以轻松迁移到任何 [LogLayer 支持的传输器](https://loglayer.dev/docs/transports)。
-- **健壮性**: 自动回退机制确保了即使在最苛刻的环境下，日志功能依然可用。
-- **可维护性**: 将复杂的日志系统配置和管理工作抽象掉，让您专注于业务逻辑。
+## 📚 示例项目
 
-## 🔧 开发
+查看 [`examples/`](./examples/) 目录：
 
-```bash
-# 安装依赖
-pnpm install
+- **[Next.js 完整示例](./examples/nextjs/)** - 包含 API 路由、页面组件、错误处理
+- **[Node.js 服务示例](./examples/nodejs/)** - Express 服务器集成
+- **[基础 API 示例](./examples/basic/)** - 所有功能演示
 
-# 开发模式
-pnpm dev
+## 🔗 相关链接
 
-# 构建
-pnpm build
+- [LogLayer 官方文档](https://loglayer.dev/)
+- [GitHub 仓库](https://github.com/yai-nexus/loglayer-support)
+- [问题反馈](https://github.com/yai-nexus/loglayer-support/issues)
 
-# 类型检查
-pnpm type-check
+## 🤝 贡献指南
 
-# 代码检查
-pnpm lint
-
-# 格式化代码
-pnpm format
-
-# 运行测试
-pnpm test
-```
+我们欢迎社区贡献！请查看 [贡献指南](./CONTRIBUTING.md) 了解详情。
 
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE](./LICENSE) 文件。
-
-## 🤝 贡献
-
-我们欢迎任何形式的社区贡献。请在提交 Pull Request 前，确保代码通过了格式化和 lint 检查。
-
-1. Fork 本仓库
-2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交您的修改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开一个 Pull Request
-
-## 📋 更新日志
-
-查看 [CHANGELOG.md](./CHANGELOG.md) 了解版本历史和变更详情。
+[MIT License](./LICENSE) - 可自由使用于商业和开源项目。
