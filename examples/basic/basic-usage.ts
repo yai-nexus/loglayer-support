@@ -4,8 +4,8 @@
  * 展示新的用户友好配置API的基本用法
  */
 
-import { createLogger, createDefaultConfig, createDevelopmentConfig } from '../../src';
-import type { LoggerConfig } from '../../src/types';
+import { createLogger, createDefaultConfig, createDevelopmentConfig } from '../../dist/index.js';
+import type { LoggerConfig } from '../../dist/index.d.ts';
 
 // =============================================================================
 // 示例 1: 使用预设配置
@@ -47,14 +47,14 @@ async function example2_CustomConfig() {
     server: {
       outputs: [
         { type: 'stdout' },                                   // 控制台输出
-        { 
-          type: 'file', 
-          config: { 
-            dir: './logs', 
-            filename: 'app.log',
+        {
+          type: 'file',
+          config: {
+            dir: '../../logs',
+            filename: 'basic.log',
             maxSize: '10MB',
             maxFiles: 5
-          } 
+          }
         }
       ]
     },
@@ -286,6 +286,6 @@ async function runAllExamples() {
 }
 
 // 如果直接运行此文件
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runAllExamples();
 }

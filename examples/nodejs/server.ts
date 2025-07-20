@@ -4,9 +4,9 @@
  * 展示如何在 Node.js 服务器中使用新的日志系统
  */
 
-import { createLogger, createProductionConfig, createDevelopmentConfig } from '../../src';
-import { createPerformanceMeasurer, withAsyncErrorLogging } from '../../src/wrapper';
-import type { LoggerConfig } from '../../src/types';
+import { createLogger, createProductionConfig, createDevelopmentConfig } from '../../dist/index.js';
+import { createPerformanceMeasurer, withAsyncErrorLogging } from '../../dist/index.js';
+import type { LoggerConfig } from '../../dist/index.d.ts';
 
 // =============================================================================
 // 服务器专用配置
@@ -77,8 +77,8 @@ function createServerConfig(): LoggerConfig {
           { 
             type: 'file',
             config: {
-              dir: './logs',
-              filename: 'development.log'
+              dir: '../../logs',
+              filename: 'nodejs.log'
             }
           }
         ]
@@ -441,6 +441,6 @@ async function main() {
 }
 
 // 如果直接运行此文件
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }

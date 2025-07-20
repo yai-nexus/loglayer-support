@@ -5,16 +5,35 @@
  * 包含服务端核心引擎、浏览器核心引擎和高性能适配器
  */
 
-import type { 
-  LogLevel, 
-  LogMetadata, 
-  ILogger, 
-  ServerOutput, 
+import type {
+  LogLevel,
+  LogMetadata,
+  ILogger,
+  ServerOutput,
   ClientOutput,
   ServerEngineType,
-  FormatMapping 
+  FormatMapping
 } from "./types";
 import { isBrowserEnvironment, canImport } from "./environment";
+
+// =============================================================================
+// 工具函数
+// =============================================================================
+
+/**
+ * 生成本地时间格式的时间戳
+ */
+function getLocalTimestamp(): string {
+  return new Date().toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).replace(/\//g, '-') + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+}
 
 // =============================================================================
 // 格式映射配置（自动绑定）
@@ -148,7 +167,7 @@ export class CoreServerLogger implements ILogger {
   }
 
   private writeToStdout(message: string, meta: LogMetadata, level: string): void {
-    const timestamp = new Date().toISOString();
+    const timestamp = getLocalTimestamp();
     const formatted = `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
     console.log(formatted);
   }
@@ -162,7 +181,7 @@ export class CoreServerLogger implements ILogger {
       return;
     }
     
-    const timestamp = new Date().toISOString();
+    const timestamp = getLocalTimestamp();
     const formatted = `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}\n`;
     
     try {
