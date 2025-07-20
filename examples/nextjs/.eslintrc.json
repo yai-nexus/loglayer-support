@@ -1,0 +1,9 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    // 演示代码中可能有未使用的变量，关闭警告便于展示
+    "@typescript-eslint/no-unused-vars": "warn",
+    // 演示代码为了简化可能使用 any 类型，但仅警告不阻止构建
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}

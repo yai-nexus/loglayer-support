@@ -1,0 +1,36 @@
+# 构建输出
+dist/
+build/
+
+# 依赖
+node_modules/
+
+# 日志文件
+*.log
+
+# 环境文件
+.env
+.env.*
+
+# 版本控制
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 包管理器文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 临时文件
+*.tmp
+*.bak
+
+# Demo 目录
+demo/
