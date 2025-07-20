@@ -1,0 +1,71 @@
+name: 版本自动更新
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: '版本类型'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: 配置 Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+      - name: 安装依赖
+        run: npm ci
+        
+      - name: 更新版本号
+        run: npm version ${{ github.event.inputs.version_type }} --no-git-tag-version
+        
+      - name: 获取新版本号
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        
+      - name: 提交版本更新
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to v${{ steps.package-version.outputs.version }}"
+          git push
+          
+      - name: 创建标签和发布
+        run: |
+          git tag v${{ steps.package-version.outputs.version }}
+          git push origin v${{ steps.package-version.outputs.version }}
+          
+      - name: 创建 GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.package-version.outputs.version }}
+          release_name: Release v${{ steps.package-version.outputs.version }}
+          body: |
+            自动生成的版本 v${{ steps.package-version.outputs.version }}
+            
+            ## 更改内容
+            请查看 [CHANGELOG.md](./CHANGELOG.md) 获取详细信息。
+          draft: false
+          prerelease: ${{ github.event.inputs.version_type == 'prerelease' }}
