@@ -5,7 +5,7 @@
  * 基于 docs/practical-config.md 的设计
  */
 
-import type { LoggerConfig, LogLevel, EnvironmentInfo } from './types';
+import type { LoggerConfig, LogLevel, EnvironmentInfo, ServerOutput, ClientOutput } from './types';
 
 /**
  * 验证配置的有效性
@@ -88,6 +88,9 @@ export function shouldLog(messageLevel: LogLevel, configLevel: LogLevel): boolea
 /**
  * 获取有效的输出配置（基于环境）
  */
+export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo & { isServer: true }): ServerOutput[];
+export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo & { isServer: false }): ClientOutput[];
+export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo): ServerOutput[] | ClientOutput[];
 export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo) {
   if (env.isServer) {
     return config.server.outputs;

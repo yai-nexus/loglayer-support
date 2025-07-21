@@ -89,10 +89,10 @@ export function createLoggerSync(name: string): IEnhancedLogger {
   let logger: ILogger;
   if (env.isServer) {
     // 服务端使用核心引擎（同步）
-    logger = new CoreServerLogger(outputs);
+    logger = new CoreServerLogger(outputs as ServerOutput[]);
   } else {
     // 客户端使用浏览器引擎
-    logger = new BrowserLogger(outputs);
+    logger = new BrowserLogger(outputs as ClientOutput[]);
   }
 
   return new LogLayerWrapper(logger, name, defaultConfig);
@@ -171,9 +171,9 @@ export function createNextjsLoggerSync(name: string): IEnhancedLogger {
 
   let logger: ILogger;
   if (env.isServer) {
-    logger = new CoreServerLogger(outputs);
+    logger = new CoreServerLogger(outputs as ServerOutput[]);
   } else {
-    logger = new BrowserLogger(outputs);
+    logger = new BrowserLogger(outputs as ClientOutput[]);
   }
 
   const wrapper = new LogLayerWrapper(logger, name, nextjsConfig);
