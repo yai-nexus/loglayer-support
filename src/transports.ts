@@ -164,7 +164,7 @@ export class CoreServerLogger implements ILogger {
     // SLS transport not fully implemented
   }
 
-  private sendToHttp(message: string, meta: LogMetadata, level: string, config: any = {}): void {
+  private sendToHttp(message: string, meta: LogMetadata, level: string, _config: any = {}): void {
     if (!this.http) return;
 
     // HTTP log data would include:\n    // timestamp, level, message, meta
