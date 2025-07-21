@@ -160,7 +160,6 @@ export class CoreServerLogger implements ILogger {
   private sendToSls(message: string, meta: LogMetadata, level: string, _config: any = {}): void {
     // SLS 实现（结构化格式）
     // SLS log data would include:\n    // timestamp, level, message, meta, hostname, pid
-
     // 这里应该调用实际的 SLS SDK
     // SLS transport not fully implemented
   }
@@ -171,7 +170,7 @@ export class CoreServerLogger implements ILogger {
     // HTTP log data would include:\n    // timestamp, level, message, meta
 
     // 简单的 HTTP 发送实现\n    // const url = config?.url || '/api/logs';
-    const headers = config?.headers || { 'Content-Type': 'application/json' };
+    // const headers = config?.headers || { 'Content-Type': 'application/json' };
 
     // 这里应该实现实际的 HTTP 发送
     // HTTP transport not fully implemented
