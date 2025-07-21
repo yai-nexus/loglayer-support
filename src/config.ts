@@ -88,9 +88,18 @@ export function shouldLog(messageLevel: LogLevel, configLevel: LogLevel): boolea
 /**
  * 获取有效的输出配置（基于环境）
  */
-export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo & { isServer: true }): ServerOutput[];
-export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo & { isServer: false }): ClientOutput[];
-export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo): ServerOutput[] | ClientOutput[];
+export function getEffectiveOutputs(
+  config: LoggerConfig,
+  env: EnvironmentInfo & { isServer: true }
+): ServerOutput[];
+export function getEffectiveOutputs(
+  config: LoggerConfig,
+  env: EnvironmentInfo & { isServer: false }
+): ClientOutput[];
+export function getEffectiveOutputs(
+  config: LoggerConfig,
+  env: EnvironmentInfo
+): ServerOutput[] | ClientOutput[];
 export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo) {
   if (env.isServer) {
     return config.server.outputs;
