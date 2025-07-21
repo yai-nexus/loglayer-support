@@ -1,6 +1,6 @@
 {
   "name": "loglayer-nextjs-example",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "NextJS example for loglayer-support with complete client/server logging demonstration",
   "private": true,
   "scripts": {

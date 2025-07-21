@@ -18,7 +18,7 @@
     "example:multiple": "npx tsx details/multiple-outputs.ts"
   },
   "dependencies": {
-    "loglayer-support": "file:../../"
+    "@yai-nexus/loglayer-support": "file:../../"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
