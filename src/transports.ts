@@ -63,21 +63,16 @@ export class CoreServerLogger implements ILogger {
   }
 
   private initNodeModules() {
-    console.log('[DEBUG] CoreServerLogger: initNodeModules called');
-    console.log('[DEBUG] isBrowserEnvironment():', isBrowserEnvironment());
+    // Initialize Node.js modules for server environment
     if (!isBrowserEnvironment()) {
       try {
         // 同步导入 Node.js 模块
         this.fs = require('fs');
         this.path = require('path');
         this.http = require('http');
-        console.log('[DEBUG] Node.js modules loaded successfully:', {
-          fs: !!this.fs,
-          path: !!this.path,
-          http: !!this.http,
-        });
+        // Node.js modules loaded successfully
       } catch (error) {
-        console.warn('Failed to load Node.js modules:', error);
+        // Failed to load Node.js modules
       }
     }
   }
@@ -99,21 +94,17 @@ export class CoreServerLogger implements ILogger {
   }
 
   private log(level: LogLevel, message: string, meta: LogMetadata): void {
-    console.log(
-      `[DEBUG] CoreServerLogger.log called: level=${level}, message="${message}", outputs count=${this.outputs.length}`
-    );
-    this.outputs.forEach((output, index) => {
-      console.log(`[DEBUG] Processing output ${index}:`, output);
+    // Process log message with configured outputs
+    this.outputs.forEach((output, _index) => {
+      // Process output configuration
 
       // 检查级别过滤
       if (output.level && !this.shouldLog(level, output.level)) {
-        console.log(
-          `[DEBUG] Skipping output ${index} due to level filter: message=${level}, required=${output.level}`
-        );
+        // Skip due to level filter
         return;
       }
 
-      console.log(`[DEBUG] Executing output ${index} type: ${output.type}`);
+      // Execute output type
       switch (output.type) {
         case 'stdout':
           this.writeToStdout(message, meta, level);
@@ -143,11 +134,7 @@ export class CoreServerLogger implements ILogger {
   }
 
   private writeToFile(message: string, meta: LogMetadata, level: string, config: any = {}): void {
-    console.log('[DEBUG] writeToFile called with config:', config);
-    console.log('[DEBUG] fs and path available:', { fs: !!this.fs, path: !!this.path });
-
     if (!this.fs || !this.path) {
-      console.log('[DEBUG] Missing fs or path modules, skipping file write');
       return;
     }
 
@@ -159,57 +146,35 @@ export class CoreServerLogger implements ILogger {
       const filename = config?.filename || 'app.log';
       const filePath = this.path.join(dir, filename);
 
-      console.log('[DEBUG] File write details:', { dir, filename, filePath });
-
-      // 确保目录存在
+      // Ensure directory exists
       if (!this.fs.existsSync(dir)) {
-        console.log('[DEBUG] Directory does not exist, creating:', dir);
         this.fs.mkdirSync(dir, { recursive: true });
-        console.log('[DEBUG] Directory created successfully');
-      } else {
-        console.log('[DEBUG] Directory already exists:', dir);
       }
 
-      console.log('[DEBUG] Writing to file:', filePath);
-      console.log('[DEBUG] Content to write:', formatted.trim());
       this.fs.appendFileSync(filePath, formatted);
-      console.log('[DEBUG] File write successful');
     } catch (error) {
-      console.error('[DEBUG] Failed to write to file:', error);
+      // Failed to write to file
     }
   }
 
-  private sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): void {
+  private sendToSls(message: string, meta: LogMetadata, level: string, _config: any = {}): void {
     // SLS 实现（结构化格式）
-    const logData = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      ...meta,
-      hostname: require('os').hostname?.() || 'unknown',
-      pid: process.pid,
-    };
+    // SLS log data would include:\n    // timestamp, level, message, meta, hostname, pid
 
     // 这里应该调用实际的 SLS SDK
-    console.log(`[SLS] ${JSON.stringify(logData)}`);
+    // SLS transport not fully implemented
   }
 
   private sendToHttp(message: string, meta: LogMetadata, level: string, config: any = {}): void {
     if (!this.http) return;
 
-    const logData = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      ...meta,
-    };
+    // HTTP log data would include:\n    // timestamp, level, message, meta
 
-    // 简单的 HTTP 发送实现
-    const url = config?.url || '/api/logs';
+    // 简单的 HTTP 发送实现\n    // const url = config?.url || '/api/logs';
     const headers = config?.headers || { 'Content-Type': 'application/json' };
 
     // 这里应该实现实际的 HTTP 发送
-    console.log(`[HTTP] Sending to ${url}:`, logData);
+    // HTTP transport not fully implemented
   }
 }
 
@@ -307,7 +272,9 @@ export class BrowserLogger implements ILogger {
       method: 'POST',
       headers,
       body: JSON.stringify(logData),
-    }).catch((err) => console.warn('日志上报失败:', err));
+    }).catch(() => {
+      // Log upload failed
+    });
   }
 
   private saveToStorage(message: string, meta: LogMetadata, level: string, config: any = {}): void {
@@ -333,7 +300,7 @@ export class BrowserLogger implements ILogger {
 
       (globalThis as any).localStorage.setItem(key, JSON.stringify(logs));
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error);
+      // Failed to save to localStorage
     }
   }
 
@@ -487,7 +454,7 @@ export class EngineLoader {
       // 3. 保底：Core（原生实现）
       return new CoreServerLogger(outputs);
     } catch (error) {
-      console.warn('Failed to load preferred server engine, using core:', error);
+      // Failed to load preferred server engine, using core
       return new CoreServerLogger(outputs);
     }
   }

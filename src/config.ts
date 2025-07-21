@@ -13,36 +13,27 @@ import type { LoggerConfig, LogLevel, EnvironmentInfo } from './types';
 export function validateConfig(config: LoggerConfig): boolean {
   // 检查基本结构
   if (!config.level || typeof config.level.default !== 'string') {
-    console.error('Logger config validation failed: level.default is required');
     return false;
   }
 
   if (!config.server || !Array.isArray(config.server.outputs)) {
-    console.error('Logger config validation failed: server.outputs must be an array');
     return false;
   }
 
   if (!config.client || !Array.isArray(config.client.outputs)) {
-    console.error('Logger config validation failed: client.outputs must be an array');
     return false;
   }
 
   // 验证日志级别
   const validLevels = ['debug', 'info', 'warn', 'error'];
   if (!validLevels.includes(config.level.default)) {
-    console.error(
-      `Logger config validation failed: invalid default level "${config.level.default}"`
-    );
     return false;
   }
 
   // 验证自定义 logger 级别
   if (config.level.loggers) {
-    for (const [loggerName, level] of Object.entries(config.level.loggers)) {
+    for (const level of Object.values(config.level.loggers)) {
       if (!validLevels.includes(level)) {
-        console.error(
-          `Logger config validation failed: invalid level "${level}" for logger "${loggerName}"`
-        );
         return false;
       }
     }
@@ -52,14 +43,10 @@ export function validateConfig(config: LoggerConfig): boolean {
   for (const output of config.server.outputs) {
     const validServerTypes = ['stdout', 'file', 'sls', 'http'];
     if (!validServerTypes.includes(output.type)) {
-      console.error(`Logger config validation failed: invalid server output type "${output.type}"`);
       return false;
     }
 
     if (output.level && !validLevels.includes(output.level)) {
-      console.error(
-        `Logger config validation failed: invalid output level "${output.level}" for server output`
-      );
       return false;
     }
   }
@@ -68,14 +55,10 @@ export function validateConfig(config: LoggerConfig): boolean {
   for (const output of config.client.outputs) {
     const validClientTypes = ['console', 'http', 'localstorage'];
     if (!validClientTypes.includes(output.type)) {
-      console.error(`Logger config validation failed: invalid client output type "${output.type}"`);
       return false;
     }
 
     if (output.level && !validLevels.includes(output.level)) {
-      console.error(
-        `Logger config validation failed: invalid output level "${output.level}" for client output`
-      );
       return false;
     }
   }

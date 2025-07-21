@@ -7,7 +7,7 @@
 
 import { detectEnvironment } from './environment';
 import { validateConfig, getEffectiveOutputs } from './config';
-import { EngineLoader } from './transports';
+import { EngineLoader, CoreServerLogger, BrowserLogger } from './transports';
 import { LogLayerWrapper } from './wrapper';
 import type {
   LoggerConfig,
@@ -89,11 +89,9 @@ export function createLoggerSync(name: string): IEnhancedLogger {
   let logger: ILogger;
   if (env.isServer) {
     // 服务端使用核心引擎（同步）
-    const { CoreServerLogger } = require('./transports');
     logger = new CoreServerLogger(outputs);
   } else {
     // 客户端使用浏览器引擎
-    const { BrowserLogger } = require('./transports');
     logger = new BrowserLogger(outputs);
   }
 
@@ -173,10 +171,8 @@ export function createNextjsLoggerSync(name: string): IEnhancedLogger {
 
   let logger: ILogger;
   if (env.isServer) {
-    const { CoreServerLogger } = require('./transports');
     logger = new CoreServerLogger(outputs);
   } else {
-    const { BrowserLogger } = require('./transports');
     logger = new BrowserLogger(outputs);
   }
 
@@ -201,7 +197,7 @@ export async function createResilientLogger(
   try {
     return await createLogger(name, config);
   } catch (error) {
-    console.warn(`Failed to create logger "${name}" with provided config, using fallback:`, error);
+    // Failed to create logger with provided config, using fallback
 
     // 回退到最简单的配置
     const fallbackConfig: LoggerConfig = {
@@ -239,7 +235,7 @@ export async function createLoggers(
     try {
       loggers[name] = await createLogger(name, config);
     } catch (error) {
-      console.error(`Failed to create logger "${name}":`, error);
+      // Failed to create logger, skip and continue
       // 继续创建其他 logger
     }
   }
