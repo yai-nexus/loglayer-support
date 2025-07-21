@@ -480,9 +480,24 @@ export class EngineLoader {
       // 1. 首选：Pino（如果可用）
       if (await canImport('pino')) {
         const { pino } = await import('pino');
+
+        // 配置 pretty 格式用于 stdout 输出
         const pinoLogger = pino({
           level: 'debug',
           base: { service: 'loglayer-support' },
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              colorize: true,
+              translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+              ignore: 'pid,hostname,service',
+              messageFormat: '{msg}',
+              customPrettifiers: {
+                // 保持 meta 数据为 JSON 格式
+                '*': (value: unknown) => JSON.stringify(value),
+              },
+            },
+          },
         });
         return new PinoAdapter(pinoLogger, outputs);
       }
@@ -490,9 +505,19 @@ export class EngineLoader {
       // 2. 备选：Winston（如果可用）
       if (await canImport('winston')) {
         const winston = await import('winston');
+
+        // 配置 pretty 格式用于 stdout 输出
         const winstonLogger = winston.createLogger({
           level: 'debug',
-          format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+          format: winston.format.combine(
+            winston.format.timestamp({
+              format: 'YYYY-MM-DD HH:mm:ss.SSS'
+            }),
+            winston.format.printf(({ timestamp, level, message, ...meta }) => {
+              const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
+              return `${timestamp} [${level.toUpperCase()}] ${message}${metaStr}`;
+            })
+          ),
           transports: [new winston.transports.Console()],
         });
         return new WinstonAdapter(winstonLogger, outputs);

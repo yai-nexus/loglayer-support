@@ -56,6 +56,7 @@
     "@loglayer/transport-simple-pretty-terminal": "^2.0.0",
     "@loglayer/plugin-redaction": "^2.0.0",
     "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
