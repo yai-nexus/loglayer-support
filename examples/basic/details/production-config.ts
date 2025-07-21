@@ -35,7 +35,7 @@ async function runProductionConfigExample(): Promise<void> {
         {
           type: 'sls',          // 云端日志收集
           level: 'warn',        // 只收集警告及以上级别
-          config: getSLSConfig('loglayer-basic-production')
+          config: getSLSConfig()
         }
       ]
     },

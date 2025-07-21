@@ -37,7 +37,7 @@ async function runMultipleOutputsExample(): Promise<void> {
         {
           type: 'sls',                                        // 阿里云日志服务
           level: 'info',                                      // 信息及以上发送到 SLS
-          config: getSLSConfig('loglayer-basic-multi')
+          config: getSLSConfig()
         }
       ]
     },

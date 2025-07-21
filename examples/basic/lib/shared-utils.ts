@@ -27,14 +27,14 @@ export function getLogsDir(): string {
 /**
  * 获取 SLS 配置
  */
-export function getSLSConfig(appName: string = 'loglayer-basic'): Record<string, string> {
+export function getSLSConfig(): Record<string, string> {
   return {
-    endpoint: process.env.SLS_ENDPOINT || 'cn-beijing.log.aliyuncs.com',
-    project: process.env.SLS_PROJECT || 'yai-log-test',
-    logstore: process.env.SLS_LOGSTORE || 'app-log',
-    accessKey: process.env.SLS_ACCESS_KEY || 'LTAI5tNpnJzbTm6PBdmAfzKp',
-    accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET || 'pUOfZVW7Qk0L78Ku4Ber1ysr2bvXol',
-    appName: process.env.SLS_APP_NAME || appName
+    endpoint: process.env.SLS_ENDPOINT!,
+    project: process.env.SLS_PROJECT!,
+    logstore: process.env.SLS_LOGSTORE!,
+    accessKey: process.env.SLS_ACCESS_KEY!,
+    accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET!,
+    appName: process.env.SLS_APP_NAME!
   };
 }
 
