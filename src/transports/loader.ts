@@ -60,7 +60,8 @@ export class EngineLoader {
             winston.format.timestamp({
               format: 'YYYY-MM-DD HH:mm:ss.SSS',
             }),
-            winston.format.printf(({ timestamp, level, message, ...meta }) => {
+            winston.format.printf((info: any) => {
+              const { timestamp, level, message, ...meta } = info;
               const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
               return `${timestamp} [${level.toUpperCase()}] ${message}${metaStr}`;
             })
