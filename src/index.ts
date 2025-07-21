@@ -14,7 +14,7 @@ export type {
   LogMetadata,
   IEnhancedLogger,
   EnvironmentInfo,
-  
+
   // 配置类型
   LoggerConfig,
   ServerOutput,

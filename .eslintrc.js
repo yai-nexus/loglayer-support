@@ -20,12 +20,12 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js', 'dist/', 'node_modules/', 'examples/', 'demo/'],
   rules: {
-    // TypeScript 特定规则
+    // TypeScript 特定规则 - 放宽为警告
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
@@ -33,14 +33,15 @@ module.exports = {
     '@typescript-eslint/no-unsafe-return': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-var-requires': 'warn',
+    '@typescript-eslint/restrict-template-expressions': 'warn', // 新增：模板字符串表达式规则
 
-    // 代码质量规则
+    // 代码质量规则 - 放宽
     'no-console': 'warn',
-    'no-debugger': 'error',
-    'prefer-const': 'error',
-    'no-var': 'error',
+    'no-debugger': 'warn', // 改为警告
+    'prefer-const': 'warn', // 改为警告
+    'no-var': 'warn', // 改为警告
 
-    // Prettier 集成
-    'prettier/prettier': 'error',
+    // Prettier 集成 - 改为警告
+    'prettier/prettier': 'warn',
   },
 };

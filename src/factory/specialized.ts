@@ -1,6 +1,6 @@
 /**
  * 特殊场景 Logger 工厂函数
- * 
+ *
  * 提供针对特定场景的 Logger 创建功能，如 Next.js 优化、批量创建等
  */
 
@@ -9,13 +9,7 @@ import { validateConfig, getEffectiveOutputs } from '../config';
 import { EngineLoader } from '../transports';
 import { LogLayerWrapper } from '../wrapper';
 import { createLogger } from './core';
-import type {
-  LoggerConfig,
-  IEnhancedLogger,
-  ILogger,
-  ServerOutput,
-  ClientOutput,
-} from '../core';
+import type { LoggerConfig, IEnhancedLogger, ILogger, ServerOutput, ClientOutput } from '../core';
 
 /**
  * 为 Next.js 创建优化的 Logger

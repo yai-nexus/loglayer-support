@@ -1,6 +1,6 @@
 /**
  * 服务端核心引擎
- * 
+ *
  * 使用原生 Node.js API 的零依赖日志引擎
  */
 
@@ -119,10 +119,18 @@ export class CoreServerLogger implements ILogger {
 
   private sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): void {
     // 检查必需的配置参数
-    if (!config?.endpoint || !config?.project || !config?.logstore || !config?.accessKey || !config?.accessKeySecret) {
+    if (
+      !config?.endpoint ||
+      !config?.project ||
+      !config?.logstore ||
+      !config?.accessKey ||
+      !config?.accessKeySecret
+    ) {
       // 如果是开发环境，提供友好提示
       if (process.env.NODE_ENV !== 'production') {
-        console.warn('[LogLayer SLS] 缺少必需的 SLS 配置，请检查环境变量：SLS_ENDPOINT, SLS_PROJECT, SLS_LOGSTORE, SLS_ACCESS_KEY, SLS_ACCESS_KEY_SECRET');
+        console.warn(
+          '[LogLayer SLS] 缺少必需的 SLS 配置，请检查环境变量：SLS_ENDPOINT, SLS_PROJECT, SLS_LOGSTORE, SLS_ACCESS_KEY, SLS_ACCESS_KEY_SECRET'
+        );
       }
       return; // 静默失败，保持与其他传输方法一致
     }
@@ -130,7 +138,7 @@ export class CoreServerLogger implements ILogger {
     try {
       // 动态导入 SLS SDK
       const Client = require('@alicloud/log');
-      
+
       // 创建 SLS 客户端
       const client = new Client({
         accessKeyId: config.accessKey,
@@ -147,9 +155,7 @@ export class CoreServerLogger implements ILogger {
         pid: String(process.pid), // SLS 需要字符串值
         app_name: config.appName || 'unknown',
         // 将 meta 数据也转换为字符串
-        ...Object.fromEntries(
-          Object.entries(meta).map(([key, value]) => [key, String(value)])
-        )
+        ...Object.fromEntries(Object.entries(meta).map(([key, value]) => [key, String(value)])),
       };
 
       // 发送日志到 SLS
@@ -157,8 +163,8 @@ export class CoreServerLogger implements ILogger {
         logs: [
           {
             content: logContent,
-            timestamp: timestamp
-          }
+            timestamp: timestamp,
+          },
         ],
         topic: config.topic || 'loglayer',
         source: config.source || 'nodejs',

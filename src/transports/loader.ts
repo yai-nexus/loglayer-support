@@ -1,6 +1,6 @@
 /**
  * 引擎加载器
- * 
+ *
  * 智能选择最佳日志引擎，实现环境隔离和引擎优先级策略
  */
 
@@ -58,7 +58,7 @@ export class EngineLoader {
           level: 'debug',
           format: winston.format.combine(
             winston.format.timestamp({
-              format: 'YYYY-MM-DD HH:mm:ss.SSS'
+              format: 'YYYY-MM-DD HH:mm:ss.SSS',
             }),
             winston.format.printf(({ timestamp, level, message, ...meta }) => {
               const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
