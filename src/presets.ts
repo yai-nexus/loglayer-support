@@ -4,45 +4,45 @@
  * 提供常用的日志配置预设
  */
 
-import type { EnvironmentConfig, LoggerConfig } from "./types";
+import type { EnvironmentConfig, LoggerConfig } from './types';
 
 /**
  * 默认环境配置
  */
-export const defaultConfigs: LoggerConfig["environments"] = {
+export const defaultConfigs: LoggerConfig['environments'] = {
   development: {
     server: {
-      preferredTransport: "pino",
-      fallbackTransport: "winston",
+      preferredTransport: 'pino',
+      fallbackTransport: 'winston',
       transportOptions: {
         pino: {
-          level: "debug",
+          level: 'debug',
           pretty: true,
-          streams: [{ stream: process.stdout }, { stream: "logs/app.log" }],
+          streams: [{ stream: process.stdout }, { stream: 'logs/app.log' }],
         },
         winston: {
-          level: "debug",
-          format: "pretty",
-          transports: ["console", "file"],
+          level: 'debug',
+          format: 'pretty',
+          transports: ['console', 'file'],
         },
       },
       plugins: [
         {
-          name: "redaction",
-          config: { paths: ["password", "token"], censor: "[REDACTED]" },
+          name: 'redaction',
+          config: { paths: ['password', 'token'], censor: '[REDACTED]' },
         },
       ],
     },
     client: {
-      preferredTransport: "console",
-      fallbackTransport: "simplePrettyTerminal",
+      preferredTransport: 'console',
+      fallbackTransport: 'simplePrettyTerminal',
       transportOptions: {
         console: {
-          level: "debug",
+          level: 'debug',
           pretty: true,
         },
         simplePrettyTerminal: {
-          level: "debug",
+          level: 'debug',
           colorize: true,
         },
       },
@@ -51,44 +51,44 @@ export const defaultConfigs: LoggerConfig["environments"] = {
 
   production: {
     server: {
-      preferredTransport: "pino",
-      fallbackTransport: "winston",
+      preferredTransport: 'pino',
+      fallbackTransport: 'winston',
       transportOptions: {
         pino: {
-          level: "info",
+          level: 'info',
           pretty: false,
           streams: [
             { stream: process.stdout },
-            { stream: "logs/app.log" },
-            { stream: "logs/error.log", level: "error" },
+            { stream: 'logs/app.log' },
+            { stream: 'logs/error.log', level: 'error' },
           ],
         },
         winston: {
-          level: "info",
-          format: "json",
-          transports: ["console", "file"],
+          level: 'info',
+          format: 'json',
+          transports: ['console', 'file'],
         },
       },
       plugins: [
         {
-          name: "redaction",
+          name: 'redaction',
           config: {
-            paths: ["password", "token", "apiKey"],
-            censor: "[REDACTED]",
+            paths: ['password', 'token', 'apiKey'],
+            censor: '[REDACTED]',
           },
         },
       ],
     },
     client: {
-      preferredTransport: "console",
-      fallbackTransport: "simplePrettyTerminal",
+      preferredTransport: 'console',
+      fallbackTransport: 'simplePrettyTerminal',
       transportOptions: {
         console: {
-          level: "warn",
+          level: 'warn',
           pretty: false,
         },
         simplePrettyTerminal: {
-          level: "warn",
+          level: 'warn',
           colorize: false,
         },
       },
@@ -97,21 +97,21 @@ export const defaultConfigs: LoggerConfig["environments"] = {
 
   test: {
     server: {
-      preferredTransport: "console",
-      fallbackTransport: "simplePrettyTerminal",
+      preferredTransport: 'console',
+      fallbackTransport: 'simplePrettyTerminal',
       transportOptions: {
         console: {
-          level: "error",
+          level: 'error',
           pretty: false,
         },
       },
     },
     client: {
-      preferredTransport: "console",
-      fallbackTransport: "simplePrettyTerminal",
+      preferredTransport: 'console',
+      fallbackTransport: 'simplePrettyTerminal',
       transportOptions: {
         console: {
-          level: "error",
+          level: 'error',
           pretty: false,
         },
       },
@@ -124,23 +124,23 @@ export const defaultConfigs: LoggerConfig["environments"] = {
  * 当遇到 Next.js webpack 兼容性问题时使用
  */
 export const nextjsCompatibilityConfig: EnvironmentConfig = {
-  preferredTransport: "winston",
-  fallbackTransport: "simplePrettyTerminal",
+  preferredTransport: 'winston',
+  fallbackTransport: 'simplePrettyTerminal',
   transportOptions: {
     winston: {
-      level: process.env.NODE_ENV === "production" ? "info" : "debug",
-      format: "pretty",
-      transports: ["console"],
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+      format: 'pretty',
+      transports: ['console'],
     },
     simplePrettyTerminal: {
-      level: process.env.NODE_ENV === "production" ? "info" : "debug",
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
       colorize: true,
     },
   },
   plugins: [
     {
-      name: "redaction",
-      config: { paths: ["password", "token"], censor: "[REDACTED]" },
+      name: 'redaction',
+      config: { paths: ['password', 'token'], censor: '[REDACTED]' },
     },
   ],
 };
@@ -173,8 +173,8 @@ export const presets = {
     serviceName,
     environments: defaultConfigs,
     forceConfig: {
-      transport: "winston",
-      reason: "Next.js pino compatibility issue",
+      transport: 'winston',
+      reason: 'Next.js pino compatibility issue',
     },
   }),
 
@@ -185,8 +185,8 @@ export const presets = {
     serviceName,
     environments: defaultConfigs,
     forceConfig: {
-      transport: "console",
-      reason: "Test environment - minimal logging",
+      transport: 'console',
+      reason: 'Test environment - minimal logging',
     },
   }),
 
@@ -197,8 +197,8 @@ export const presets = {
     serviceName,
     environments: defaultConfigs,
     forceConfig: {
-      transport: "console",
-      reason: "Console only logging",
+      transport: 'console',
+      reason: 'Console only logging',
     },
   }),
 };

@@ -1,6 +1,6 @@
 /**
  * 配置管理模块
- * 
+ *
  * 处理新的用户友好配置格式
  * 基于 docs/practical-config.md 的设计
  */
@@ -30,7 +30,9 @@ export function validateConfig(config: LoggerConfig): boolean {
   // 验证日志级别
   const validLevels = ['debug', 'info', 'warn', 'error'];
   if (!validLevels.includes(config.level.default)) {
-    console.error(`Logger config validation failed: invalid default level "${config.level.default}"`);
+    console.error(
+      `Logger config validation failed: invalid default level "${config.level.default}"`
+    );
     return false;
   }
 
@@ -38,7 +40,9 @@ export function validateConfig(config: LoggerConfig): boolean {
   if (config.level.loggers) {
     for (const [loggerName, level] of Object.entries(config.level.loggers)) {
       if (!validLevels.includes(level)) {
-        console.error(`Logger config validation failed: invalid level "${level}" for logger "${loggerName}"`);
+        console.error(
+          `Logger config validation failed: invalid level "${level}" for logger "${loggerName}"`
+        );
         return false;
       }
     }
@@ -53,7 +57,9 @@ export function validateConfig(config: LoggerConfig): boolean {
     }
 
     if (output.level && !validLevels.includes(output.level)) {
-      console.error(`Logger config validation failed: invalid output level "${output.level}" for server output`);
+      console.error(
+        `Logger config validation failed: invalid output level "${output.level}" for server output`
+      );
       return false;
     }
   }
@@ -67,7 +73,9 @@ export function validateConfig(config: LoggerConfig): boolean {
     }
 
     if (output.level && !validLevels.includes(output.level)) {
-      console.error(`Logger config validation failed: invalid output level "${output.level}" for client output`);
+      console.error(
+        `Logger config validation failed: invalid output level "${output.level}" for client output`
+      );
       return false;
     }
   }
@@ -90,7 +98,7 @@ export function shouldLog(messageLevel: LogLevel, configLevel: LogLevel): boolea
   const levels = ['debug', 'info', 'warn', 'error'];
   const messageLevelIndex = levels.indexOf(messageLevel);
   const configLevelIndex = levels.indexOf(configLevel);
-  
+
   return messageLevelIndex >= configLevelIndex;
 }
 
@@ -111,18 +119,14 @@ export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo) 
 export function createDefaultConfig(): LoggerConfig {
   return {
     level: {
-      default: 'info'
+      default: 'info',
     },
     server: {
-      outputs: [
-        { type: 'stdout' }
-      ]
+      outputs: [{ type: 'stdout' }],
     },
     client: {
-      outputs: [
-        { type: 'console' }
-      ]
-    }
+      outputs: [{ type: 'console' }],
+    },
   };
 }
 
@@ -138,15 +142,15 @@ export function mergeConfigs(
       default: overrideConfig.level?.default || baseConfig.level.default,
       loggers: {
         ...baseConfig.level.loggers,
-        ...overrideConfig.level?.loggers
-      }
+        ...overrideConfig.level?.loggers,
+      },
     },
     server: {
-      outputs: overrideConfig.server?.outputs || baseConfig.server.outputs
+      outputs: overrideConfig.server?.outputs || baseConfig.server.outputs,
     },
     client: {
-      outputs: overrideConfig.client?.outputs || baseConfig.client.outputs
-    }
+      outputs: overrideConfig.client?.outputs || baseConfig.client.outputs,
+    },
   };
 
   return merged;
@@ -158,25 +162,23 @@ export function mergeConfigs(
 export function createDevelopmentConfig(): LoggerConfig {
   return {
     level: {
-      default: 'debug'
+      default: 'debug',
     },
     server: {
       outputs: [
         { type: 'stdout' },
-        { 
-          type: 'file', 
-          config: { 
+        {
+          type: 'file',
+          config: {
             dir: './logs',
-            filename: 'app.log'
-          } 
-        }
-      ]
+            filename: 'app.log',
+          },
+        },
+      ],
     },
     client: {
-      outputs: [
-        { type: 'console' }
-      ]
-    }
+      outputs: [{ type: 'console' }],
+    },
   };
 }
 
@@ -188,35 +190,35 @@ export function createProductionConfig(): LoggerConfig {
     level: {
       default: 'info',
       loggers: {
-        'debug': 'error',
-        'test': 'error'
-      }
+        debug: 'error',
+        test: 'error',
+      },
     },
     server: {
       outputs: [
         { type: 'stdout' },
-        { 
+        {
           type: 'file',
           config: {
             dir: '/var/log/app',
             filename: 'app.log',
             maxSize: '10MB',
-            maxFiles: 5
-          }
-        }
-      ]
+            maxFiles: 5,
+          },
+        },
+      ],
     },
     client: {
       outputs: [
-        { 
+        {
           type: 'http',
           level: 'warn',
           config: {
-            endpoint: '/api/client-logs'
-          }
-        }
-      ]
-    }
+            endpoint: '/api/client-logs',
+          },
+        },
+      ],
+    },
   };
 }
 
@@ -233,11 +235,11 @@ export function createConfigForEnvironment(env: EnvironmentInfo): LoggerConfig {
       return {
         level: { default: 'error' },
         server: {
-          outputs: [{ type: 'stdout' }]
+          outputs: [{ type: 'stdout' }],
         },
         client: {
-          outputs: [{ type: 'console' }]
-        }
+          outputs: [{ type: 'console' }],
+        },
       };
     default:
       return createDefaultConfig();

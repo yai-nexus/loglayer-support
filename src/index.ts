@@ -6,38 +6,38 @@
  */
 
 // 导出所有类型
-export type * from "./types";
+export type * from './types';
 
-// 导出核心模块  
-export * from "./config";
-export * from "./environment";
-export * from "./factory";
-export * from "./transports";
-export * from "./wrapper";
+// 导出核心模块
+export * from './config';
+export * from './environment';
+export * from './factory';
+export * from './transports';
+export * from './wrapper';
 
 // 导入核心功能
-import { 
+import {
   createLogger,
   createLoggerSync,
   createNextjsLogger,
   createNextjsLoggerSync,
   createResilientLogger,
-  LoggerFactory
-} from "./factory";
-import { 
+  LoggerFactory,
+} from './factory';
+import {
   createDefaultConfig,
   createDevelopmentConfig,
   createProductionConfig,
-  createConfigForEnvironment
-} from "./config";
-import { detectEnvironment } from "./environment";
-import { 
-  generateRequestId, 
+  createConfigForEnvironment,
+} from './config';
+import { detectEnvironment } from './environment';
+import {
+  generateRequestId,
   generateTraceId,
   createPerformanceMeasurer,
   withErrorLogging,
-  withAsyncErrorLogging
-} from "./wrapper";
+  withAsyncErrorLogging,
+} from './wrapper';
 
 // 重新导出主要创建函数
 export {
@@ -46,7 +46,7 @@ export {
   createNextjsLogger,
   createNextjsLoggerSync,
   createResilientLogger,
-  LoggerFactory
+  LoggerFactory,
 };
 
 // 重新导出配置创建函数
@@ -54,7 +54,7 @@ export {
   createDefaultConfig,
   createDevelopmentConfig,
   createProductionConfig,
-  createConfigForEnvironment
+  createConfigForEnvironment,
 };
 
 // 重新导出工具函数
@@ -64,7 +64,7 @@ export {
   createPerformanceMeasurer,
   withErrorLogging,
   withAsyncErrorLogging,
-  detectEnvironment
+  detectEnvironment,
 };
 
 // 注意：此库采用显式初始化设计，确保日志完整性

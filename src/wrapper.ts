@@ -1,6 +1,6 @@
 /**
  * Logger 包装器模块
- * 
+ *
  * 提供增强的 Logger 接口，适配新的内部引擎架构
  * 不再依赖 LogLayer，直接包装内部引擎
  */
@@ -18,7 +18,12 @@ export class LogLayerWrapper implements IEnhancedLogger {
   private config: LoggerConfig;
   private context: LogMetadata = {};
 
-  constructor(engine: ILogger, loggerName: string, config: LoggerConfig, context: LogMetadata = {}) {
+  constructor(
+    engine: ILogger,
+    loggerName: string,
+    config: LoggerConfig,
+    context: LogMetadata = {}
+  ) {
     this.engine = engine;
     this.loggerName = loggerName;
     this.config = config;
@@ -72,10 +77,10 @@ export class LogLayerWrapper implements IEnhancedLogger {
   }
 
   forRequest(requestId: string, traceId?: string): IEnhancedLogger {
-    const context = { 
-      requestId, 
+    const context = {
+      requestId,
       ...(traceId && { traceId }),
-      requestTimestamp: new Date().toISOString()
+      requestTimestamp: new Date().toISOString(),
     };
     return this.child(context);
   }
@@ -89,17 +94,17 @@ export class LogLayerWrapper implements IEnhancedLogger {
   }
 
   // 增强方法
-  logError(error: Error, context?: LogMetadata, message = "Error occurred"): void {
+  logError(error: Error, context?: LogMetadata, message = 'Error occurred'): void {
     const errorMetadata = {
       error: {
         name: error.name,
         message: error.message,
         stack: error.stack,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ...context,
     };
-    
+
     this.error(message, errorMetadata);
   }
 
@@ -113,7 +118,7 @@ export class LogLayerWrapper implements IEnhancedLogger {
         ...metadata,
       },
     };
-    
+
     this.info(`Performance: ${operation} completed in ${duration}ms`, performanceMetadata);
   }
 
@@ -170,7 +175,7 @@ export function generateTraceId(): string {
  */
 export function createPerformanceMeasurer(logger: IEnhancedLogger, operation: string) {
   const startTime = Date.now();
-  
+
   return {
     /**
      * 完成测量并记录性能日志
@@ -180,13 +185,13 @@ export function createPerformanceMeasurer(logger: IEnhancedLogger, operation: st
       logger.logPerformance(operation, duration, metadata);
       return duration;
     },
-    
+
     /**
      * 获取当前已用时间（不记录日志）
      */
     getElapsed(): number {
       return Date.now() - startTime;
-    }
+    },
   };
 }
 

@@ -12,9 +12,8 @@ import type {
   ServerOutput,
   ClientOutput,
   ServerEngineType,
-  FormatMapping
-} from "./types";
-import { isBrowserEnvironment, canImport } from "./environment";
+} from './types';
+import { isBrowserEnvironment, canImport } from './environment';
 
 // =============================================================================
 // 工具函数
@@ -24,59 +23,26 @@ import { isBrowserEnvironment, canImport } from "./environment";
  * 生成本地时间格式的时间戳
  */
 function getLocalTimestamp(): string {
-  return new Date().toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  }).replace(/\//g, '-') + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+  return (
+    new Date()
+      .toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+      .replace(/\//g, '-') +
+    '.' +
+    String(new Date().getMilliseconds()).padStart(3, '0')
+  );
 }
 
 // =============================================================================
-// 格式映射配置（自动绑定）
+// 格式映射配置（暂未使用，预留用于后续功能扩展）
 // =============================================================================
-
-const serverFormatMapping: Record<string, FormatMapping> = {
-  stdout: {
-    format: 'pretty',
-    options: { colorize: true, timestamp: true }
-  },
-  file: {
-    format: 'pretty', 
-    options: { timestamp: true, level: true, colorize: false }
-  },
-  sls: {
-    format: 'structured',
-    options: { timestamp: true, hostname: true, pid: true }
-  },
-  http: {
-    format: 'json',
-    options: { timestamp: true }
-  }
-};
-
-const clientFormatMapping: Record<string, FormatMapping> = {
-  console: {
-    format: 'pretty',
-    options: { colorize: true, groupCollapsed: true }
-  },
-  http: {
-    format: 'json',
-    options: { 
-      timestamp: true, 
-      userAgent: true, 
-      url: true,
-      sessionId: true 
-    }
-  },
-  localstorage: {
-    format: 'json',
-    options: { timestamp: true, compact: true }
-  }
-};
 
 // =============================================================================
 // 服务端核心引擎（基础实现，零依赖）
@@ -108,7 +74,7 @@ export class CoreServerLogger implements ILogger {
         console.log('[DEBUG] Node.js modules loaded successfully:', {
           fs: !!this.fs,
           path: !!this.path,
-          http: !!this.http
+          http: !!this.http,
         });
       } catch (error) {
         console.warn('Failed to load Node.js modules:', error);
@@ -133,13 +99,17 @@ export class CoreServerLogger implements ILogger {
   }
 
   private log(level: LogLevel, message: string, meta: LogMetadata): void {
-    console.log(`[DEBUG] CoreServerLogger.log called: level=${level}, message="${message}", outputs count=${this.outputs.length}`);
+    console.log(
+      `[DEBUG] CoreServerLogger.log called: level=${level}, message="${message}", outputs count=${this.outputs.length}`
+    );
     this.outputs.forEach((output, index) => {
       console.log(`[DEBUG] Processing output ${index}:`, output);
-      
+
       // 检查级别过滤
       if (output.level && !this.shouldLog(level, output.level)) {
-        console.log(`[DEBUG] Skipping output ${index} due to level filter: message=${level}, required=${output.level}`);
+        console.log(
+          `[DEBUG] Skipping output ${index} due to level filter: message=${level}, required=${output.level}`
+        );
         return;
       }
 
@@ -175,22 +145,22 @@ export class CoreServerLogger implements ILogger {
   private writeToFile(message: string, meta: LogMetadata, level: string, config: any = {}): void {
     console.log('[DEBUG] writeToFile called with config:', config);
     console.log('[DEBUG] fs and path available:', { fs: !!this.fs, path: !!this.path });
-    
+
     if (!this.fs || !this.path) {
       console.log('[DEBUG] Missing fs or path modules, skipping file write');
       return;
     }
-    
+
     const timestamp = getLocalTimestamp();
     const formatted = `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}\n`;
-    
+
     try {
       const dir = config?.dir || './logs';
       const filename = config?.filename || 'app.log';
       const filePath = this.path.join(dir, filename);
-      
+
       console.log('[DEBUG] File write details:', { dir, filename, filePath });
-      
+
       // 确保目录存在
       if (!this.fs.existsSync(dir)) {
         console.log('[DEBUG] Directory does not exist, creating:', dir);
@@ -199,7 +169,7 @@ export class CoreServerLogger implements ILogger {
       } else {
         console.log('[DEBUG] Directory already exists:', dir);
       }
-      
+
       console.log('[DEBUG] Writing to file:', filePath);
       console.log('[DEBUG] Content to write:', formatted.trim());
       this.fs.appendFileSync(filePath, formatted);
@@ -217,7 +187,7 @@ export class CoreServerLogger implements ILogger {
       message,
       ...meta,
       hostname: require('os').hostname?.() || 'unknown',
-      pid: process.pid
+      pid: process.pid,
     };
 
     // 这里应该调用实际的 SLS SDK
@@ -231,7 +201,7 @@ export class CoreServerLogger implements ILogger {
       timestamp: new Date().toISOString(),
       level,
       message,
-      ...meta
+      ...meta,
     };
 
     // 简单的 HTTP 发送实现
@@ -274,7 +244,7 @@ export class BrowserLogger implements ILogger {
   }
 
   private log(level: LogLevel, message: string, meta: LogMetadata): void {
-    this.outputs.forEach(output => {
+    this.outputs.forEach((output) => {
       // 检查级别过滤
       if (output.level && !this.shouldLog(level, output.level)) {
         return;
@@ -303,7 +273,7 @@ export class BrowserLogger implements ILogger {
     const timestamp = new Date().toISOString();
     const style = this.getConsoleStyle(level);
     const hasMetadata = Object.keys(meta).length > 0;
-    
+
     if (hasMetadata) {
       console.groupCollapsed(`%c${timestamp} [${level.toUpperCase()}] ${message}`, style);
       console.table(meta);
@@ -319,9 +289,15 @@ export class BrowserLogger implements ILogger {
       level,
       message,
       ...meta,
-      userAgent: typeof (globalThis as any).navigator !== 'undefined' ? (globalThis as any).navigator.userAgent : 'unknown',
-      url: typeof (globalThis as any).window !== 'undefined' ? (globalThis as any).window.location.href : 'unknown',
-      sessionId: this.getSessionId()
+      userAgent:
+        typeof (globalThis as any).navigator !== 'undefined'
+          ? (globalThis as any).navigator.userAgent
+          : 'unknown',
+      url:
+        typeof (globalThis as any).window !== 'undefined'
+          ? (globalThis as any).window.location.href
+          : 'unknown',
+      sessionId: this.getSessionId(),
     };
 
     const endpoint = config?.endpoint || '/api/client-logs';
@@ -330,14 +306,14 @@ export class BrowserLogger implements ILogger {
     fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify(logData)
-    }).catch(err => console.warn('日志上报失败:', err));
+      body: JSON.stringify(logData),
+    }).catch((err) => console.warn('日志上报失败:', err));
   }
 
   private saveToStorage(message: string, meta: LogMetadata, level: string, config: any = {}): void {
     const key = config?.key || 'app-logs';
     const maxEntries = config?.maxEntries || 100;
-    
+
     try {
       if (typeof (globalThis as any).localStorage === 'undefined') return;
       const logs = JSON.parse((globalThis as any).localStorage.getItem(key) || '[]');
@@ -345,16 +321,16 @@ export class BrowserLogger implements ILogger {
         timestamp: new Date().toISOString(),
         level,
         message,
-        ...meta
+        ...meta,
       };
-      
+
       logs.push(newLog);
-      
+
       // 保持最大条数限制
       if (logs.length > maxEntries) {
         logs.splice(0, logs.length - maxEntries);
       }
-      
+
       (globalThis as any).localStorage.setItem(key, JSON.stringify(logs));
     } catch (error) {
       console.warn('Failed to save to localStorage:', error);
@@ -364,9 +340,9 @@ export class BrowserLogger implements ILogger {
   private getConsoleStyle(level: string): string {
     const styles = {
       debug: 'color: #888',
-      info: 'color: #2196F3', 
+      info: 'color: #2196F3',
       warn: 'color: #FF9800',
-      error: 'color: #F44336'
+      error: 'color: #F44336',
     };
     return styles[level as keyof typeof styles] || '';
   }
@@ -375,7 +351,7 @@ export class BrowserLogger implements ILogger {
     if (typeof (globalThis as any).sessionStorage === 'undefined') {
       return 'sess_' + Math.random().toString(36).substr(2, 9);
     }
-    
+
     let sessionId = (globalThis as any).sessionStorage.getItem('log-session-id');
     if (!sessionId) {
       sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
@@ -400,9 +376,9 @@ export class PinoAdapter implements ILogger {
   constructor(pinoInstance: any, outputs: ServerOutput[]) {
     this.pino = pinoInstance;
     this.outputs = outputs;
-    
+
     // 过滤掉 stdout 输出，避免与 Pino 重复
-    const customOutputs = outputs.filter(output => output.type !== 'stdout');
+    const customOutputs = outputs.filter((output) => output.type !== 'stdout');
     this.coreLogger = new CoreServerLogger(customOutputs);
   }
 
@@ -440,9 +416,9 @@ export class WinstonAdapter implements ILogger {
   constructor(winstonInstance: any, outputs: ServerOutput[]) {
     this.winston = winstonInstance;
     this.outputs = outputs;
-    
+
     // 过滤掉 stdout 输出，避免与 Winston 重复
-    const customOutputs = outputs.filter(output => output.type !== 'stdout');
+    const customOutputs = outputs.filter((output) => output.type !== 'stdout');
     this.coreLogger = new CoreServerLogger(customOutputs);
   }
 
@@ -497,18 +473,13 @@ export class EngineLoader {
         return new PinoAdapter(pinoLogger, outputs);
       }
 
-      // 2. 备选：Winston（如果可用） 
+      // 2. 备选：Winston（如果可用）
       if (await canImport('winston')) {
         const winston = await import('winston');
         const winstonLogger = winston.createLogger({
           level: 'debug',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json()
-          ),
-          transports: [
-            new winston.transports.Console()
-          ]
+          format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+          transports: [new winston.transports.Console()],
         });
         return new WinstonAdapter(winstonLogger, outputs);
       }
@@ -539,9 +510,9 @@ export class EngineLoader {
 
     switch (engineType) {
       case 'pino':
-        return await canImport('pino') && await canImport('@loglayer/transport-pino');
+        return (await canImport('pino')) && (await canImport('@loglayer/transport-pino'));
       case 'winston':
-        return await canImport('winston') && await canImport('@loglayer/transport-winston');
+        return (await canImport('winston')) && (await canImport('@loglayer/transport-winston'));
       case 'core':
         return true; // 核心引擎总是可用
       default:

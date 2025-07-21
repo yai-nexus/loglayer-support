@@ -5,18 +5,19 @@
  * 基于 docs/implementation-strategy.md 的设计
  */
 
-import type { EnvironmentInfo } from "./types";
+import type { EnvironmentInfo } from './types';
 
 /**
  * 检测当前运行环境（简化版本，专注隔离）
  */
 export function detectEnvironment(): EnvironmentInfo {
-  const isServer = typeof globalThis !== 'undefined' && typeof (globalThis as any).window === 'undefined';
+  const isServer =
+    typeof globalThis !== 'undefined' && typeof (globalThis as any).window === 'undefined';
   const isClient = !isServer;
 
   // 简化的环境检测
   let environment: 'development' | 'production' | 'test' = 'development';
-  
+
   if (typeof process !== 'undefined' && process.env?.NODE_ENV) {
     const nodeEnv = process.env.NODE_ENV;
     if (nodeEnv === 'production' || nodeEnv === 'test') {
@@ -35,26 +36,30 @@ export function detectEnvironment(): EnvironmentInfo {
  * 检查是否在浏览器环境中
  */
 export function isBrowserEnvironment(): boolean {
-  return typeof globalThis !== 'undefined' && 
-         typeof (globalThis as any).window !== 'undefined' && 
-         typeof (globalThis as any).document !== 'undefined';
+  return (
+    typeof globalThis !== 'undefined' &&
+    typeof (globalThis as any).window !== 'undefined' &&
+    typeof (globalThis as any).document !== 'undefined'
+  );
 }
 
 /**
  * 检查是否在 Node.js 环境中
  */
 export function isNodeEnvironment(): boolean {
-  return typeof globalThis !== 'undefined' && 
-         typeof (globalThis as any).window === 'undefined' && 
-         typeof process !== 'undefined' && 
-         typeof process.versions?.node !== 'undefined';
+  return (
+    typeof globalThis !== 'undefined' &&
+    typeof (globalThis as any).window === 'undefined' &&
+    typeof process !== 'undefined' &&
+    typeof process.versions?.node !== 'undefined'
+  );
 }
 
 /**
  * 安全获取环境变量（只在服务端可用）
  */
-export function getEnvVar(key: string, defaultValue: string = ""): string {
-  if (typeof process === "undefined" || !process.env) {
+export function getEnvVar(key: string, defaultValue: string = ''): string {
+  if (typeof process === 'undefined' || !process.env) {
     return defaultValue;
   }
   return process.env[key] || defaultValue;
