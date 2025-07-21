@@ -1,0 +1,40 @@
+{
+  "name": "loglayer-basic-example",
+  "version": "1.0.0",
+  "description": "Basic usage examples for loglayer-support with modular demonstrations",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-modules dist/index.js",
+    "dev": "npx tsx index.ts",
+    "build": "npx tsc",
+    "clean": "rm -rf dist/ *.js *.d.ts",
+    "test": "npm run build && npm run start",
+    "example:presets": "npx tsx details/config-presets.ts",
+    "example:custom": "npx tsx details/custom-config.ts",
+    "example:enhanced": "npx tsx details/enhanced-features.ts",
+    "example:production": "npx tsx details/production-config.ts",
+    "example:multiple": "npx tsx details/multiple-outputs.ts"
+  },
+  "dependencies": {
+    "loglayer-support": "file:../../"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "logging",
+    "loglayer",
+    "examples",
+    "nodejs",
+    "typescript",
+    "modular"
+  ]
+}

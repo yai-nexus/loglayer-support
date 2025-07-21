@@ -50,7 +50,7 @@ async function example2_CustomConfig() {
         {
           type: 'file',
           config: {
-            dir: './logs',
+            dir: '../../logs',
             filename: 'basic.log',
             maxSize: '10MB',
             maxFiles: 5
@@ -155,7 +155,7 @@ async function example4_ProductionConfig() {
         { 
           type: 'file',
           config: { 
-            dir: './logs',
+            dir: '/var/log/app',
             filename: 'production.log',
             maxSize: '50MB',
             maxFiles: 10

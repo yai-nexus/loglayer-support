@@ -160,6 +160,10 @@ export class CoreServerLogger implements ILogger {
   private sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): void {
     // 检查必需的配置参数
     if (!config?.endpoint || !config?.project || !config?.logstore || !config?.accessKey || !config?.accessKeySecret) {
+      // 如果是开发环境，提供友好提示
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[LogLayer SLS] 缺少必需的 SLS 配置，请检查环境变量：SLS_ENDPOINT, SLS_PROJECT, SLS_LOGSTORE, SLS_ACCESS_KEY, SLS_ACCESS_KEY_SECRET');
+      }
       return; // 静默失败，保持与其他传输方法一致
     }
 
