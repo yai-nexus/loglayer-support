@@ -32,8 +32,7 @@ jobs:
         run: npm ci
         
       - name: 运行代码检查
-        run: |
-          npm run lint
+        run: npm run lint
           
       - name: 构建项目
         run: npm run build
