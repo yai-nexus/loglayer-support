@@ -47,7 +47,8 @@
   "author": "YAI Nexus Team",
   "license": "MIT",
   "dependencies": {
-    "loglayer": "^6.6.0"
+    "loglayer": "^6.6.0",
+    "@alicloud/log": "^1.2.5"
   },
   "optionalDependencies": {
     "@loglayer/transport-pino": "^2.0.0",

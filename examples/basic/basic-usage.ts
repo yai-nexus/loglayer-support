@@ -50,7 +50,7 @@ async function example2_CustomConfig() {
         {
           type: 'file',
           config: {
-            dir: '../../logs',
+            dir: './logs',
             filename: 'basic.log',
             maxSize: '10MB',
             maxFiles: 5
@@ -155,7 +155,7 @@ async function example4_ProductionConfig() {
         { 
           type: 'file',
           config: { 
-            dir: '/var/log/app',
+            dir: './logs',
             filename: 'production.log',
             maxSize: '50MB',
             maxFiles: 10
@@ -165,10 +165,12 @@ async function example4_ProductionConfig() {
           type: 'sls',          // 云端日志收集
           level: 'warn',        // 只收集警告及以上级别
           config: {
-            endpoint: 'https://sls.aliyun.com',
-            project: 'my-project',
-            logstore: 'production-logs',
-            accessKey: process.env.SLS_ACCESS_KEY
+            endpoint: 'cn-beijing.log.aliyuncs.com',
+            project: 'yai-log-test',
+            logstore: 'app-log',
+            accessKey: 'LTAI5tNpnJzbTm6PBdmAfzKp',
+            accessKeySecret: 'pUOfZVW7Qk0L78Ku4Ber1ysr2bvXol',
+            appName: 'loglayer-basic-production'
           }
         }
       ]
@@ -235,6 +237,18 @@ async function example5_MultipleOutputs() {
           config: { 
             url: 'http://monitoring.example.com/logs',
             headers: { 'Authorization': 'Bearer token123' }
+          }
+        },
+        {
+          type: 'sls',                                        // 阿里云日志服务
+          level: 'info',                                      // 信息及以上发送到 SLS
+          config: {
+            endpoint: 'cn-beijing.log.aliyuncs.com',
+            project: 'yai-log-test',
+            logstore: 'app-log',
+            accessKey: 'LTAI5tNpnJzbTm6PBdmAfzKp',
+            accessKeySecret: 'pUOfZVW7Qk0L78Ku4Ber1ysr2bvXol',
+            appName: 'loglayer-basic-multi'
           }
         }
       ]

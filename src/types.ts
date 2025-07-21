@@ -103,6 +103,8 @@ export interface ServerOutputConfig {
   project?: string; // 项目名
   logstore?: string; // 日志库
   accessKey?: string; // 访问密钥
+  accessKeySecret?: string; // 访问密钥密码
+  appName?: string; // 应用名称
 
   // http 类型配置
   url?: string; // HTTP 端点

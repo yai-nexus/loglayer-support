@@ -22,7 +22,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(npm run lint)",
-      "Bash(npm run format:*)"
+      "Bash(npm run format:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }

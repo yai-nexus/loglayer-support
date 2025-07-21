@@ -157,11 +157,55 @@ export class CoreServerLogger implements ILogger {
     }
   }
 
-  private sendToSls(message: string, meta: LogMetadata, level: string, _config: any = {}): void {
-    // SLS 实现（结构化格式）
-    // SLS log data would include:\n    // timestamp, level, message, meta, hostname, pid
-    // 这里应该调用实际的 SLS SDK
-    // SLS transport not fully implemented
+  private sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): void {
+    // 检查必需的配置参数
+    if (!config?.endpoint || !config?.project || !config?.logstore || !config?.accessKey || !config?.accessKeySecret) {
+      return; // 静默失败，保持与其他传输方法一致
+    }
+
+    try {
+      // 动态导入 SLS SDK
+      const Client = require('@alicloud/log');
+      
+      // 创建 SLS 客户端
+      const client = new Client({
+        accessKeyId: config.accessKey,
+        accessKeySecret: config.accessKeySecret,
+        endpoint: config.endpoint,
+      });
+
+      // 构建结构化日志数据 - SLS 格式需要键值对
+      const timestamp = Math.floor(Date.now() / 1000); // SLS 需要秒级时间戳
+      const logContent = {
+        level,
+        message,
+        hostname: require('os').hostname(),
+        pid: String(process.pid), // SLS 需要字符串值
+        app_name: config.appName || 'unknown',
+        // 将 meta 数据也转换为字符串
+        ...Object.fromEntries(
+          Object.entries(meta).map(([key, value]) => [key, String(value)])
+        )
+      };
+
+      // 发送日志到 SLS
+      const logGroup = {
+        logs: [
+          {
+            content: logContent,
+            timestamp: timestamp
+          }
+        ],
+        topic: config.topic || 'loglayer',
+        source: config.source || 'nodejs',
+      };
+
+      client.postLogStoreLogs(config.project, config.logstore, logGroup).catch(() => {
+        // SLS 发送失败，静默处理
+      });
+    } catch (error) {
+      // SLS SDK 不可用或其他错误，静默处理
+    }
   }
 
   private sendToHttp(message: string, meta: LogMetadata, level: string, _config: any = {}): void {
