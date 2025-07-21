@@ -5,6 +5,14 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.5.0] - 2025-07-22
+
+### 版本发布
+- 🚀 发布 v0.5.0 版本
+- 📦 更新包版本到 0.5.0
+- 🏷️ 创建对应的 Git 标签
+- 📋 发布 GitHub Release
+
 ## [0.4.9] - 2025-07-21
 
 ### 文档优化

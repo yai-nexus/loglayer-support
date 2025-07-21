@@ -5,7 +5,7 @@
  */
 
 import { createLogger, createDefaultConfig, createDevelopmentConfig } from 'loglayer-support';
-import { printExampleTitle, createExampleRunner } from '../lib/shared-utils.js';
+import { printExampleTitle, createExampleRunner } from '../lib/shared-utils.ts';
 
 /**
  * 使用预设配置示例

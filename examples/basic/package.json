@@ -1,6 +1,6 @@
 {
   "name": "loglayer-basic-example",
-  "version": "1.0.0",
+  "version": "0.5.0",
   "description": "Basic usage examples for loglayer-support with modular demonstrations",
   "private": true,
   "type": "module",

@@ -5,7 +5,7 @@
  */
 
 import { createLogger, createDevelopmentConfig } from 'loglayer-support';
-import { createExampleRunner, delay } from '../lib/shared-utils.js';
+import { createExampleRunner, delay } from '../lib/shared-utils.ts';
 
 /**
  * 增强功能示例

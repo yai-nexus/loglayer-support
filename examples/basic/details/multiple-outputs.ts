@@ -6,7 +6,7 @@
 
 import { createLogger } from 'loglayer-support';
 import type { LoggerConfig } from 'loglayer-support';
-import { createExampleRunner, getSLSConfig, getLogsDir } from '../lib/shared-utils.js';
+import { createExampleRunner, getSLSConfig, getLogsDir } from '../lib/shared-utils.ts';
 
 /**
  * 多输出配置示例
@@ -19,7 +19,7 @@ async function runMultipleOutputsExample(): Promise<void> {
         { type: 'stdout' },                                   // 控制台实时查看
         { 
           type: 'file', 
-          config: { dir: getLogsDir(), filename: 'all.log' }     // 完整日志文件
+          config: { dir: getLogsDir(), filename: 'multi.log' }
         },
         { 
           type: 'file',

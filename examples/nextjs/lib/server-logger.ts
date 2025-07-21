@@ -3,12 +3,8 @@
  * 在 API 路由中使用，支持文件输出到项目根目录的 logs 目录
  */
 
-import { detectEnvironment, getEffectiveOutputs, LogLayerWrapper } from '../../../src'
-import { CoreServerLogger } from '../../../src/transports'
-import type { LoggerConfig, ServerOutput } from '../../../src/types'
-
-// 创建自定义配置，使用相对路径指向项目根目录的 logs 目录
-const env = detectEnvironment();
+import { createLogger } from 'loglayer-support'
+import type { LoggerConfig, IEnhancedLogger } from 'loglayer-support'
 
 // 获取项目根目录路径（相对于当前工作目录）
 const getProjectLogsDir = () => {
@@ -24,6 +20,7 @@ const getProjectLogsDir = () => {
 
 const logsDir = getProjectLogsDir();
 
+// 创建适用于 Next.js 服务端的配置
 const serverConfig: LoggerConfig = {
   level: {
     default: 'debug',
@@ -51,33 +48,62 @@ const serverConfig: LoggerConfig = {
   }
 }
 
-// 创建服务端 logger - 使用自定义配置
-console.log('[DEBUG] Creating server logger with custom config...');
+// 创建异步初始化的服务端 logger
+console.log('[DEBUG] Creating server logger with public API...');
 console.log('[DEBUG] Current working directory:', process.cwd());
 console.log('[DEBUG] Logs directory:', logsDir);
 
-const outputs = getEffectiveOutputs(serverConfig, env);
-const serverOutputs = outputs.filter(output =>
-  output.type === 'stdout' || output.type === 'file' || output.type === 'sls' || output.type === 'http'
-) as ServerOutput[];
-const coreLogger = new CoreServerLogger(serverOutputs);
-export const serverLogger = new LogLayerWrapper(coreLogger, 'nextjs-server', serverConfig);
-
-console.log('[DEBUG] Server logger created successfully');
-
-// 记录 Next.js 应用启动日志
-serverLogger.info('Next.js 应用启动', {
-  environment: env.environment,
-  nodeVersion: process.version,
-  platform: process.platform,
-  workingDirectory: process.cwd(),
-  logsDirectory: logsDir,
-  pid: process.pid
+let serverLoggerInstance: IEnhancedLogger | null = null;
+const serverLoggerPromise = createLogger('nextjs-server', serverConfig).then(logger => {
+  serverLoggerInstance = logger;
+  console.log('[DEBUG] Server logger created successfully');
+  
+  // 记录 Next.js 应用启动日志
+  logger.info('Next.js 应用启动', {
+    nodeVersion: process.version,
+    platform: process.platform,
+    workingDirectory: process.cwd(),
+    logsDirectory: logsDir,
+    pid: process.pid
+  });
+  
+  return logger;
 });
 
-// 模块特定的 logger
-export const apiLogger = serverLogger.forModule('api')
-export const dbLogger = serverLogger.forModule('database')
+// 导出 promise 和同步访问器
+export const getServerLogger = () => {
+  if (!serverLoggerInstance) {
+    throw new Error('Server logger not initialized yet. Use await getServerLoggerAsync() instead.');
+  }
+  return serverLoggerInstance;
+};
+
+export const getServerLoggerAsync = async () => {
+  return await serverLoggerPromise;
+};
+
+// 兼容导出 - 延迟访问
+export const serverLogger = new Proxy({} as IEnhancedLogger, {
+  get(target, prop) {
+    const logger = getServerLogger();
+    return (logger as any)[prop];
+  }
+});
+
+// 模块特定的 logger - 延迟访问
+export const apiLogger = new Proxy({} as IEnhancedLogger, {
+  get(target, prop) {
+    const logger = getServerLogger().forModule('api');
+    return (logger as any)[prop];
+  }
+});
+
+export const dbLogger = new Proxy({} as IEnhancedLogger, {
+  get(target, prop) {
+    const logger = getServerLogger().forModule('database');
+    return (logger as any)[prop];
+  }
+});
 
 // 兼容导出
-export const logger = serverLogger
+export const logger = serverLogger;

@@ -5,15 +5,27 @@
  * 完全按照 docs/practical-config.md 和 docs/implementation-strategy.md 设计
  */
 
-// 导出所有类型
-export type * from './types';
+// =============================================================================
+// 公共类型导出（用户需要的类型）
+// =============================================================================
+export type {
+  // 基础类型
+  LogLevel,
+  LogMetadata,
+  IEnhancedLogger,
+  EnvironmentInfo,
+  
+  // 配置类型
+  LoggerConfig,
+  ServerOutput,
+  ClientOutput,
+  ServerOutputConfig,
+  ClientOutputConfig,
+} from './core';
 
-// 导出核心模块
-export * from './config';
-export * from './environment';
-export * from './factory';
-export * from './transports';
-export * from './wrapper';
+// =============================================================================
+// 核心API导出
+// =============================================================================
 
 // 导入核心功能
 import {
@@ -30,7 +42,7 @@ import {
   createProductionConfig,
   createConfigForEnvironment,
 } from './config';
-import { detectEnvironment } from './environment';
+import { detectEnvironment } from './core';
 import {
   generateRequestId,
   generateTraceId,
@@ -38,8 +50,9 @@ import {
   withErrorLogging,
   withAsyncErrorLogging,
 } from './wrapper';
+import { presets } from './config';
 
-// 重新导出主要创建函数
+// 核心创建函数
 export {
   createLogger,
   createLoggerSync,
@@ -49,7 +62,7 @@ export {
   LoggerFactory,
 };
 
-// 重新导出配置创建函数
+// 配置创建函数
 export {
   createDefaultConfig,
   createDevelopmentConfig,
@@ -57,7 +70,10 @@ export {
   createConfigForEnvironment,
 };
 
-// 重新导出工具函数
+// 预设配置
+export { presets };
+
+// 实用工具函数
 export {
   generateRequestId,
   generateTraceId,
@@ -67,5 +83,8 @@ export {
   detectEnvironment,
 };
 
+// =============================================================================
+// 使用说明
+// =============================================================================
 // 注意：此库采用显式初始化设计，确保日志完整性
 // 请使用 createLogger() 或 createLoggerSync() 创建 logger 实例

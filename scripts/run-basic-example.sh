@@ -34,11 +34,11 @@ echo ""
 echo "=== 运行基础示例 ==="
 cd examples/basic
 echo "📍 当前目录: $(pwd)"
-echo "🔄 运行 basic-usage.ts..."
+echo "🔄 运行 index.ts..."
 echo ""
 
 # 执行示例
-if npx ts-node basic-usage.ts; then
+if npx ts-node index.ts; then
     echo ""
     echo "✅ 基础示例运行成功"
 else

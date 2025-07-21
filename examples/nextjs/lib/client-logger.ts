@@ -2,13 +2,15 @@
 
 /**
  * 客户端专用日志功能
- * 避免在客户端导入 Node.js 模块
+ * 使用轻量级实现避免导入 Node.js 模块
  */
+
+import type { LogLevel, LogMetadata } from 'loglayer-support'
 
 interface LogData {
   level: string
   message: string
-  metadata?: any
+  metadata?: LogMetadata
   timestamp: string
   userAgent?: string
   url?: string
@@ -40,7 +42,7 @@ class ClientLogger {
     return sessionId
   }
 
-  private createLogData(level: string, message: string, metadata: any = {}, error?: Error): LogData {
+  private createLogData(level: string, message: string, metadata: LogMetadata = {}, error?: Error): LogData {
     const logData: LogData = {
       level,
       message,
@@ -62,7 +64,7 @@ class ClientLogger {
     return logData
   }
 
-  private log(level: string, message: string, metadata: any = {}, error?: Error) {
+  private log(level: string, message: string, metadata: LogMetadata = {}, error?: Error) {
     const logData = this.createLogData(level, message, metadata, error)
     
     // 浏览器控制台输出
@@ -138,28 +140,28 @@ class ClientLogger {
     }
   }
 
-  info(message: string, metadata: any = {}) {
+  info(message: string, metadata: LogMetadata = {}) {
     this.log('info', message, metadata)
   }
 
-  debug(message: string, metadata: any = {}) {
+  debug(message: string, metadata: LogMetadata = {}) {
     this.log('debug', message, metadata)
   }
 
-  warn(message: string, metadata: any = {}) {
+  warn(message: string, metadata: LogMetadata = {}) {
     this.log('warn', message, metadata)
   }
 
-  error(message: string, metadata: any = {}) {
+  error(message: string, metadata: LogMetadata = {}) {
     this.log('error', message, metadata)
   }
 
-  logError(error: Error, metadata: any = {}, customMessage?: string) {
+  logError(error: Error, metadata: LogMetadata = {}, customMessage?: string) {
     const message = customMessage || error.message
     this.log('error', message, metadata, error)
   }
 
-  logPerformance(operation: string, duration: number, metadata: any = {}) {
+  logPerformance(operation: string, duration: number, metadata: LogMetadata = {}) {
     const perfData = {
       operation,
       duration: `${duration.toFixed(2)}ms`,
@@ -172,6 +174,17 @@ class ClientLogger {
       performance: perfData,
       ...metadata
     })
+  }
+
+  // LogLayerWrapper 兼容接口
+  forModule(moduleName: string) {
+    // 客户端简化实现，返回同一个实例
+    return this
+  }
+
+  forRequest(requestId: string) {
+    // 客户端简化实现，返回同一个实例
+    return this
   }
 }
 

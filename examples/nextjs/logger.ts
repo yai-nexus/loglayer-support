@@ -4,8 +4,8 @@
  * 展示如何在 Next.js 项目中配置和使用 Logger
  */
 
-import { createLoggerSync, detectEnvironment } from '../../src';
-import type { LoggerConfig } from '../../src/types';
+import { createLoggerSync, detectEnvironment } from 'loglayer-support';
+import type { LoggerConfig } from 'loglayer-support';
 
 // =============================================================================
 // Next.js 专用配置

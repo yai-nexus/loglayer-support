@@ -1,11 +1,10 @@
 /**
- * 配置管理模块
- *
- * 处理新的用户友好配置格式
- * 基于 docs/practical-config.md 的设计
+ * 配置验证和工具函数
+ * 
+ * 处理配置验证、级别检查和输出配置获取等核心逻辑
  */
 
-import type { LoggerConfig, LogLevel, EnvironmentInfo, ServerOutput, ClientOutput } from './types';
+import type { LoggerConfig, LogLevel, EnvironmentInfo, ServerOutput, ClientOutput } from '../core';
 
 /**
  * 验证配置的有效性
@@ -109,23 +108,6 @@ export function getEffectiveOutputs(config: LoggerConfig, env: EnvironmentInfo) 
 }
 
 /**
- * 创建默认配置
- */
-export function createDefaultConfig(): LoggerConfig {
-  return {
-    level: {
-      default: 'info',
-    },
-    server: {
-      outputs: [{ type: 'stdout' }],
-    },
-    client: {
-      outputs: [{ type: 'console' }],
-    },
-  };
-}
-
-/**
  * 合并配置（深度合并）
  */
 export function mergeConfigs(
@@ -149,94 +131,4 @@ export function mergeConfigs(
   };
 
   return merged;
-}
-
-/**
- * 为开发环境创建推荐配置
- */
-export function createDevelopmentConfig(): LoggerConfig {
-  return {
-    level: {
-      default: 'debug',
-    },
-    server: {
-      outputs: [
-        { type: 'stdout' },
-        {
-          type: 'file',
-          config: {
-            dir: './logs',
-            filename: 'app.log',
-          },
-        },
-      ],
-    },
-    client: {
-      outputs: [{ type: 'console' }],
-    },
-  };
-}
-
-/**
- * 为生产环境创建推荐配置
- */
-export function createProductionConfig(): LoggerConfig {
-  return {
-    level: {
-      default: 'info',
-      loggers: {
-        debug: 'error',
-        test: 'error',
-      },
-    },
-    server: {
-      outputs: [
-        { type: 'stdout' },
-        {
-          type: 'file',
-          config: {
-            dir: '/var/log/app',
-            filename: 'app.log',
-            maxSize: '10MB',
-            maxFiles: 5,
-          },
-        },
-      ],
-    },
-    client: {
-      outputs: [
-        {
-          type: 'http',
-          level: 'warn',
-          config: {
-            endpoint: '/api/client-logs',
-          },
-        },
-      ],
-    },
-  };
-}
-
-/**
- * 基于环境自动创建配置
- */
-export function createConfigForEnvironment(env: EnvironmentInfo): LoggerConfig {
-  switch (env.environment) {
-    case 'development':
-      return createDevelopmentConfig();
-    case 'production':
-      return createProductionConfig();
-    case 'test':
-      return {
-        level: { default: 'error' },
-        server: {
-          outputs: [{ type: 'stdout' }],
-        },
-        client: {
-          outputs: [{ type: 'console' }],
-        },
-      };
-    default:
-      return createDefaultConfig();
-  }
 }

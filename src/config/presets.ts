@@ -4,7 +4,7 @@
  * 提供常用的日志配置预设
  */
 
-import type { LoggerConfig, LogLevel } from './types';
+import type { LoggerConfig, LogLevel } from '../core';
 
 /**
  * 通用日志配置工厂函数

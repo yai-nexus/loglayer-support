@@ -6,7 +6,7 @@
 
 import { createLogger } from 'loglayer-support';
 import type { LoggerConfig } from 'loglayer-support';
-import { createExampleRunner, createFileLogConfig } from '../lib/shared-utils.js';
+import { createExampleRunner, createFileLogConfig } from '../lib/shared-utils.ts';
 
 /**
  * 自定义配置示例

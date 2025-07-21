@@ -4,11 +4,11 @@
  * 这个文件是所有示例的统一入口点，按顺序运行所有示例
  */
 
-import { configPresetsExample } from './details/config-presets.js';
-import { customConfigExample } from './details/custom-config.js';
-import { enhancedFeaturesExample } from './details/enhanced-features.js';
-import { productionConfigExample } from './details/production-config.js';
-import { multipleOutputsExample } from './details/multiple-outputs.js';
+import { configPresetsExample } from './details/config-presets.ts';
+import { customConfigExample } from './details/custom-config.ts';
+import { enhancedFeaturesExample } from './details/enhanced-features.ts';
+import { productionConfigExample } from './details/production-config.ts';
+import { multipleOutputsExample } from './details/multiple-outputs.ts';
 
 /**
  * 运行所有示例
