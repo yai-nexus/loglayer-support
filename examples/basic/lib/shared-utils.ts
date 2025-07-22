@@ -32,7 +32,7 @@ export function getSLSConfig(): Record<string, string> {
     endpoint: process.env.SLS_ENDPOINT!,
     project: process.env.SLS_PROJECT!,
     logstore: process.env.SLS_LOGSTORE!,
-    accessKey: process.env.SLS_ACCESS_KEY!,
+    accessKeyId: process.env.SLS_ACCESS_KEY_ID!,
     accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET!,
     appName: process.env.SLS_APP_NAME!
   };

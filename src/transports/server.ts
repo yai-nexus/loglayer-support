@@ -123,7 +123,7 @@ export class CoreServerLogger implements ILogger {
       !config?.endpoint ||
       !config?.project ||
       !config?.logstore ||
-      !config?.accessKey ||
+      !config?.accessKeyId ||
       !config?.accessKeySecret
     ) {
       // 如果是开发环境，提供友好提示
@@ -141,7 +141,7 @@ export class CoreServerLogger implements ILogger {
 
       // 创建 SLS 客户端
       const client = new Client({
-        accessKeyId: config.accessKey,
+        accessKeyId: config.accessKeyId,
         accessKeySecret: config.accessKeySecret,
         endpoint: config.endpoint,
       });
