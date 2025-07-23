@@ -31,7 +31,10 @@
       "Bash(npx tsc:*)",
       "Bash(mv:*)",
       "Bash(bash:*)",
-      "mcp__filesystem__write_file"
+      "mcp__filesystem__write_file",
+      "mcp__filesystem__read_file",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__create_directory"
     ],
     "deny": []
   }
