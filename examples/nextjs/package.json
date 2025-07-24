@@ -1,7 +1,7 @@
 {
   "name": "loglayer-nextjs-example",
-  "version": "0.5.1",
-  "description": "NextJS example for loglayer-support with complete client/server logging demonstration",
+  "version": "0.6.0",
+  "description": "NextJS example for loglayer-support with new framework presets API demonstration",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,7 +15,7 @@
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "loglayer-support": "file:../../"
+    "@yai-nexus/loglayer-support": "file:../../"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

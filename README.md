@@ -1,15 +1,24 @@
 # @yai-nexus/loglayer-support
 
-🚀 **基于 LogLayer 的统一日志解决方案** - 专为 Next.js 和现代 JavaScript 应用设计
+🚀 **企业级日志解决方案** - 为现代 Web 应用提供开箱即用的日志功能
 
 [![npm version](https://badge.fury.io/js/@yai-nexus%2Floglayer-support.svg)](https://www.npmjs.com/package/@yai-nexus/loglayer-support)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## ✨ 新功能亮点 (v0.6.0)
+
+🎉 **全新框架预设 API** - 开箱即用的日志解决方案！
+
+- **🌐 createBrowserLogger** - 强大的浏览器端日志器（多输出、采样、性能监控）
+- **🖥️ createServerLogger** - 企业级服务端日志器（模块化、健康检查、优雅关闭）
+- **📨 createLogReceiver** - 通用日志接收器（多框架支持、安全验证、批量处理）
+
 ## 🎯 为什么选择这个库？
 
-- **🛡️ 解决 Next.js 兼容性问题**：在 Edge Runtime 和 Serverless 环境中稳定工作
-- **🔄 架构解耦设计**：代码与具体日志实现分离，可随时切换底层日志库
-- **⚡ 零配置启动**：一行代码即可开始使用，同时保留完全自定义能力
+- **🚀 开箱即用**：框架预设让您 30 秒内完成日志配置
+- **🔧 高度可配置**：从零配置到企业级定制，满足所有需求
+- **🌐 多框架支持**：Next.js、Express.js、React 等主流框架
+- **🛡️ 企业级特性**：安全验证、性能监控、健康检查、优雅关闭
 - **📈 生产就绪**：经过实际项目验证，支持高并发和复杂场景
 
 ## 📦 安装
@@ -20,68 +29,138 @@ npm install @yai-nexus/loglayer-support
 
 ## 🚀 快速开始
 
-### Next.js 应用
+### 🌐 浏览器端日志器
 
 ```typescript
-import { createNextjsLoggerSync } from '@yai-nexus/loglayer-support';
+import { createBrowserLogger } from '@yai-nexus/loglayer-support';
 
-const logger = createNextjsLoggerSync();
-
-logger.info('应用启动成功');
-logger.error('发生错误', { error: new Error('示例错误') });
-```
-
-### Node.js 服务
-
-```typescript
-import { createLoggerWithPreset } from '@yai-nexus/loglayer-support';
-
-const logger = await createLoggerWithPreset('production');
-logger.info('服务启动', { port: 3000 });
-```
-
-### 结构化日志（推荐）
-
-```typescript
-// ✅ 使用结构化数据，便于查询和分析
-logger.info('用户登录', {
-  userId: '12345',
-  ip: '192.168.1.1',
-  userAgent: 'Chrome/91.0'
+// 创建功能强大的浏览器端日志器
+const logger = await createBrowserLogger({
+  outputs: {
+    console: { colorized: true },           // 彩色控制台输出
+    localStorage: { maxEntries: 1000 },     // 本地存储
+    http: {
+      endpoint: '/api/logs',                // 发送到服务端
+      batchSize: 10,                        // 批量发送
+      retryAttempts: 3                      // 重试机制
+    }
+  },
+  errorHandling: {
+    captureGlobalErrors: true               // 自动捕获全局错误
+  }
 });
 
-// ✅ 错误处理最佳实践
-try {
-  await riskyOperation();
-} catch (error) {
-  logger.error('操作失败', {
-    operation: 'riskyOperation',
-    error: error.message,
-    context: { userId: '12345' }
-  });
+logger.info('用户操作', { action: 'click', element: 'button' });
+logger.error('API 调用失败', { endpoint: '/api/users', status: 500 });
+```
+
+### 🖥️ 服务端日志器 (Next.js)
+
+```typescript
+// lib/server-logger.ts
+import { createNextjsServerLogger } from '@yai-nexus/loglayer-support';
+
+export const serverInstance = await createNextjsServerLogger({
+  modules: {
+    api: { level: 'info' },                 // API 模块
+    database: { level: 'debug' },           // 数据库模块
+    auth: { level: 'warn' }                 // 认证模块
+  },
+  performance: { enabled: true },           // 性能监控
+  healthCheck: { enabled: true }            // 健康检查
+});
+
+export const serverLogger = serverInstance.logger;
+export const apiLogger = serverInstance.forModule('api');
+
+// API 路由中使用
+// app/api/users/route.ts
+import { apiLogger } from '../../../lib/server-logger';
+
+export async function GET() {
+  apiLogger.info('获取用户列表请求');
+  // ... 处理逻辑
 }
 ```
 
-## � 文档导航
+### 📨 日志接收器 (自动处理客户端日志)
 
-- **[详细使用指南](./docs/usage-guide.md)** - 完整的使用教程和高级功能
-- **[API 参考文档](./docs/api-reference.md)** - 所有函数和配置选项的详细说明
-- **[最佳实践指南](./docs/best-practices.md)** - 性能优化和代码规范建议
-- **[故障排除指南](./docs/troubleshooting.md)** - 常见问题解答和解决方案
+```typescript
+// app/api/logs/route.ts
+import { createNextjsLogReceiver } from '@yai-nexus/loglayer-support';
+import { serverLogger } from '../../../lib/server-logger';
+
+// 一行代码创建完整的日志接收 API
+export const POST = createNextjsLogReceiver(serverLogger, {
+  validation: {
+    requireLevel: true,
+    maxMessageLength: 2000
+  },
+  processing: {
+    supportBatch: true,                     // 支持批量处理
+    maxBatchSize: 50
+  },
+  security: {
+    rateLimiting: {                         // 速率限制
+      maxRequestsPerMinute: 100
+    }
+  }
+});
+
+// 状态查询端点
+export async function GET() {
+  const status = POST.getStatus();
+  return NextResponse.json(status);
+}
+```
 
 ## 🏗️ 核心特性
 
-- **🔄 可移植性**: 底层日志库可随时切换，业务代码无需修改
-- **🛡️ 健壮性**: 自动回退机制，确保在任何环境下都能工作
-- **🎯 专业性**: 专为 Next.js 和现代 JavaScript 应用优化
-- **📈 可扩展**: 支持插件和自定义传输器
+### 🌐 浏览器端日志器 (createBrowserLogger)
+- **🔌 多输出支持**: Console、LocalStorage、HTTP、IndexedDB
+- **🎯 智能采样**: 按级别配置采样率，优化性能
+- **📊 性能监控**: 自动记录页面加载和操作性能
+- **🛡️ 错误捕获**: 自动捕获全局错误和未处理的 Promise 拒绝
+- **🔄 批量处理**: HTTP 输出支持批量发送和重试机制
+
+### 🖥️ 服务端日志器 (createServerLogger)
+- **🧩 模块化管理**: 为不同模块配置独立的日志级别和上下文
+- **🏥 健康检查**: 内置健康检查和性能监控
+- **🔄 优雅关闭**: 支持优雅关闭和资源清理
+- **📊 运行时统计**: 实时统计日志数量和模块活动
+- **🎭 框架适配**: Next.js、Express.js 专门优化
+
+### 📨 日志接收器 (createLogReceiver)
+- **🌐 框架无关**: 支持 Next.js、Express.js 和通用场景
+- **🔒 安全优先**: 内置验证、速率限制、内容过滤
+- **📦 批量支持**: 高效处理单条和批量日志
+- **🎭 适配器模式**: 通过适配器支持不同框架
+- **🔍 详细验证**: 完整的输入验证和错误处理
+
+## 📚 文档导航
+
+- **[框架预设使用指南](./src/frameworks/USAGE.md)** - 新功能完整使用教程
+- **[API 参考文档](./docs/frameworks-api-reference.md)** - 所有预设函数的详细说明
+- **[迁移指南](./docs/migration-guide.md)** - 从旧版本迁移到新 API
+- **[第一阶段总结](./docs/phase-1-summary.md)** - 新功能开发总结
 
 ## 📚 示例项目
 
 查看 [`examples/`](./examples/) 目录：
 
-- **[Next.js 完整示例](./examples/nextjs/)** - 包含 API 路由、页面组件、错误处理
-- **[基础 API 示例](./examples/basic/)** - 所有功能演示和测试用例
+- **[Next.js 完整示例](./examples/nextjs/)** - 使用新框架预设的完整示例
+- **[React 集成示例](./examples/react/)** - React 应用中的日志集成方案
+## 🆕 版本更新
+
+### v0.6.0 - 框架预设重大更新
+- ✨ 新增 `createBrowserLogger` - 强大的浏览器端日志器
+- ✨ 新增 `createServerLogger` - 企业级服务端日志器
+- ✨ 新增 `createLogReceiver` - 通用日志接收器
+- 🔄 重构架构，提升性能和可维护性
+- 📚 完善文档和示例
+
+### 迁移指南
+如果您正在使用旧版本，请查看 [迁移指南](./docs/migration-guide.md) 了解如何升级到新 API。
 
 ## 🔗 相关链接
 
@@ -100,4 +179,4 @@ try {
 
 ---
 
-**快速开始**: `npm install @yai-nexus/loglayer-support` → [查看使用指南](./docs/usage-guide.md)
+**快速开始**: `npm install @yai-nexus/loglayer-support` → [查看框架预设指南](./src/frameworks/USAGE.md)

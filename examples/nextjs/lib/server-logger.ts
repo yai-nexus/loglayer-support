@@ -1,10 +1,10 @@
 /**
- * 服务端专用日志功能
+ * 服务端专用日志功能 - 使用新的框架预设 API
  * 在 API 路由中使用，支持文件输出到项目根目录的 logs 目录
  */
 
-import { createLogger } from 'loglayer-support'
-import type { LoggerConfig, IEnhancedLogger } from 'loglayer-support'
+import { createNextjsServerLogger } from '@yai-nexus/loglayer-support'
+import type { ServerLoggerInstance } from '@yai-nexus/loglayer-support'
 
 // 获取项目根目录路径（相对于当前工作目录）
 const getProjectLogsDir = () => {
@@ -20,90 +20,128 @@ const getProjectLogsDir = () => {
 
 const logsDir = getProjectLogsDir();
 
-// 创建适用于 Next.js 服务端的配置
-const serverConfig: LoggerConfig = {
-  level: {
-    default: 'debug',
-    loggers: {
-      'api': 'info',
-      'database': 'debug'
-    }
-  },
-  server: {
+// 创建 Next.js 服务端日志器实例
+console.log('[DEBUG] Creating server logger with new framework preset API...');
+console.log('[DEBUG] Current working directory:', process.cwd());
+console.log('[DEBUG] Logs directory:', logsDir);
+
+// 使用新的框架预设 API 创建服务端日志器
+const createServerInstance = async (): Promise<ServerLoggerInstance> => {
+  const serverInstance = await createNextjsServerLogger({
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    paths: {
+      logsDir: logsDir,
+      autoDetectRoot: true
+    },
     outputs: [
       { type: 'stdout' }, // 控制台输出
       {
         type: 'file',
         config: {
-          dir: logsDir,  // 动态计算的相对路径
-          filename: 'nextjs.log'  // 与示例名称一致
+          filename: 'nextjs.log'
         }
       }
-    ]
-  },
-  client: {
-    outputs: [
-      { type: 'console' }
-    ]
-  }
-}
+    ],
+    modules: {
+      api: { level: 'info', context: { service: 'nextjs-api' } },
+      database: { level: 'debug', context: { component: 'db-layer' } },
+      'client-log-receiver': { level: 'debug', context: { service: 'log-receiver' } },
+      'client-log-status': { level: 'info', context: { service: 'status-api' } }
+    },
+    initialization: {
+      logStartupInfo: true,
+      fallbackToConsole: true
+    },
+    performance: {
+      enabled: true,
+      interval: 60000,
+      memoryThreshold: 256
+    },
+    healthCheck: {
+      enabled: true,
+      interval: 30000
+    }
+  });
 
-// 创建异步初始化的服务端 logger
-console.log('[DEBUG] Creating server logger with public API...');
-console.log('[DEBUG] Current working directory:', process.cwd());
-console.log('[DEBUG] Logs directory:', logsDir);
+  console.log('[DEBUG] Server logger created successfully with new API');
 
-let serverLoggerInstance: IEnhancedLogger | null = null;
-const serverLoggerPromise = createLogger('nextjs-server', serverConfig).then(logger => {
-  serverLoggerInstance = logger;
-  console.log('[DEBUG] Server logger created successfully');
-  
   // 记录 Next.js 应用启动日志
-  logger.info('Next.js 应用启动', {
+  serverInstance.logger.info('Next.js 应用启动', {
     nodeVersion: process.version,
     platform: process.platform,
     workingDirectory: process.cwd(),
     logsDirectory: logsDir,
-    pid: process.pid
+    pid: process.pid,
+    apiVersion: 'v0.6.0-frameworks'
   });
-  
-  return logger;
-});
 
-// 导出 promise 和同步访问器
-export const getServerLogger = () => {
-  if (!serverLoggerInstance) {
-    throw new Error('Server logger not initialized yet. Use await getServerLoggerAsync() instead.');
-  }
-  return serverLoggerInstance;
+  return serverInstance;
 };
 
-export const getServerLoggerAsync = async () => {
-  return await serverLoggerPromise;
+// 创建服务端实例
+const serverInstancePromise = createServerInstance();
+let serverInstanceCache: ServerLoggerInstance | null = null;
+
+// 获取服务端实例的辅助函数
+const getServerInstanceSync = (): ServerLoggerInstance => {
+  if (!serverInstanceCache) {
+    throw new Error('Server logger not initialized yet. Use await getServerInstance() instead.');
+  }
+  return serverInstanceCache;
 };
 
-// 兼容导出 - 延迟访问
-export const serverLogger = new Proxy({} as IEnhancedLogger, {
-  get(target, prop) {
-    const logger = getServerLogger();
-    return (logger as any)[prop];
-  }
+// 初始化缓存
+serverInstancePromise.then(instance => {
+  serverInstanceCache = instance;
 });
 
-// 模块特定的 logger - 延迟访问
-export const apiLogger = new Proxy({} as IEnhancedLogger, {
-  get(target, prop) {
-    const logger = getServerLogger().forModule('api');
-    return (logger as any)[prop];
+// 导出服务端实例和便捷访问器
+export const getServerInstance = async (): Promise<ServerLoggerInstance> => {
+  if (serverInstanceCache) {
+    return serverInstanceCache;
   }
-});
+  const instance = await serverInstancePromise;
+  serverInstanceCache = instance;
+  return instance;
+};
 
-export const dbLogger = new Proxy({} as IEnhancedLogger, {
-  get(target, prop) {
-    const logger = getServerLogger().forModule('database');
-    return (logger as any)[prop];
-  }
-});
+// 导出主要的日志器（使用延迟访问模式）
+export const serverLogger = {
+  get logger() {
+    return getServerInstanceSync().logger;
+  },
+  debug: (...args: any[]) => getServerInstanceSync().logger.debug(...args),
+  info: (...args: any[]) => getServerInstanceSync().logger.info(...args),
+  warn: (...args: any[]) => getServerInstanceSync().logger.warn(...args),
+  error: (...args: any[]) => getServerInstanceSync().logger.error(...args),
+  logError: (...args: any[]) => getServerInstanceSync().logger.logError(...args),
+  forModule: (name: string) => getServerInstanceSync().forModule(name),
+  forRequest: (...args: any[]) => getServerInstanceSync().logger.forRequest(...args)
+};
 
-// 兼容导出
+export const apiLogger = {
+  get moduleLogger() {
+    return getServerInstanceSync().forModule('api');
+  },
+  debug: (...args: any[]) => getServerInstanceSync().forModule('api').debug(...args),
+  info: (...args: any[]) => getServerInstanceSync().forModule('api').info(...args),
+  warn: (...args: any[]) => getServerInstanceSync().forModule('api').warn(...args),
+  error: (...args: any[]) => getServerInstanceSync().forModule('api').error(...args),
+  logError: (...args: any[]) => getServerInstanceSync().forModule('api').logError(...args),
+  forModule: (name: string) => getServerInstanceSync().forModule('api').forModule(name)
+};
+
+export const dbLogger = {
+  get moduleLogger() {
+    return getServerInstanceSync().forModule('database');
+  },
+  debug: (...args: any[]) => getServerInstanceSync().forModule('database').debug(...args),
+  info: (...args: any[]) => getServerInstanceSync().forModule('database').info(...args),
+  warn: (...args: any[]) => getServerInstanceSync().forModule('database').warn(...args),
+  error: (...args: any[]) => getServerInstanceSync().forModule('database').error(...args),
+  logError: (...args: any[]) => getServerInstanceSync().forModule('database').logError(...args),
+  forModule: (name: string) => getServerInstanceSync().forModule('database').forModule(name)
+};
+
+// 兼容性导出
 export const logger = serverLogger;
