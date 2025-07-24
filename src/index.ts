@@ -84,6 +84,83 @@ export {
 };
 
 // =============================================================================
+// 框架预设导出
+// =============================================================================
+
+// 导入框架预设
+import * as frameworks from './frameworks';
+
+// 导出框架预设
+export { frameworks };
+
+// 便捷访问框架预设
+export const {
+  // 浏览器端
+  createBrowserLogger,
+  createBrowserLoggerSync,
+
+  // 服务端
+  createServerLogger,
+  createServerLoggerManager,
+  createNextjsServerLogger,
+  createExpressServerLogger,
+
+  // 日志接收器
+  createLogReceiver,
+  createNextjsLogReceiver,
+  createExpressLogReceiver,
+
+  // 便捷导出
+  browser,
+  server,
+  receiver,
+} = frameworks;
+
+// 导出框架相关类型
+export type {
+  // 浏览器端类型
+  BrowserLoggerConfig,
+  BrowserLoggerOptions,
+  IBrowserLogger,
+  BrowserLogData,
+  BrowserLogLevel,
+  ConsoleOutputConfig,
+  LocalStorageOutputConfig,
+  HttpOutputConfig,
+  IndexedDBOutputConfig,
+
+  // 服务端类型
+  ServerLoggerConfig,
+  ServerLoggerOptions,
+  ServerLoggerInstance,
+  ServerLoggerManager,
+  ModuleLogger,
+  ModuleConfig,
+  ServerEnvironment,
+  PathConfig,
+  InitializationConfig,
+  PerformanceConfig,
+  HealthCheckConfig,
+
+  // 接收器类型
+  LogReceiverConfig,
+  LogReceiverOptions,
+  LogReceiverHandler,
+  ILogReceiver,
+  ClientLogData,
+  ClientInfo,
+  ValidationResult,
+  ProcessResult,
+  ResponseData,
+  FrameworkAdapter,
+  ValidationConfig,
+  ProcessingConfig,
+  SecurityConfig,
+  ResponseConfig,
+  LogReceiverPlugin,
+} from './frameworks';
+
+// =============================================================================
 // 使用说明
 // =============================================================================
 // 注意：此库采用显式初始化设计，确保日志完整性

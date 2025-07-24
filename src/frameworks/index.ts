@@ -1,24 +1,137 @@
 /**
- * 框架适配层 - 统一导出
- * 
- * 提供针对不同框架和环境的开箱即用预设函数：
- * - createBrowserLogger: 浏览器端日志器
- * - createServerLogger: Node.js/服务端日志器  
- * - createLogReceiver: 通用日志接收器
+ * 框架适配层统一导出
+ *
+ * 这个模块提供了针对不同框架的日志器预设，
+ * 包括浏览器端、服务端和日志接收器的完整解决方案
  */
 
-// 浏览器端预设
-export { createBrowserLogger } from './browser'
-export type { BrowserLoggerConfig, BrowserLoggerOptions } from './browser'
+// ==================== 浏览器端日志器 ====================
 
-// 服务端预设
-export { createServerLogger } from './server'
-export type { ServerLoggerConfig, ServerLoggerOptions } from './server'
+// 主要工厂函数
+export {
+  createBrowserLogger,
+  createBrowserLoggerSync
+} from './browser'
 
-// 日志接收器预设
-export { createLogReceiver } from './receiver'
-export type { LogReceiverConfig, LogReceiverOptions } from './receiver'
+// 浏览器端类型定义
+export type {
+  BrowserLoggerConfig,
+  BrowserLoggerOptions,
+  IBrowserLogger,
+  BrowserLogData,
+  BrowserLogLevel,
+  ConsoleOutputConfig,
+  LocalStorageOutputConfig,
+  HttpOutputConfig,
+  IndexedDBOutputConfig
+} from './browser'
 
-// Next.js 特定预设（基于上述预设的组合）
-export { createNextjsLoggerSync, createNextjsLoggerAsync } from './nextjs'
-export type { NextjsLoggerConfig } from './nextjs'
+// ==================== 服务端日志器 ====================
+
+// 主要工厂函数
+export {
+  createServerLogger,
+  createServerLoggerManager,
+  createNextjsServerLogger,
+  createExpressServerLogger
+} from './server'
+
+// 服务端类型定义
+export type {
+  ServerLoggerConfig,
+  ServerLoggerOptions,
+  ServerLoggerInstance,
+  ServerLoggerManager,
+  ModuleLogger,
+  ModuleConfig,
+  ServerEnvironment,
+  ServerOutputConfig,
+  PathConfig,
+  InitializationConfig,
+  PerformanceConfig,
+  HealthCheckConfig
+} from './server'
+
+// ==================== 日志接收器 ====================
+
+// 主要工厂函数
+export {
+  createLogReceiver,
+  createNextjsLogReceiver,
+  createExpressLogReceiver
+} from './receiver'
+
+// 接收器类型定义
+export type {
+  LogReceiverConfig,
+  LogReceiverOptions,
+  LogReceiverHandler,
+  ILogReceiver,
+  ClientLogData,
+  ClientInfo,
+  ValidationResult,
+  ProcessResult,
+  ResponseData,
+  FrameworkAdapter,
+  ValidationConfig,
+  ProcessingConfig,
+  SecurityConfig,
+  ResponseConfig,
+  LogReceiverPlugin
+} from './receiver'
+
+// ==================== 便捷导出 ====================
+
+/**
+ * 浏览器端预设
+ */
+export const browser = {
+  createLogger: createBrowserLogger,
+  createLoggerSync: createBrowserLoggerSync
+}
+
+/**
+ * 服务端预设
+ */
+export const server = {
+  createLogger: createServerLogger,
+  createManager: createServerLoggerManager,
+  nextjs: createNextjsServerLogger,
+  express: createExpressServerLogger
+}
+
+/**
+ * 日志接收器预设
+ */
+export const receiver = {
+  create: createLogReceiver,
+  nextjs: createNextjsLogReceiver,
+  express: createExpressLogReceiver
+}
+
+// ==================== 默认导出 ====================
+
+/**
+ * 默认导出 - 包含所有主要功能
+ */
+export default {
+  browser,
+  server,
+  receiver,
+
+  // 直接访问工厂函数
+  createBrowserLogger,
+  createServerLogger,
+  createLogReceiver,
+
+  // 框架特定预设
+  nextjs: {
+    server: createNextjsServerLogger,
+    receiver: createNextjsLogReceiver
+  },
+
+  express: {
+    server: createExpressServerLogger,
+    receiver: createExpressLogReceiver
+  }
+}
