@@ -15,3 +15,6 @@ export * from './error-handling';
 
 // 性能优化
 export * from './performance';
+
+// 配置验证
+export * from './config-validation';

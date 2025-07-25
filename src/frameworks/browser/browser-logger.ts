@@ -3,7 +3,8 @@
  */
 
 import type { LogMetadata } from '../../core'
-import { ErrorHandler, createErrorHandler, ErrorCategory, ErrorSeverity } from '../../core'
+import { ErrorHandler, createErrorHandler, formatValidationResult } from '../../core'
+import { validateBrowserConfig } from './config-validator'
 import type { 
   IBrowserLogger, 
   BrowserLoggerConfig, 
@@ -26,6 +27,17 @@ export class BrowserLogger implements IBrowserLogger {
   private isDestroyed = false
 
   constructor(config: BrowserLoggerConfig = {}) {
+    // 验证配置
+    const validationResult = validateBrowserConfig(config)
+    if (!validationResult.valid) {
+      const message = formatValidationResult(validationResult)
+      console.error('Browser logger configuration validation failed:', message)
+      // 不抛出错误，而是使用默认配置并警告
+    } else if (validationResult.warnings.length > 0 || validationResult.suggestions.length > 0) {
+      const message = formatValidationResult(validationResult)
+      console.warn('Browser logger configuration warnings:', message)
+    }
+
     this.config = this.normalizeConfig(config)
 
     // 初始化错误处理器
