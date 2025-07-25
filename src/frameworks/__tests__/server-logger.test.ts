@@ -64,6 +64,7 @@ describe('createServerLogger', () => {
 
     it('应该能够创建带配置的服务端日志器', async () => {
       const config = {
+        level: { default: 'info' },
         environment: 'production' as const,
         paths: {
           logsDir: './custom-logs'
@@ -95,8 +96,9 @@ describe('createServerLogger', () => {
   describe('模块管理', () => {
     it('应该能够创建模块日志器', async () => {
       const serverInstance = await createServerLogger('module-test', {
+        level: { default: 'info' },
         modules: {
-          testModule: { 
+          testModule: {
             level: 'debug',
             context: { service: 'test' }
           }
@@ -123,6 +125,7 @@ describe('createServerLogger', () => {
 
     it('应该能够更新模块配置', async () => {
       const serverInstance = await createServerLogger('update-test', {
+        level: { default: 'info' },
         modules: {
           updateModule: { level: 'info' }
         }

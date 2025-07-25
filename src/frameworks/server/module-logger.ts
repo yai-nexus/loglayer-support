@@ -3,7 +3,7 @@
  * 提供模块特定的日志功能和配置管理
  */
 
-import type { IEnhancedLogger, LogMetadata } from '../../core'
+import type { IEnhancedLogger, LogMetadata, LogLayer } from '../../core'
 import type { ModuleLogger, ModuleConfig } from '../server'
 
 export class ModuleLoggerImpl implements ModuleLogger {
@@ -63,6 +63,22 @@ export class ModuleLoggerImpl implements ModuleLogger {
   forRequest(requestId: string, metadata?: LogMetadata): IEnhancedLogger {
     const moduleLogger = this.getModuleLogger()
     return moduleLogger.forRequest(requestId, this.enrichMetadata(metadata))
+  }
+
+  forUser(userId: string): IEnhancedLogger {
+    const moduleLogger = this.getModuleLogger()
+    return moduleLogger.forUser(userId)
+  }
+
+  logPerformance(operation: string, duration: number, metadata: LogMetadata = {}): void {
+    const moduleLogger = this.getModuleLogger()
+    moduleLogger.logPerformance(operation, duration, this.enrichMetadata(metadata))
+    this.updateStats()
+  }
+
+  get raw(): LogLayer {
+    const moduleLogger = this.getModuleLogger()
+    return moduleLogger.raw
   }
 
   // ==================== ModuleLogger 特定接口 ====================

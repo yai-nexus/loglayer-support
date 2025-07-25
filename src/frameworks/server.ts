@@ -5,7 +5,7 @@
  * 解决 Proxy 方案的问题，提供更优雅的异步初始化
  */
 
-import type { LoggerConfig, IEnhancedLogger } from '../core'
+import type { LoggerConfig, IEnhancedLogger, LogLevel } from '../core'
 
 // ==================== 核心类型定义 ====================
 
@@ -119,6 +119,10 @@ export interface HealthCheckConfig {
  * 服务端日志器配置
  */
 export interface ServerLoggerConfig extends Omit<LoggerConfig, 'server' | 'client'> {
+  level: {
+    default: LogLevel
+    loggers?: Record<string, LogLevel>
+  }
   /** 服务端环境 */
   environment?: ServerEnvironment
 
