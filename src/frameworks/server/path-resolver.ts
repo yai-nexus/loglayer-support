@@ -192,7 +192,7 @@ export class PathResolver {
       }
 
     } catch (error) {
-      errors.push(`Path validation failed: ${error.message}`)
+      errors.push(`Path validation failed: ${error instanceof Error ? error.message : String(error)}`)
     }
 
     return {
