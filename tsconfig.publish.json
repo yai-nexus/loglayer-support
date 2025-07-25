@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "src/frameworks/__tests__/**/*",
+    "src/frameworks/browser/**/*",
+    "src/frameworks/receiver/**/*",
+    "src/frameworks/server/example.ts",
+    "tests/**/*"
+  ]
+}

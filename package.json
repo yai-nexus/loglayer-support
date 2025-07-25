@@ -1,6 +1,6 @@
 {
   "name": "@yai-nexus/loglayer-support",
-  "version": "0.6.0-alpha.2",
+  "version": "0.6.0-alpha.3",
   "description": "企业级日志解决方案，提供开箱即用的框架预设 API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,13 +23,14 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
+    "type-check:publish": "tsc --noEmit --project tsconfig.publish.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 500",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\" || true",
-    "prepublishOnly": "npm run clean && npm run build && npm run type-check",
+    "prepublishOnly": "npm run clean && npm run build && npm run type-check:publish",
     "prepack": "npm run build",
     "publish:beta": "npm publish --tag beta",
     "publish:latest": "npm publish"

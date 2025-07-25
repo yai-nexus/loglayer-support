@@ -41,7 +41,7 @@ export class ServerLoggerManagerImpl implements ServerLoggerManager {
       
       return instance
     } catch (error) {
-      throw new Error(`Failed to create logger instance "${name}": ${error.message}`)
+      throw new Error(`Failed to create logger instance "${name}": ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
@@ -112,7 +112,7 @@ export class ServerLoggerManagerImpl implements ServerLoggerManager {
       } catch (error) {
         results[name] = {
           healthy: false,
-          details: { error: error.message }
+          details: { error: error instanceof Error ? error.message : String(error) }
         }
       }
     }
@@ -152,6 +152,7 @@ export class ServerLoggerManagerImpl implements ServerLoggerManager {
     instanceConfig?: ServerLoggerConfig
   ): ServerLoggerConfig {
     const merged: ServerLoggerConfig = {
+      level: { default: 'info' },
       environment: 'development',
       paths: {
         autoDetectRoot: true,
