@@ -1,6 +1,6 @@
 {
   "name": "loglayer-nextjs-example",
-  "version": "0.6.0-alpha.1",
+  "version": "0.6.0-alpha.2",
   "description": "NextJS example for loglayer-support with new framework presets API demonstration",
   "private": true,
   "scripts": {

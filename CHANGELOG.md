@@ -5,6 +5,19 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.6.0-alpha.2] - 2025-01-28
+
+### 🔧 修复版本 - TypeScript 编译错误修复
+
+修复了 alpha.1 版本中的 TypeScript 编译错误，确保 CI/CD 构建成功。
+
+#### 🐛 修复内容
+- 修复 `ServerLoggerConfig` 接口缺少必需的 `level` 字段
+- 修复 `ModuleLoggerManager` 类缺少的方法实现（`forUser`、`logPerformance`、`raw`）
+- 修复测试文件中的配置类型错误
+- 修复 `path-resolver.ts` 中的 unknown 类型错误处理
+- 所有 TypeScript 编译错误已解决
+
 ## [0.6.0-alpha.1] - 2025-01-28
 
 ### 🎉 重大更新 - 框架预设 API (Alpha 版本)
