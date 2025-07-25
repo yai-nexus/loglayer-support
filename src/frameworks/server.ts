@@ -263,6 +263,12 @@ export interface ServerLoggerManager {
 
   /** 销毁所有实例 */
   destroyAll(): Promise<void>
+
+  /** 批量健康检查 */
+  healthCheckAll(): Promise<Record<string, {
+    healthy: boolean
+    details: any
+  }>>
 }
 
 // ==================== 工厂函数 ====================

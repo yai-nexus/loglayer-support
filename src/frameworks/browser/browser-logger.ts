@@ -52,7 +52,7 @@ export class BrowserLogger implements IBrowserLogger {
    * 标准化配置
    */
   private normalizeConfig(config: BrowserLoggerConfig): BrowserLoggerConfig {
-    return deepMerge({
+    const defaultConfig: BrowserLoggerConfig = {
       level: 'info' as BrowserLogLevel,
       outputs: {
         console: true,
@@ -78,7 +78,9 @@ export class BrowserLogger implements IBrowserLogger {
       sampling: {
         rate: 1.0
       }
-    }, config)
+    }
+
+    return deepMerge(defaultConfig, config)
   }
 
   /**

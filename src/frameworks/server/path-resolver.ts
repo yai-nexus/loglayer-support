@@ -100,7 +100,7 @@ export class PathResolver {
         return tempLogsDir
       } catch (tempError) {
         console.error('Failed to create temp logs directory:', tempError)
-        throw new Error(`Cannot create logs directory: ${error.message}`)
+        throw new Error(`Cannot create logs directory: ${error instanceof Error ? error.message : String(error)}`)
       }
     }
   }
@@ -182,7 +182,7 @@ export class PathResolver {
           errors.push(`No write permission for logs directory: ${logsDir}`)
         }
       } catch (logsDirError) {
-        errors.push(`Cannot create or access logs directory: ${logsDirError.message}`)
+        errors.push(`Cannot create or access logs directory: ${logsDirError instanceof Error ? logsDirError.message : String(logsDirError)}`)
       }
 
       // 检查路径长度（Windows 限制）

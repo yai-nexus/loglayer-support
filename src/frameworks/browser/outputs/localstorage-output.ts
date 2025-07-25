@@ -12,12 +12,12 @@ export class LocalStorageOutput implements LogOutput {
 
   constructor(config: LocalStorageOutputConfig) {
     this.config = {
-      enabled: true,
       key: 'app-logs',
       maxEntries: 500,
       compress: false,
       levelFilter: [],
-      ...config
+      ...config,
+      enabled: config.enabled ?? true
     }
   }
 
@@ -82,7 +82,7 @@ export class LocalStorageOutput implements LogOutput {
       storage.setItem(this.config.key!, serialized)
     } catch (error) {
       // 如果存储失败（可能是容量不足），尝试清理旧日志
-      if (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+      if (error instanceof Error && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
         this.handleQuotaExceeded(storage, logs)
       } else {
         console.warn('Failed to save logs to localStorage:', error)

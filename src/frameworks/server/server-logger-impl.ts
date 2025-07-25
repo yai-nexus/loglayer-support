@@ -94,7 +94,15 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
       cpuUsage: NodeJS.CpuUsage
     }
   } {
-    const stats = {
+    const stats: {
+      uptime: number
+      totalLogs: number
+      moduleStats: Record<string, { logCount: number; lastActivity: Date }>
+      performance?: {
+        memoryUsage: NodeJS.MemoryUsage
+        cpuUsage: NodeJS.CpuUsage
+      }
+    } = {
       uptime: Date.now() - this.startTime,
       totalLogs: this.totalLogs,
       moduleStats: this.moduleManager.getAllStats()
@@ -120,7 +128,12 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
       performance?: any
     }
   }> {
-    const details = {
+    const details: {
+      logger: boolean
+      outputs: Record<string, boolean>
+      modules: Record<string, boolean>
+      performance?: any
+    } = {
       logger: this.isReady(),
       outputs: {} as Record<string, boolean>,
       modules: {} as Record<string, boolean>

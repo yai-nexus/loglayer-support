@@ -60,9 +60,9 @@ export class ModuleLoggerImpl implements ModuleLogger {
     return moduleLogger.forModule(moduleName)
   }
 
-  forRequest(requestId: string, metadata?: LogMetadata): IEnhancedLogger {
+  forRequest(requestId: string, traceId?: string): IEnhancedLogger {
     const moduleLogger = this.getModuleLogger()
-    return moduleLogger.forRequest(requestId, this.enrichMetadata(metadata))
+    return moduleLogger.forRequest(requestId, traceId)
   }
 
   forUser(userId: string): IEnhancedLogger {
