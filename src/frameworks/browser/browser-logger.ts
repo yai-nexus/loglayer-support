@@ -3,6 +3,7 @@
  */
 
 import type { LogMetadata } from '../../core'
+import { ErrorHandler, createErrorHandler, ErrorCategory, ErrorSeverity } from '../../core'
 import type { 
   IBrowserLogger, 
   BrowserLoggerConfig, 
@@ -21,11 +22,21 @@ export class BrowserLogger implements IBrowserLogger {
   private readonly sessionManager: SessionManager
   private readonly logDataBuilder: LogDataBuilder
   private readonly outputs: Map<string, LogOutput> = new Map()
+  private readonly errorHandler: ErrorHandler
   private isDestroyed = false
 
   constructor(config: BrowserLoggerConfig = {}) {
     this.config = this.normalizeConfig(config)
-    
+
+    // 初始化错误处理器
+    this.errorHandler = createErrorHandler({
+      enableRetry: true,
+      maxRetries: 3,
+      retryDelay: 1000,
+      enableFallback: true,
+      logErrors: true
+    })
+
     // 初始化会话管理器
     this.sessionManager = new SessionManager(
       this.config.sessionId,
@@ -235,9 +246,30 @@ export class BrowserLogger implements IBrowserLogger {
     this.log('error', message, metadata)
   }
 
-  logError(error: Error, metadata: LogMetadata = {}, customMessage?: string): void {
-    const logData = this.logDataBuilder.buildErrorLog(error, metadata, customMessage)
-    this.writeToOutputs(logData)
+  async logError(error: Error, metadata: LogMetadata = {}, customMessage?: string): Promise<void> {
+    try {
+      // 使用错误处理器处理错误
+      const standardError = await this.errorHandler.handle(error, {
+        ...metadata,
+        customMessage,
+        source: 'browser-logger'
+      })
+
+      // 构建日志数据
+      const logData = this.logDataBuilder.buildErrorLog(error, {
+        ...metadata,
+        errorCode: standardError.code,
+        errorCategory: standardError.category,
+        errorSeverity: standardError.severity
+      }, customMessage)
+
+      this.writeToOutputs(logData)
+    } catch (handlingError) {
+      // 如果错误处理失败，回退到基本日志记录
+      console.error('Error handling failed:', handlingError)
+      const logData = this.logDataBuilder.buildErrorLog(error, metadata, customMessage)
+      this.writeToOutputs(logData)
+    }
   }
 
   logPerformance(operation: string, duration: number, metadata: LogMetadata = {}): void {

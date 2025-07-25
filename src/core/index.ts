@@ -9,3 +9,6 @@ export * from './types';
 
 // 环境检测
 export * from './environment';
+
+// 错误处理
+export * from './error-handling';
