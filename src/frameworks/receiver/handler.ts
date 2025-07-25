@@ -33,10 +33,10 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
    */
   async nextjs(request: any): Promise<any> {
     const logReceiver = this.logger.forModule('client-log-receiver')
-    
+    const adapter = this.receiver.getAdapter()
+
     try {
       // 解析请求数据
-      const adapter = this.receiver.getAdapter()
       const requestData = await adapter.parseRequest(request)
       
       // 检查是否为批量数据
@@ -67,10 +67,9 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
         success: false,
         processed: 0,
         failed: 1,
-        errors: [{ item: null, error: error.message }]
+        errors: [{ item: null, error: error instanceof Error ? error.message : String(error) }]
       })
 
-      const adapter = this.receiver.getAdapter()
       return adapter.createResponse(errorResponse, 500)
     }
   }
@@ -80,10 +79,10 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
    */
   async express(req: any, res: any, next?: any): Promise<void> {
     const logReceiver = this.logger.forModule('client-log-receiver')
-    
+    const adapter = this.receiver.getAdapter()
+
     try {
       // 解析请求数据
-      const adapter = this.receiver.getAdapter()
       const requestData = await adapter.parseRequest(req)
       
       // 检查是否为批量数据
@@ -115,7 +114,7 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
         success: false,
         processed: 0,
         failed: 1,
-        errors: [{ item: null, error: error.message }]
+        errors: [{ item: null, error: error instanceof Error ? error.message : String(error) }]
       })
 
       res.status(500).json(errorResponse)

@@ -29,7 +29,7 @@ export class ExpressAdapter implements FrameworkAdapter {
           const parsed = JSON.parse(body)
           resolve(parsed)
         } catch (error) {
-          reject(new Error(`Failed to parse request body: ${error.message}`))
+          reject(new Error(`Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`))
         }
       })
       

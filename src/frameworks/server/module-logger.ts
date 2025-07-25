@@ -3,7 +3,8 @@
  * 提供模块特定的日志功能和配置管理
  */
 
-import type { IEnhancedLogger, LogMetadata, LogLayer } from '../../core'
+import type { IEnhancedLogger, LogMetadata } from '../../core'
+import type { LogLayer } from 'loglayer'
 import type { ModuleLogger, ModuleConfig } from '../server'
 
 export class ModuleLoggerImpl implements ModuleLogger {

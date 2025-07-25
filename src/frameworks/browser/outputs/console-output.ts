@@ -11,8 +11,7 @@ export class ConsoleOutput implements LogOutput {
   private readonly config: ConsoleOutputConfig
 
   constructor(config: ConsoleOutputConfig) {
-    this.config = {
-      enabled: true,
+    const defaultConfig = {
       groupCollapsed: true,
       colorized: true,
       showTimestamp: true,
@@ -22,7 +21,11 @@ export class ConsoleOutput implements LogOutput {
         info: '#2196F3',
         warn: '#FF9800',
         error: '#F44336'
-      },
+      }
+    }
+
+    this.config = {
+      ...defaultConfig,
       ...config
     }
   }
@@ -36,10 +39,10 @@ export class ConsoleOutput implements LogOutput {
     }
 
     try {
-      const hasMetadata = data.metadata && Object.keys(data.metadata).length > 0
+      const hasMetadata = !!(data.metadata && Object.keys(data.metadata).length > 0)
       const hasError = !!data.error
 
-      if ((hasMetadata || hasError) && this.config.groupCollapsed) {
+      if ((hasMetadata || hasError) && this.config.groupCollapsed === true) {
         this.writeGroupedLog(data, hasMetadata, hasError)
       } else {
         this.writeSimpleLog(data)

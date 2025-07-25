@@ -21,7 +21,7 @@ async function basicUsageExample() {
   try {
     throw new Error('Something went wrong')
   } catch (error) {
-    logger.logError(error, { context: 'user-action' })
+    logger.logError(error instanceof Error ? error : new Error(String(error)), { context: 'user-action' })
   }
   
   // 性能日志
@@ -126,7 +126,7 @@ function syncVersionExample() {
   const logger = createBrowserLoggerSync({
     outputs: {
       console: true,
-      localStorage: { maxEntries: 100 }
+      localStorage: { enabled: true, maxEntries: 100 }
     }
   })
   

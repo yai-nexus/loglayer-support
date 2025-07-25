@@ -18,6 +18,7 @@ export async function basicUsageExample() {
   
   // 创建服务端日志器
   const serverInstance = await createServerLogger('my-app', {
+    level: { default: 'info' },
     environment: 'development',
     paths: {
       logsDir: './logs',
@@ -201,6 +202,7 @@ export async function managerExample() {
 
   // 创建多个服务实例
   const apiService = await manager.create('api-service', {
+    level: { default: 'info' },
     modules: {
       api: { level: 'info' },
       validation: { level: 'debug' }
@@ -211,6 +213,7 @@ export async function managerExample() {
   })
 
   const dbService = await manager.create('db-service', {
+    level: { default: 'info' },
     modules: {
       database: { level: 'debug' },
       migration: { level: 'info' }
@@ -247,6 +250,7 @@ export async function advancedFeaturesExample() {
   console.log('=== 高级功能示例 ===')
   
   const serverInstance = await createServerLogger('advanced-app', {
+    level: { default: 'info' },
     environment: 'production',
     
     // 性能监控
@@ -325,6 +329,7 @@ export async function lifecycleExample() {
   console.log('=== 生命周期管理示例 ===')
   
   const serverInstance = await createServerLogger('lifecycle-test', {
+    level: { default: 'info' },
     initialization: {
       logStartupInfo: true
     }

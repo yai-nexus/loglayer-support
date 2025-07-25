@@ -13,6 +13,7 @@ import { ServerLoggerInstanceImpl } from './server-logger-impl'
 export class ServerLoggerManagerImpl implements ServerLoggerManager {
   private readonly instances = new Map<string, ServerLoggerInstance>()
   private readonly globalConfig: Partial<ServerLoggerConfig>
+  private readonly startTime = Date.now()
 
   constructor(globalConfig: Partial<ServerLoggerConfig> = {}) {
     this.globalConfig = globalConfig
@@ -87,13 +88,18 @@ export class ServerLoggerManagerImpl implements ServerLoggerManager {
    */
   getManagerStats(): {
     totalInstances: number
-    instanceNames: string[]
-    globalConfig: Partial<ServerLoggerConfig>
+    activeInstances: number
+    totalLogs: number
+    uptime: number
   } {
+    const totalLogs = Array.from(this.instances.values())
+      .reduce((sum, instance) => sum + (instance.getStats?.()?.totalLogs || 0), 0)
+
     return {
       totalInstances: this.instances.size,
-      instanceNames: Array.from(this.instances.keys()),
-      globalConfig: { ...this.globalConfig }
+      activeInstances: this.instances.size, // 所有实例都是活跃的
+      totalLogs,
+      uptime: Date.now() - this.startTime
     }
   }
 

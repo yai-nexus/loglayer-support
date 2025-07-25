@@ -14,20 +14,23 @@ export class HttpOutput implements LogOutput {
   private isDestroyed = false
 
   constructor(config: HttpOutputConfig) {
-    this.config = {
-      enabled: true,
+    const defaultConfig = {
       endpoint: '/api/logs',
-      method: 'POST',
+      method: 'POST' as const,
       headers: {
         'Content-Type': 'application/json'
       },
       batchSize: 10,
       flushInterval: 5000,
       retryAttempts: 3,
-      retryDelay: 'exponential',
+      retryDelay: 'exponential' as const,
       baseRetryDelay: 1000,
       onlyErrors: false,
-      levelFilter: [],
+      levelFilter: []
+    }
+
+    this.config = {
+      ...defaultConfig,
       ...config
     }
 

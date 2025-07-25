@@ -14,7 +14,7 @@ export class NextjsAdapter implements FrameworkAdapter {
     try {
       return await request.json()
     } catch (error) {
-      throw new Error(`Failed to parse request body: ${error.message}`)
+      throw new Error(`Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

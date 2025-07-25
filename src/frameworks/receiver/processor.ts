@@ -52,7 +52,7 @@ export class LogProcessor {
         failed: 1,
         errors: [{
           item: data,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         }]
       }
     }
@@ -89,7 +89,7 @@ export class LogProcessor {
         results.failed++
         results.errors!.push({
           item: data,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         })
       }
     }

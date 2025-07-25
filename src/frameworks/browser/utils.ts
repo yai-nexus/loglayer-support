@@ -86,23 +86,23 @@ export function serializeError(error: Error): { name: string; message: string; s
 /**
  * 深度合并对象
  */
-export function deepMerge<T>(target: T, source: Partial<T>): T {
-  const result = { ...target }
-  
+export function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+  const result = { ...target } as T
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
       const sourceValue = source[key]
       const targetValue = result[key]
-      
+
       if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue) &&
           targetValue && typeof targetValue === 'object' && !Array.isArray(targetValue)) {
-        result[key] = deepMerge(targetValue, sourceValue)
+        (result as any)[key] = deepMerge(targetValue, sourceValue)
       } else if (sourceValue !== undefined) {
-        result[key] = sourceValue
+        (result as any)[key] = sourceValue
       }
     }
   }
-  
+
   return result
 }
 

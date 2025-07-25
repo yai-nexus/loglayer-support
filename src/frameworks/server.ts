@@ -269,6 +269,17 @@ export interface ServerLoggerManager {
     healthy: boolean
     details: any
   }>>
+
+  /** 获取管理器统计信息 */
+  getManagerStats(): {
+    totalInstances: number
+    activeInstances: number
+    totalLogs: number
+    uptime: number
+  }
+
+  /** 刷新所有实例的日志 */
+  flushAll(): Promise<void>
 }
 
 // ==================== 工厂函数 ====================

@@ -25,7 +25,7 @@ export class LogReceiver implements ILogReceiver {
   private readonly validator: LogDataValidator
   private readonly processor: LogProcessor
   private readonly adapter: FrameworkAdapter
-  private isDestroyed = false
+  private _isDestroyed = false
 
   constructor(
     logger: IEnhancedLogger,
@@ -95,7 +95,7 @@ export class LogReceiver implements ILogReceiver {
    * 处理单条日志
    */
   async processSingle(data: ClientLogData, context?: any): Promise<ProcessResult> {
-    if (this.isDestroyed) {
+    if (this._isDestroyed) {
       throw new Error('LogReceiver has been destroyed')
     }
 
@@ -124,7 +124,7 @@ export class LogReceiver implements ILogReceiver {
    * 处理批量日志
    */
   async processBatch(data: ClientLogData[], context?: any): Promise<ProcessResult> {
-    if (this.isDestroyed) {
+    if (this._isDestroyed) {
       throw new Error('LogReceiver has been destroyed')
     }
 
@@ -285,7 +285,7 @@ export class LogReceiver implements ILogReceiver {
    * 销毁接收器
    */
   async destroy(): Promise<void> {
-    this.isDestroyed = true
+    this._isDestroyed = true
     // 这里可以添加清理逻辑
   }
 
@@ -293,6 +293,6 @@ export class LogReceiver implements ILogReceiver {
    * 检查是否已销毁
    */
   isDestroyed(): boolean {
-    return this.isDestroyed
+    return this._isDestroyed
   }
 }

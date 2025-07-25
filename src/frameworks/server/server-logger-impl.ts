@@ -169,7 +169,7 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
         Object.assign(details, { custom: customResult })
       } catch (error) {
         details.logger = false
-        Object.assign(details, { customCheckError: error.message })
+        Object.assign(details, { customCheckError: error instanceof Error ? error.message : String(error) })
       }
     }
 

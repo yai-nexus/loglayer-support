@@ -116,7 +116,7 @@ export class LogDataValidator {
           }
         }
       } catch (error) {
-        errors.push(`Custom validation failed: ${error.message}`)
+        errors.push(`Custom validation failed: ${error instanceof Error ? error.message : String(error)}`)
       }
     }
 

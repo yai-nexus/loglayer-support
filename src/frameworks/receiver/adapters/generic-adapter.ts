@@ -31,7 +31,7 @@ export class GenericAdapter implements FrameworkAdapter {
       try {
         return JSON.parse(request)
       } catch (error) {
-        throw new Error(`Failed to parse request string: ${error.message}`)
+        throw new Error(`Failed to parse request string: ${error instanceof Error ? error.message : String(error)}`)
       }
     }
 
