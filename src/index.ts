@@ -93,28 +93,19 @@ import * as frameworks from './frameworks';
 // 导出框架预设
 export { frameworks };
 
-// 便捷访问框架预设
-export const {
-  // 浏览器端
-  createBrowserLogger,
-  createBrowserLoggerSync,
-
-  // 服务端
-  createServerLogger,
-  createServerLoggerManager,
-  createNextjsServerLogger,
-  createExpressServerLogger,
-
-  // 日志接收器
-  createLogReceiver,
-  createNextjsLogReceiver,
-  createExpressLogReceiver,
-
-  // 便捷导出
-  browser,
-  server,
-  receiver,
-} = frameworks;
+// 便捷访问框架预设 - 重新导出
+export const createBrowserLogger = frameworks.createBrowserLogger;
+export const createBrowserLoggerSync = frameworks.createBrowserLoggerSync;
+export const createServerLogger = frameworks.createServerLogger;
+export const createServerLoggerManager = frameworks.createServerLoggerManager;
+export const createNextjsServerLogger = frameworks.createNextjsServerLogger;
+export const createExpressServerLogger = frameworks.createExpressServerLogger;
+export const createLogReceiver = frameworks.createLogReceiver;
+export const createNextjsLogReceiver = frameworks.createNextjsLogReceiver;
+export const createExpressLogReceiver = frameworks.createExpressLogReceiver;
+export const browser = frameworks.browser;
+export const server = frameworks.server;
+export const receiver = frameworks.receiver;
 
 // 导出框架相关类型
 export type {

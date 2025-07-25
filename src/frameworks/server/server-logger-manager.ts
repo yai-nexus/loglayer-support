@@ -2,7 +2,7 @@
  * 服务端日志器管理器实现
  */
 
-import { createLogger } from '../../core'
+import { createLogger } from '../../factory'
 import type { 
   ServerLoggerManager, 
   ServerLoggerInstance, 

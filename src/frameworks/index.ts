@@ -82,31 +82,48 @@ export type {
 
 // ==================== 便捷导出 ====================
 
+// 导入所有函数以便在便捷导出中使用
+import {
+  createBrowserLogger as _createBrowserLogger,
+  createBrowserLoggerSync as _createBrowserLoggerSync
+} from './browser'
+import {
+  createServerLogger as _createServerLogger,
+  createServerLoggerManager as _createServerLoggerManager,
+  createNextjsServerLogger as _createNextjsServerLogger,
+  createExpressServerLogger as _createExpressServerLogger
+} from './server'
+import {
+  createLogReceiver as _createLogReceiver,
+  createNextjsLogReceiver as _createNextjsLogReceiver,
+  createExpressLogReceiver as _createExpressLogReceiver
+} from './receiver'
+
 /**
  * 浏览器端预设
  */
 export const browser = {
-  createLogger: createBrowserLogger,
-  createLoggerSync: createBrowserLoggerSync
+  createLogger: _createBrowserLogger,
+  createLoggerSync: _createBrowserLoggerSync
 }
 
 /**
  * 服务端预设
  */
 export const server = {
-  createLogger: createServerLogger,
-  createManager: createServerLoggerManager,
-  nextjs: createNextjsServerLogger,
-  express: createExpressServerLogger
+  createLogger: _createServerLogger,
+  createManager: _createServerLoggerManager,
+  nextjs: _createNextjsServerLogger,
+  express: _createExpressServerLogger
 }
 
 /**
  * 日志接收器预设
  */
 export const receiver = {
-  create: createLogReceiver,
-  nextjs: createNextjsLogReceiver,
-  express: createExpressLogReceiver
+  create: _createLogReceiver,
+  nextjs: _createNextjsLogReceiver,
+  express: _createExpressLogReceiver
 }
 
 // ==================== 默认导出 ====================
@@ -120,18 +137,18 @@ export default {
   receiver,
 
   // 直接访问工厂函数
-  createBrowserLogger,
-  createServerLogger,
-  createLogReceiver,
+  createBrowserLogger: _createBrowserLogger,
+  createServerLogger: _createServerLogger,
+  createLogReceiver: _createLogReceiver,
 
   // 框架特定预设
   nextjs: {
-    server: createNextjsServerLogger,
-    receiver: createNextjsLogReceiver
+    server: _createNextjsServerLogger,
+    receiver: _createNextjsLogReceiver
   },
 
   express: {
-    server: createExpressServerLogger,
-    receiver: createExpressLogReceiver
+    server: _createExpressServerLogger,
+    receiver: _createExpressLogReceiver
   }
 }

@@ -118,7 +118,7 @@ export interface HealthCheckConfig {
 /**
  * 服务端日志器配置
  */
-export interface ServerLoggerConfig extends Omit<LoggerConfig, 'server'> {
+export interface ServerLoggerConfig extends Omit<LoggerConfig, 'server' | 'client'> {
   /** 服务端环境 */
   environment?: ServerEnvironment
 
@@ -335,6 +335,7 @@ export function createNextjsServerLogger(
   config?: Partial<ServerLoggerConfig>
 ): Promise<ServerLoggerInstance> {
   const nextjsConfig: ServerLoggerConfig = {
+    level: { default: 'info' },
     environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
     paths: {
       autoDetectRoot: true,
@@ -391,6 +392,7 @@ export function createExpressServerLogger(
   config?: Partial<ServerLoggerConfig>
 ): Promise<ServerLoggerInstance> {
   const expressConfig: ServerLoggerConfig = {
+    level: { default: 'info' },
     environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
     outputs: [
       { type: 'stdout' },
