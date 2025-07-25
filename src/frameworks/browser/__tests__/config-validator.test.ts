@@ -362,7 +362,7 @@ describe('validateBrowserConfig', () => {
         http: { enabled: true, endpoint: 123 }
       },
       sampling: { rate: 2.0 }
-    }
+    } as any
 
     const result = validateBrowserConfig(config)
     expect(result.valid).toBe(false)
@@ -382,7 +382,7 @@ describe('validateBrowserConfigStrict', () => {
 
   it('应该在配置无效时抛出错误', () => {
     const config = {
-      level: 'invalid-level',
+      level: 'invalid-level' as any,
       outputs: { console: true }
     }
 
@@ -395,7 +395,7 @@ describe('validateBrowserConfigStrict', () => {
     const config = {
       outputs: {
         unknownOutput: true
-      }
+      } as any
     }
 
     validateBrowserConfigStrict(config)

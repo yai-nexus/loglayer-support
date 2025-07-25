@@ -11,7 +11,8 @@
 import { createBrowserLogger } from '../../frameworks/browser'
 import { createServerLogger } from '../../frameworks/server'
 import { createNextjsLogReceiver } from '../../frameworks/receiver'
-import type { BrowserLoggerConfig, ServerLoggerConfig } from '../../frameworks/browser'
+import type { BrowserLoggerConfig } from '../../frameworks/browser'
+import type { ServerLoggerConfig } from '../../frameworks/server'
 
 // Mock HTTP 服务器
 class MockHttpServer {

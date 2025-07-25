@@ -44,7 +44,7 @@ afterEach(() => {
 
 // Mock setImmediate for Node.js compatibility
 if (!global.setImmediate) {
-  global.setImmediate = (callback: (...args: any[]) => void, ...args: any[]) => {
+  (global as any).setImmediate = (callback: (...args: any[]) => void, ...args: any[]) => {
     return setTimeout(callback, 0, ...args)
   }
 }
@@ -185,7 +185,7 @@ global.MutationObserver = jest.fn().mockImplementation(() => ({
 }))
 
 // Mock WebSocket
-global.WebSocket = jest.fn().mockImplementation(() => ({
+(global as any).WebSocket = jest.fn().mockImplementation(() => ({
   send: jest.fn(),
   close: jest.fn(),
   addEventListener: jest.fn(),
@@ -206,7 +206,7 @@ global.EventSource = jest.fn().mockImplementation(() => ({
   CONNECTING: 0,
   OPEN: 1,
   CLOSED: 2
-}))
+})) as any
 
 // Set up fake timers for consistent testing
 beforeEach(() => {

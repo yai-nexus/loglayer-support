@@ -1,6 +1,6 @@
-# API 参考文档
+# LogLayer v0.6.0-beta.1 API 参考文档
 
-本文档提供 `@yai-nexus/loglayer-support` 所有 API 的详细说明。
+本文档提供 `@yai-nexus/loglayer-support` v0.6.0-beta.1 所有 API 的详细说明，包括新增的错误处理、性能优化和配置验证功能。
 
 ## 核心 API
 
