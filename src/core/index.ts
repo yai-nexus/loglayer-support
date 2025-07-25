@@ -12,3 +12,6 @@ export * from './environment';
 
 // 错误处理
 export * from './error-handling';
+
+// 性能优化
+export * from './performance';

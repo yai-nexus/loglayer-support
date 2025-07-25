@@ -5,6 +5,7 @@
 
 import type { LogOutput, BrowserLogData, HttpOutputConfig, BrowserLogLevel } from '../../browser'
 import { shouldLog, calculateRetryDelay, isBrowser } from '../utils'
+import { SmartBatcher, FastSerializer, MemoryManager } from '../../../core'
 
 export class HttpOutput implements LogOutput {
   readonly name = 'http'
@@ -12,6 +13,9 @@ export class HttpOutput implements LogOutput {
   private buffer: BrowserLogData[] = []
   private flushTimer: NodeJS.Timeout | null = null
   private isDestroyed = false
+  private readonly batcher: SmartBatcher<BrowserLogData>
+  private readonly serializer: FastSerializer
+  private readonly memoryManager: MemoryManager
 
   constructor(config: HttpOutputConfig) {
     const defaultConfig = {
@@ -34,6 +38,28 @@ export class HttpOutput implements LogOutput {
       ...config
     }
 
+    // 初始化性能组件
+    this.batcher = new SmartBatcher(
+      async (logs) => this.sendLogs(logs),
+      {
+        maxBatchSize: this.config.batchSize,
+        batchTimeout: this.config.flushInterval,
+        adaptive: true
+      }
+    )
+
+    this.serializer = new FastSerializer({
+      fastMode: true,
+      caching: true,
+      cacheSize: 500
+    })
+
+    this.memoryManager = new MemoryManager({
+      maxMemoryUsage: 30, // 30MB for browser
+      checkInterval: 60000, // 1 minute
+      compression: true
+    })
+
     // 启动定时刷新
     this.startFlushTimer()
   }
@@ -54,10 +80,11 @@ export class HttpOutput implements LogOutput {
     // 应用数据转换
     const transformedData = this.config.transform ? this.config.transform(data) : data
 
-    // 添加到缓冲区
-    this.buffer.push(transformedData)
+    // 使用智能批处理器
+    this.batcher.add(transformedData)
 
-    // 检查是否需要立即刷新
+    // 同时保持原有的缓冲区逻辑作为备用
+    this.buffer.push(transformedData)
     if (this.buffer.length >= this.config.batchSize!) {
       this.flush()
     }
@@ -101,10 +128,13 @@ export class HttpOutput implements LogOutput {
     
     for (let attempt = 1; attempt <= this.config.retryAttempts!; attempt++) {
       try {
+        // 使用内存压缩优化传输
+        const compressedLogs = this.memoryManager.compress(logs)
+
         const response = await fetch(this.config.endpoint!, {
           method: this.config.method,
           headers: this.config.headers,
-          body: JSON.stringify(logs)
+          body: compressedLogs
         })
 
         if (!response.ok) {
@@ -188,7 +218,12 @@ export class HttpOutput implements LogOutput {
   async destroy(): Promise<void> {
     this.isDestroyed = true
     this.stopFlushTimer()
-    
+
+    // 销毁性能组件
+    await this.batcher.destroy()
+    this.serializer.destroy()
+    this.memoryManager.destroy()
+
     // 最后一次刷新，发送剩余的日志
     if (this.buffer.length > 0) {
       try {
