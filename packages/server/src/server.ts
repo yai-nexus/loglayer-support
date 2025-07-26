@@ -360,15 +360,27 @@ function createCompatibleWrapper(logLayer: LogLayer): CompatibleLogger {
  */
 export async function createServerLogger(
   name: string,
-  config?: ServerLoggerConfig
+  config?: ServerLoggerConfig | LoggerConfig
 ): Promise<CompatibleLogger> {
   // 简化实现，直接返回 LogLayer 实例
   
-  // 转换配置为 ServerOutput 格式
-  const outputs: ServerOutput[] = (config?.outputs || [{ type: 'stdout' }]).map(output => ({
-    type: output.type as any,
-    config: output.config
-  }))
+  // 转换配置为 ServerOutput 格式 - 支持两种配置格式
+  let outputs: ServerOutput[];
+  if ((config as any)?.server?.outputs) {
+    // LoggerConfig 格式 (config.server.outputs)
+    outputs = (config as any).server.outputs.map((output: any) => ({
+      type: output.type as any,
+      config: output.config,
+      level: output.level
+    }));
+  } else {
+    // ServerLoggerConfig 格式 (config.outputs)
+    outputs = ((config as any)?.outputs || [{ type: 'stdout' }]).map((output: any) => ({
+      type: output.type as any,
+      config: output.config,
+      level: output.level
+    }));
+  }
   
   // 创建 ServerTransport
   const transport = new ServerTransport(outputs)

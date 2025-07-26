@@ -1,7 +1,7 @@
 /**
- * 服务端核心引擎
+ * 服务端日志传输层
  *
- * 使用原生 Node.js API 的零依赖日志引擎
+ * 使用原生 Node.js API 的零依赖日志传输实现
  */
 
 import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport'
@@ -9,6 +9,8 @@ import type { LogLayerTransportParams, LogLevelType } from '@loglayer/shared'
 import type { LogLevel, LogMetadata, ServerOutput } from '@yai-loglayer/core';
 import { isBrowserEnvironment, serializeMessages } from '@yai-loglayer/core';
 // import { getLocalTimestamp } from './utils'; // 暂时移除，使用内联实现
+
+
 
 /**
  * 获取本地时间戳
@@ -35,9 +37,11 @@ import * as path from 'path';
 import * as http from 'http';
 
 /**
- * 服务端核心 Logger（使用原生 Node.js API）
+ * 服务端输出引擎（使用原生 Node.js API）
+ * 
+ * 负责将日志消息路由到不同的输出目标：stdout、file、SLS、HTTP 等
  */
-export class CoreServerLogger {
+export class ServerOutputEngine {
   private outputs: ServerOutput[];
   private fs?: typeof import('fs');
   private path?: typeof import('path');
@@ -99,7 +103,9 @@ export class CoreServerLogger {
           this.writeToFile(message, meta, level, output.config);
           break;
         case 'sls':
-          this.sendToSls(message, meta, level, output.config);
+          this.sendToSls(message, meta, level, output.config).catch(() => {
+            // SLS 发送失败，静默处理
+          });
           break;
         case 'http':
           this.sendToHttp(message, meta, level, output.config);
@@ -143,7 +149,7 @@ export class CoreServerLogger {
     }
   }
 
-  private sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): void {
+  private async sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): Promise<void> {
     // 检查必需的配置参数
     if (
       !config?.endpoint ||
@@ -162,7 +168,9 @@ export class CoreServerLogger {
     }
 
     try {
-      // 动态导入 SLS SDK
+      // 使用 createRequire 来导入 CommonJS 模块
+      const { createRequire } = await import('module');
+      const require = createRequire(import.meta.url);
       const Client = require('@alicloud/log');
 
       // 创建 SLS 客户端
@@ -177,7 +185,7 @@ export class CoreServerLogger {
       const logContent = {
         level,
         message,
-        hostname: require('os').hostname(),
+        hostname: (await import('os')).hostname(),
         pid: String(process.pid), // SLS 需要字符串值
         app_name: config.appName || 'unknown',
         // 将 meta 数据也转换为字符串
@@ -196,11 +204,17 @@ export class CoreServerLogger {
         source: config.source || 'nodejs',
       };
 
-      client.postLogStoreLogs(config.project, config.logstore, logGroup).catch(() => {
-        // SLS 发送失败，静默处理
+      client.postLogStoreLogs(config.project, config.logstore, logGroup).then(() => {
+        // SLS 发送成功，静默处理
+      }).catch((error: any) => {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('[LogLayer SLS] 发送失败:', error?.message || error);
+        }
       });
-    } catch (error) {
-      // SLS SDK 不可用或其他错误，静默处理
+    } catch (error: any) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('[LogLayer SLS] 发送过程中出现错误:', error?.message || error);
+      }
     }
   }
 
@@ -225,11 +239,11 @@ export interface ServerTransportConfig extends LoggerlessTransportConfig {
 }
 
 export class ServerTransport extends LoggerlessTransport {
-  private coreLogger: CoreServerLogger
+  private outputEngine: ServerOutputEngine
 
   constructor(outputs: ServerOutput[]) {
     super({ id: 'server-transport' })
-    this.coreLogger = new CoreServerLogger(outputs)
+    this.outputEngine = new ServerOutputEngine(outputs)
   }
 
   /**
@@ -245,28 +259,28 @@ export class ServerTransport extends LoggerlessTransport {
     const message = serializeMessages(messages)
     const meta = data || {}
 
-    // 使用核心 logger 处理日志
-    this.coreLogger.debug = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('debug', msg, metadata)
-    this.coreLogger.info = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('info', msg, metadata)
-    this.coreLogger.warn = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('warn', msg, metadata)
-    this.coreLogger.error = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('error', msg, metadata)
+    // 使用输出引擎处理日志
+    this.outputEngine.debug = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('debug', msg, metadata)
+    this.outputEngine.info = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('info', msg, metadata)
+    this.outputEngine.warn = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('warn', msg, metadata)
+    this.outputEngine.error = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('error', msg, metadata)
 
     // 调用对应的日志方法
     switch (level) {
       case 'debug':
-        this.coreLogger.debug(message, meta)
+        this.outputEngine.debug(message, meta)
         break
       case 'info':
-        this.coreLogger.info(message, meta)
+        this.outputEngine.info(message, meta)
         break
       case 'warn':
-        this.coreLogger.warn(message, meta)
+        this.outputEngine.warn(message, meta)
         break
       case 'error':
-        this.coreLogger.error(message, meta)
+        this.outputEngine.error(message, meta)
         break
       default:
-        this.coreLogger.info(message, meta)
+        this.outputEngine.info(message, meta)
     }
 
     return messages
