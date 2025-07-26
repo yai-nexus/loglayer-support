@@ -10,11 +10,11 @@ export default function HomePage() {
 
   // 页面加载时记录日志
   useEffect(() => {
-    uiLogger.info('NextJS 页面加载完成', {
+    uiLogger.withMetadata({
       page: 'home',
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent
-    })
+    }).info('NextJS 页面加载完成')
     
     addLog('✅ 页面加载完成，已记录客户端日志')
   }, [])
@@ -25,23 +25,23 @@ export default function HomePage() {
 
   // 基础日志测试
   const handleInfoLog = () => {
-    logger.info('用户点击了 Info 按钮', {
+    logger.withMetadata({
       buttonType: 'info',
       timestamp: new Date().toISOString()
-    })
+    }).info('用户点击了 Info 按钮')
     addLog('📝 已触发 Info 日志')
   }
 
   const handleErrorLog = () => {
     setErrorCount(prev => prev + 1)
     const error = new Error(`模拟错误 #${errorCount + 1}`)
-    logger.error('用户触发的测试错误', {
+    logger.withMetadata({
       errorCount: errorCount + 1,
       userTriggered: true,
       error,
       errorName: error.name,
       errorStack: error.stack
-    })
+    }).error('用户触发的测试错误')
     addLog(`❌ 已触发 Error 日志 (#${errorCount + 1})`)
   }
 
@@ -88,11 +88,13 @@ export default function HomePage() {
     const endTime = performance.now()
     const duration = endTime - startTime
     
-    uiLogger.logPerformance('client-computation', duration, {
+    uiLogger.withMetadata({
+      operation: 'client-computation',
+      duration: Math.round(duration),
       iterations: 1000000,
       result: result.toFixed(2),
       timestamp: new Date().toISOString()
-    })
+    }).info('性能: client-computation')
     
     addLog(`⚡ 性能测试完成: ${duration.toFixed(2)}ms`)
   }
@@ -104,12 +106,15 @@ export default function HomePage() {
       const obj: any = null
       obj.nonExistentMethod()
     } catch (error) {
-      uiLogger.logError(error as Error, {
+      uiLogger.withMetadata({
         simulatedCrash: true,
         timestamp: new Date().toISOString(),
-        location: 'handleCrashSimulation'
-      }, '模拟的客户端崩溃')
-      
+        location: 'handleCrashSimulation',
+        error: error as Error,
+        errorName: (error as Error).name,
+        errorStack: (error as Error).stack
+      }).error('模拟的客户端崩溃')
+
       addLog('💥 已模拟客户端崩溃并记录')
     }
   }

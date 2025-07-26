@@ -14,10 +14,12 @@ const createClientLogger = (): LogLayer => {
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     outputs: {
       console: {
+        enabled: true,
         colorized: true,
         groupCollapsed: true
       },
       localStorage: {
+        enabled: true,
         key: 'app-logs',
         maxEntries: 100
       },
@@ -46,31 +48,37 @@ export const apiLogger = clientLogger;
 // 添加一些便捷方法来展示新功能
 export const logPageLoad = () => {
   const loadTime = performance.now();
-  clientLogger.info('Performance: page-load', {
+  clientLogger.withMetadata({
     operation: 'page-load',
     duration: loadTime,
     performanceType: 'measurement',
     url: window.location.href,
     userAgent: navigator.userAgent
-  });
+  }).info('Performance: page-load');
 };
 
 export const logUserAction = (action: string, element: string, metadata: any = {}) => {
-  clientLogger.info(`用户操作: ${action}`, {
+  clientLogger.withMetadata({
     action,
     element,
     timestamp: new Date().toISOString(),
     ...metadata
-  });
+  }).info(`用户操作: ${action}`);
 };
 
 export const logApiCall = (endpoint: string, method: string, duration: number, status?: number) => {
   const level = status && status >= 400 ? 'error' : 'info';
-  clientLogger[level](`API 调用: ${method} ${endpoint}`, {
+  const metadata = {
     endpoint,
     method,
     duration: `${duration.toFixed(2)}ms`,
     status,
     timestamp: new Date().toISOString()
-  });
+  };
+
+  if (level === 'error') {
+    clientLogger.withMetadata(metadata).error(`API 调用: ${method} ${endpoint}`);
+  } else {
+    clientLogger.withMetadata(metadata).info(`API 调用: ${method} ${endpoint}`);
+  }
 };

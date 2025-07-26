@@ -10,14 +10,14 @@ echo "📅 停止时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
 # 确保在项目根目录下运行
-if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs" ]]; then
+if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs-example" ]]; then
     echo "❌ 请在项目根目录下运行此脚本"
     echo "💡 使用方法: ./scripts/stop-nextjs.sh"
     exit 1
 fi
 
 # 进入 Next.js 目录
-cd examples/nextjs
+cd examples/nextjs-example
 
 # 检查是否有保存的 PID
 if [[ -f "nextjs.pid" ]]; then

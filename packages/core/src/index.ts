@@ -72,7 +72,13 @@ export {
   createDevelopmentConfig,
   createProductionConfig,
   createConfigForEnvironment,
-  presets
+  presets,
+  // 便捷配置创建函数
+  createServerConfig,
+  createClientConfig,
+  createFileLoggerConfig,
+  createDevConfig,
+  createProdConfig,
 } from './creators';
 
 // 配置验证和工具函数

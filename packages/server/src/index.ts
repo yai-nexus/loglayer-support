@@ -19,12 +19,10 @@ export {
   type InitializationConfig,
   type PerformanceConfig,
   type HealthCheckConfig,
-  type ServerLoggerConfig,
   type ServerLoggerOptions,
   type ModuleLogger,
   type ServerLoggerInstance,
   type ServerLoggerManager,
-  type CompatibleLogger,
 
   // 主要工厂函数
   createServerLogger,

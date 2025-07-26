@@ -10,9 +10,9 @@ echo "📅 运行时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
 # 确保在项目根目录下运行
-if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs" ]]; then
+if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs-example" ]]; then
     echo "❌ 请在项目根目录下运行此脚本"
-    echo "💡 使用方法: ./scripts/test-nextjs.sh"
+    echo "💡 使用方法: ./scripts/run-nextjs-example.sh"
     exit 1
 fi
 

@@ -10,7 +10,7 @@ echo "📅 启动时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
 # 确保在项目根目录下运行
-if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs" ]]; then
+if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs-example" ]]; then
     echo "❌ 请在项目根目录下运行此脚本"
     echo "💡 使用方法: ./scripts/start-nextjs.sh"
     exit 1
@@ -34,7 +34,7 @@ if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null 2>&1; then
 fi
 
 # 进入 Next.js 目录
-cd examples/nextjs
+cd examples/nextjs-example
 
 # 检查依赖是否安装
 if [[ ! -d "node_modules" ]]; then
@@ -105,7 +105,7 @@ echo ""
 echo "📋 使用说明:"
 echo "   🌐 访问应用: http://localhost:3001"
 echo "   📝 查看日志: tail -f logs/nextjs.log"
-echo "   📄 控制台日志: tail -f examples/nextjs/nextjs-console.log"
+echo "   📄 控制台日志: tail -f examples/nextjs-example/nextjs-console.log"
 echo "   🛑 停止应用: ./scripts/stop-nextjs.sh"
 echo ""
 echo "🧪 测试功能:"

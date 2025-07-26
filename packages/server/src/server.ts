@@ -7,7 +7,7 @@
 
 import { LogLayer } from 'loglayer'
 import type { LogLayerConfig } from 'loglayer'
-import type { LoggerConfig, LogLevel, ServerOutput } from '@yai-loglayer/core'
+import type { LoggerConfig, ServerOutput } from '@yai-loglayer/core'
 import { ServerTransport } from './server-transport'
 
 // ==================== 核心类型定义 ====================
@@ -119,49 +119,6 @@ export interface HealthCheckConfig {
 // ==================== 主配置接口 ====================
 
 /**
- * 服务端日志器配置
- */
-export interface ServerLoggerConfig extends Omit<LoggerConfig, 'server' | 'client'> {
-  level: {
-    default: LogLevel
-    loggers?: Record<string, LogLevel>
-  }
-  /** 服务端环境 */
-  environment?: ServerEnvironment
-
-  /** 路径配置 */
-  paths?: PathConfig
-
-  /** 服务端输出配置 */
-  outputs?: ServerOutputConfig[]
-
-  /** 模块化配置 */
-  modules?: Record<string, ModuleConfig>
-
-  /** 初始化配置 */
-  initialization?: InitializationConfig
-
-  /** 性能监控配置 */
-  performance?: PerformanceConfig
-
-  /** 健康检查配置 */
-  healthCheck?: HealthCheckConfig
-
-  /** 全局上下文 */
-  globalContext?: Record<string, any>
-
-  /** 错误处理配置 */
-  errorHandling?: {
-    /** 是否捕获未处理的异常 */
-    captureUncaughtExceptions?: boolean
-    /** 是否捕获未处理的 Promise 拒绝 */
-    captureUnhandledRejections?: boolean
-    /** 错误处理器 */
-    errorHandler?: (error: Error, context?: any) => void
-  }
-}
-
-/**
  * 服务端日志器选项
  */
 export interface ServerLoggerOptions {
@@ -211,10 +168,10 @@ export interface ServerLoggerInstance {
   getModuleNames(): string[]
 
   /** 获取配置 */
-  getConfig(): ServerLoggerConfig
+  getConfig(): LoggerConfig
 
   /** 更新配置 */
-  updateConfig(config: Partial<ServerLoggerConfig>): Promise<void>
+  updateConfig(config: Partial<LoggerConfig>): Promise<void>
 
   /** 获取运行时统计信息 */
   getStats(): {
@@ -253,7 +210,7 @@ export interface ServerLoggerInstance {
  */
 export interface ServerLoggerManager {
   /** 创建新实例 */
-  create(name: string, config?: ServerLoggerConfig): Promise<ServerLoggerInstance>
+  create(name: string, config?: LoggerConfig): Promise<ServerLoggerInstance>
 
   /** 获取现有实例 */
   get(name: string): ServerLoggerInstance | undefined
@@ -285,113 +242,33 @@ export interface ServerLoggerManager {
   flushAll(): Promise<void>
 }
 
-// ==================== 兼容接口 ====================
-
-/**
- * 兼容的日志器接口，支持传递对象作为第二个参数
- */
-export interface CompatibleLogger {
-  debug(message: string, metadata?: Record<string, any>): void;
-  info(message: string, metadata?: Record<string, any>): void;
-  warn(message: string, metadata?: Record<string, any>): void;
-  error(message: string, metadata?: Record<string, any>): void;
-  trace?(message: string, metadata?: Record<string, any>): void;
-  fatal?(message: string, metadata?: Record<string, any>): void;
-}
-
-/**
- * 创建兼容的日志器包装器
- */
-function createCompatibleWrapper(logLayer: LogLayer): CompatibleLogger {
-  return {
-    debug: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).debug(message);
-      } else {
-        logLayer.debug(message);
-      }
-    },
-    info: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).info(message);
-      } else {
-        logLayer.info(message);
-      }
-    },
-    warn: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).warn(message);
-      } else {
-        logLayer.warn(message);
-      }
-    },
-    error: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).error(message);
-      } else {
-        logLayer.error(message);
-      }
-    },
-    trace: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).trace(message);
-      } else {
-        logLayer.trace(message);
-      }
-    },
-    fatal: (message: string, metadata?: Record<string, any>) => {
-      if (metadata && Object.keys(metadata).length > 0) {
-        logLayer.withMetadata(metadata).fatal(message);
-      } else {
-        logLayer.fatal(message);
-      }
-    }
-  };
-}
+// ==================== 工厂函数 ====================
 
 // ==================== 工厂函数 ====================
 
 /**
- * 创建服务端日志器（简化版本）
+ * 创建服务端日志器
  *
  * @param name 日志器名称
  * @param config 日志器配置
- * @returns 兼容的日志器实例
+ * @returns LogLayer 实例
  */
 export async function createServerLogger(
   name: string,
-  config?: ServerLoggerConfig | LoggerConfig
-): Promise<CompatibleLogger> {
-  // 简化实现，直接返回 LogLayer 实例
-  
-  // 转换配置为 ServerOutput 格式 - 支持两种配置格式
-  let outputs: ServerOutput[];
-  if ((config as any)?.server?.outputs) {
-    // LoggerConfig 格式 (config.server.outputs)
-    outputs = (config as any).server.outputs.map((output: any) => ({
-      type: output.type as any,
-      config: output.config,
-      level: output.level
-    }));
-  } else {
-    // ServerLoggerConfig 格式 (config.outputs)
-    outputs = ((config as any)?.outputs || [{ type: 'stdout' }]).map((output: any) => ({
-      type: output.type as any,
-      config: output.config,
-      level: output.level
-    }));
-  }
-  
+  config?: LoggerConfig
+): Promise<LogLayer> {
+  // 使用统一的 LoggerConfig 格式
+  const outputs: ServerOutput[] = config?.server?.outputs || [{ type: 'stdout' }];
+
   // 创建 ServerTransport
   const transport = new ServerTransport(outputs)
-  
+
   // 创建 LogLayer 配置
   const logLayerConfig: LogLayerConfig = {
     transport
   }
 
-  const logLayer = new LogLayer(logLayerConfig)
-  return createCompatibleWrapper(logLayer)
+  return new LogLayer(logLayerConfig)
 }
 
 /**
@@ -401,11 +278,11 @@ export async function createServerLogger(
  * @returns 简化的管理器
  */
 export function createServerLoggerManager(
-  globalConfig?: Partial<ServerLoggerConfig>
+  globalConfig?: Partial<LoggerConfig>
 ): any {
   // 简化实现，返回基础管理器
   return {
-    create: async (name: string, config?: ServerLoggerConfig) => {
+    create: async (name: string, config?: LoggerConfig) => {
       return await createServerLogger(name, config)
     },
     getManagerStats: () => ({
@@ -418,27 +295,31 @@ export function createServerLoggerManager(
 }
 
 /**
- * 创建 Next.js 服务端日志器（简化版本）
+ * 创建 Next.js 服务端日志器
  *
  * @param config Next.js 特定配置
  * @returns LogLayer 实例
  */
 export function createNextjsServerLogger(
-  config?: Partial<ServerLoggerConfig>
-): Promise<CompatibleLogger> {
-  const nextjsConfig: ServerLoggerConfig = {
+  config?: Partial<LoggerConfig>
+): Promise<LogLayer> {
+  const nextjsConfig: LoggerConfig = {
     level: { default: 'info' },
-    environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
-    outputs: [
-      { type: 'stdout' },
-      {
-        type: 'file',
-        config: {
-          dir: './logs',
-          filename: 'nextjs.log'
+    server: {
+      outputs: [
+        { type: 'stdout' },
+        {
+          type: 'file',
+          config: {
+            dir: './logs',
+            filename: 'nextjs.log'
+          }
         }
-      }
-    ],
+      ]
+    },
+    client: {
+      outputs: [{ type: 'console' }]
+    },
     ...config
   }
 
@@ -446,27 +327,31 @@ export function createNextjsServerLogger(
 }
 
 /**
- * 创建 Express.js 服务端日志器（简化版本）
+ * 创建 Express.js 服务端日志器
  *
  * @param config Express.js 特定配置
  * @returns LogLayer 实例
  */
 export function createExpressServerLogger(
-  config?: Partial<ServerLoggerConfig>
-): Promise<CompatibleLogger> {
-  const expressConfig: ServerLoggerConfig = {
+  config?: Partial<LoggerConfig>
+): Promise<LogLayer> {
+  const expressConfig: LoggerConfig = {
     level: { default: 'info' },
-    environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
-    outputs: [
-      { type: 'stdout' },
-      {
-        type: 'file',
-        config: {
-          dir: './logs',
-          filename: 'express.log'
+    server: {
+      outputs: [
+        { type: 'stdout' },
+        {
+          type: 'file',
+          config: {
+            dir: './logs',
+            filename: 'express.log'
+          }
         }
-      }
-    ],
+      ]
+    },
+    client: {
+      outputs: [{ type: 'console' }]
+    },
     ...config
   }
 

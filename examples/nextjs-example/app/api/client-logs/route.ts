@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createNextjsLogReceiver } from '@yai-loglayer/server'
+import { createNextjsLogReceiver } from '@yai-loglayer/receiver'
 import { getServerInstance } from '../../../lib/server-logger'
 
 /**
@@ -20,30 +20,22 @@ const createLogReceiver = async () => {
     processing: {
       supportBatch: true,
       maxBatchSize: 50,
-      addServerContext: true,
-      reconstructErrors: true
+      enableFiltering: true,
+      enableFormatting: true,
+      preserveMetadata: true
     },
-    security: {
-      validateOrigin: false, // 示例项目中禁用，生产环境应启用
-      rateLimiting: {
-        maxRequestsPerMinute: 100,
-        byIP: true
-      }
-    },
-    response: {
-      successMessage: '日志已成功接收',
-      includeStats: true
-    },
-    debug: process.env.NODE_ENV === 'development'
+    adapter: 'nextjs'
   });
 };
 
 // 创建接收器实例
 const logReceiverPromise = createLogReceiver();
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const logReceiver = await logReceiverPromise;
-  return logReceiver(request);
+  const result = await logReceiver(request);
+  const data = await result.json();
+  return NextResponse.json(data, { status: result.status });
 }
 
 /**

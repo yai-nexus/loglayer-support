@@ -237,3 +237,105 @@ export const presets = {
     },
   }),
 };
+
+// =============================================================================
+// 便捷配置创建函数
+// =============================================================================
+
+/**
+ * 创建服务端配置（只包含服务端输出）
+ */
+export function createServerConfig(outputs: import('./types').ServerOutput[]): LoggerConfig {
+  return {
+    level: { default: 'info' },
+    server: { outputs },
+    client: { outputs: [{ type: 'console' }] }, // 默认客户端配置
+  };
+}
+
+/**
+ * 创建客户端配置（只包含客户端输出）
+ */
+export function createClientConfig(outputs: import('./types').ClientOutput[]): LoggerConfig {
+  return {
+    level: { default: 'info' },
+    server: { outputs: [{ type: 'stdout' }] }, // 默认服务端配置
+    client: { outputs },
+  };
+}
+
+/**
+ * 创建简单的文件日志配置
+ */
+export function createFileLoggerConfig(
+  logDir: string = './logs',
+  filename: string = 'app.log'
+): LoggerConfig {
+  return createServerConfig([
+    { type: 'stdout' },
+    {
+      type: 'file',
+      config: { dir: logDir, filename },
+    },
+  ]);
+}
+
+/**
+ * 创建开发环境配置（详细日志 + 文件输出）
+ */
+export function createDevConfig(logDir: string = './logs'): LoggerConfig {
+  return {
+    level: { default: 'debug' },
+    server: {
+      outputs: [
+        { type: 'stdout' },
+        {
+          type: 'file',
+          config: { dir: logDir, filename: 'dev.log' },
+        },
+      ],
+    },
+    client: {
+      outputs: [{ type: 'console' }],
+    },
+  };
+}
+
+/**
+ * 创建生产环境配置（优化的日志级别 + 文件轮转）
+ */
+export function createProdConfig(logDir: string = '/var/log/app'): LoggerConfig {
+  return {
+    level: { default: 'info' },
+    server: {
+      outputs: [
+        { type: 'stdout', level: 'warn' }, // 只输出警告和错误到控制台
+        {
+          type: 'file',
+          level: 'info',
+          config: {
+            dir: logDir,
+            filename: 'app.log',
+            maxSize: '10MB',
+            maxFiles: 5,
+          },
+        },
+        {
+          type: 'file',
+          level: 'error',
+          config: {
+            dir: logDir,
+            filename: 'error.log',
+            maxSize: '5MB',
+            maxFiles: 10,
+          },
+        },
+      ],
+    },
+    client: {
+      outputs: [
+        { type: 'console', level: 'error' }, // 生产环境只显示错误
+      ],
+    },
+  };
+}
