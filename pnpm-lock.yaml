@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@alicloud/log':
+        specifier: ^1.2.5
+        version: 1.2.5
       '@changesets/changelog-github':
         specifier: ^0.5.1
         version: 0.5.1
