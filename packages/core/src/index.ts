@@ -13,5 +13,4 @@ export * from './message-utils'
 
 // 配置相关功能
 export * from './creators'
-export * from './presets'
 export * from './validation'

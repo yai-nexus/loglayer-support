@@ -6,64 +6,7 @@
 
 import type { LoggerConfig, LogLevel, EnvironmentInfo, ServerOutput, ClientOutput } from './types';
 
-/**
- * 验证配置的有效性
- */
-export function validateConfig(config: LoggerConfig): boolean {
-  // 检查基本结构
-  if (!config.level || typeof config.level.default !== 'string') {
-    return false;
-  }
-
-  if (!config.server || !Array.isArray(config.server.outputs)) {
-    return false;
-  }
-
-  if (!config.client || !Array.isArray(config.client.outputs)) {
-    return false;
-  }
-
-  // 验证日志级别
-  const validLevels = ['debug', 'info', 'warn', 'error'];
-  if (!validLevels.includes(config.level.default)) {
-    return false;
-  }
-
-  // 验证自定义 logger 级别
-  if (config.level.loggers) {
-    for (const level of Object.values(config.level.loggers)) {
-      if (!validLevels.includes(level)) {
-        return false;
-      }
-    }
-  }
-
-  // 验证服务端输出配置
-  for (const output of config.server.outputs) {
-    const validServerTypes = ['stdout', 'file', 'sls', 'http'];
-    if (!validServerTypes.includes(output.type)) {
-      return false;
-    }
-
-    if (output.level && !validLevels.includes(output.level)) {
-      return false;
-    }
-  }
-
-  // 验证客户端输出配置
-  for (const output of config.client.outputs) {
-    const validClientTypes = ['console', 'http', 'localstorage'];
-    if (!validClientTypes.includes(output.type)) {
-      return false;
-    }
-
-    if (output.level && !validLevels.includes(output.level)) {
-      return false;
-    }
-  }
-
-  return true;
-}
+// validateConfig 函数已移除，请使用 @yai-loglayer/core 的 ConfigValidator 类进行配置验证
 
 /**
  * 获取 logger 的有效级别

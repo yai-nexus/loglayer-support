@@ -10,8 +10,9 @@ import type { ClientOutput } from '@yai-loglayer/core'
 
 /**
  * 从旧的配置格式转换为新的 BrowserOutputConfig
+ * 内部函数，不对外暴露
  */
-export function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
+function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
   const config: BrowserOutputConfig = {}
 
   for (const output of outputs) {

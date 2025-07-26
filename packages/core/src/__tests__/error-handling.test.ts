@@ -13,7 +13,7 @@ import {
 } from '../error-handling'
 
 describe('ErrorHandler', () => {
-  let errorHandler: ErrorHandler
+  let errorHandler: ErrorHandler;
 
   beforeEach(() => {
     errorHandler = createErrorHandler({
@@ -22,7 +22,7 @@ describe('ErrorHandler', () => {
       retryDelay: 100,
       enableFallback: true,
       logErrors: false // 禁用日志以避免测试输出污染
-    })
+    });
   })
 
   afterEach(() => {

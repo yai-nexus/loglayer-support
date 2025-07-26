@@ -122,31 +122,4 @@ export interface ClientOutputConfig {
   ttl?: number; // 过期时间（毫秒）
 }
 
-// =============================================================================
-// 内部实现类型（基于 docs/implementation-strategy.md）
-// =============================================================================
-
-/**
- * 内部引擎类型
- */
-export type ServerEngineType = 'pino' | 'winston' | 'core';
-export type ClientEngineType = 'browser';
-
-// ILogger 已移除，直接使用 LogLayer
-
-/**
- * 引擎选择策略
- */
-export interface EngineStrategy {
-  preferred: ServerEngineType;
-  fallback: ServerEngineType;
-  guaranteed: ServerEngineType;
-}
-
-/**
- * 格式映射配置
- */
-export interface FormatMapping {
-  format: 'pretty' | 'json' | 'structured';
-  options: Record<string, unknown>;
-}
+// 内部实现类型已移至 internal-types.ts，不再从此文件导出

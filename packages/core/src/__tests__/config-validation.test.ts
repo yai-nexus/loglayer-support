@@ -187,11 +187,11 @@ describe('ValidationRules', () => {
 })
 
 describe('FieldValidator', () => {
-  let validator: FieldValidator
+  let validator: FieldValidator;
 
   beforeEach(() => {
-    validator = createFieldValidator()
-  })
+    validator = createFieldValidator();
+  });
 
   describe('基础功能', () => {
     it('应该能够添加验证规则', () => {

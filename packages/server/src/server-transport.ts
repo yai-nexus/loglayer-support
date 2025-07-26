@@ -38,10 +38,11 @@ import * as http from 'http';
 
 /**
  * 服务端输出引擎（使用原生 Node.js API）
- * 
+ *
  * 负责将日志消息路由到不同的输出目标：stdout、file、SLS、HTTP 等
+ * 内部类，不对外暴露
  */
-export class ServerOutputEngine {
+class ServerOutputEngine {
   private outputs: ServerOutput[];
   private fs?: typeof import('fs');
   private path?: typeof import('path');
