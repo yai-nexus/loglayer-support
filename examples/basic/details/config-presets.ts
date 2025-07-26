@@ -4,7 +4,7 @@
  * 展示如何使用 LogLayer 提供的预设配置
  */
 
-import { createLogger, createDefaultConfig, createDevelopmentConfig } from 'loglayer-support';
+import { createLogger, createDefaultConfig, createDevelopmentConfig } from '@yai-nexus/loglayer-support';
 import { printExampleTitle, createExampleRunner } from '../lib/shared-utils.ts';
 
 /**

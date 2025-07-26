@@ -24,34 +24,9 @@ const createClientLogger = (): LogLayer => {
       http: {
         enabled: true,
         endpoint: '/api/client-logs',
-        batchSize: 1, // 立即发送，适合示例
-        retryAttempts: 3,
-        retryDelay: 1000,
         headers: {
           'Content-Type': 'application/json'
         }
-      }
-    },
-    context: {
-      includeUserAgent: true,
-      includeUrl: true,
-      includeTimestamp: true
-    },
-    errorHandling: {
-      captureGlobalErrors: true,
-      captureUnhandledRejections: true
-    },
-    performance: {
-      enablePerformanceLogging: true,
-      autoLogPageLoad: true
-    },
-    sampling: {
-      rate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 生产环境采样
-      levelRates: {
-        error: 1.0, // 错误日志总是记录
-        warn: 0.8,
-        info: 0.5,
-        debug: 0.1
       }
     }
   });

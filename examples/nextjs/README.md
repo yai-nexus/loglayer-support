@@ -7,10 +7,9 @@
 ### 🌐 浏览器端日志器 (createBrowserLoggerSync)
 - ✅ 直接返回 LogLayer 实例
 - ✅ 多输出支持（Console + LocalStorage + HTTP）
-- ✅ 智能采样策略
-- ✅ 自动错误捕获
 - ✅ 类型安全的 TypeScript 支持
 - ✅ 彩色控制台输出
+- ✅ 简洁的配置API
 
 ### 🖥️ 服务端日志器 (createLogger)
 - ✅ 直接返回 LogLayer 实例

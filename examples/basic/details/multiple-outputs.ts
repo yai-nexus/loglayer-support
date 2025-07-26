@@ -4,8 +4,8 @@
  * 展示如何配置多种输出方式
  */
 
-import { createLogger } from 'loglayer-support';
-import type { LoggerConfig } from 'loglayer-support';
+import { createLogger } from '@yai-nexus/loglayer-support';
+import type { LoggerConfig } from '@yai-nexus/loglayer-support';
 import { createExampleRunner, getSLSConfig, getLogsDir } from '../lib/shared-utils.ts';
 
 /**

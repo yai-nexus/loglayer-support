@@ -4,7 +4,7 @@
  * 展示 LogLayer 的高级功能
  */
 
-import { createLogger, createDevelopmentConfig } from 'loglayer-support';
+import { createLogger, createDevelopmentConfig } from '@yai-nexus/loglayer-support';
 import { createExampleRunner, delay } from '../lib/shared-utils.ts';
 
 /**

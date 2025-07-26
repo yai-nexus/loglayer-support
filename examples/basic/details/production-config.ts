@@ -4,8 +4,8 @@
  * 展示适合生产环境的配置
  */
 
-import { createLogger } from 'loglayer-support';
-import type { LoggerConfig } from 'loglayer-support';
+import { createLogger } from '@yai-nexus/loglayer-support';
+import type { LoggerConfig } from '@yai-nexus/loglayer-support';
 import { createExampleRunner, getSLSConfig } from '../lib/shared-utils.ts';
 
 /**

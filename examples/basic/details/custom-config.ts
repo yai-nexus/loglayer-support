@@ -4,8 +4,8 @@
  * 展示如何创建自定义的日志配置
  */
 
-import { createLogger } from 'loglayer-support';
-import type { LoggerConfig } from 'loglayer-support';
+import { createLogger } from '@yai-nexus/loglayer-support';
+import type { LoggerConfig } from '@yai-nexus/loglayer-support';
 import { createExampleRunner, createFileLogConfig } from '../lib/shared-utils.ts';
 
 /**

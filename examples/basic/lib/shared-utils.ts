@@ -4,7 +4,7 @@
  * 提供所有示例共用的工具函数和配置
  */
 
-import type { LoggerConfig } from 'loglayer-support';
+import type { LoggerConfig } from '@yai-nexus/loglayer-support';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';

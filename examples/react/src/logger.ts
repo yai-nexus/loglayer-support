@@ -16,38 +16,12 @@ export const logger = createBrowserLoggerSync({
     localStorage: {
       key: 'react-app-logs',
       maxEntries: 200
-    },
-    // 在实际应用中，这里会配置发送到服务端
+    }
+    // 在实际应用中，可以启用HTTP输出
     // http: {
     //   enabled: true,
-    //   endpoint: '/api/logs',
-    //   batchSize: 10
+    //   endpoint: '/api/logs'
     // }
-  },
-  context: {
-    includeUserAgent: true,
-    includeUrl: true,
-    customFields: {
-      appName: () => 'React Demo App',
-      buildTime: () => new Date().toISOString()
-    }
-  },
-  errorHandling: {
-    captureGlobalErrors: true,
-    captureUnhandledRejections: true
-  },
-  performance: {
-    enablePerformanceLogging: true,
-    autoLogPageLoad: true
-  },
-  sampling: {
-    rate: import.meta.env.DEV ? 1.0 : 0.2,
-    levelRates: {
-      error: 1.0,
-      warn: 0.8,
-      info: 0.5,
-      debug: 0.1
-    }
   }
 })
 
