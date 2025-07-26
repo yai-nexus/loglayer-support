@@ -53,6 +53,8 @@ function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
 
 /**
  * 创建浏览器 LogLayer 实例
+ * 内部函数，建议使用更高级的 createBrowserLogger API
+ * @internal
  */
 export function createBrowserLogLayer(outputs: ClientOutput[]): LogLayer {
   const browserOutputs = convertLegacyOutputs(outputs)

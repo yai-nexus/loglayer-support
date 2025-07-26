@@ -65,19 +65,8 @@ export function getEnvVar(key: string, defaultValue: string = ''): string {
   return process.env[key] || defaultValue;
 }
 
-/**
- * 检查是否可以使用 Node.js API
- */
-export function canUseNodeAPIs(): boolean {
-  return isNodeEnvironment();
-}
-
-/**
- * 检查是否可以使用浏览器 API
- */
-export function canUseBrowserAPIs(): boolean {
-  return isBrowserEnvironment();
-}
+// canUseNodeAPIs 和 canUseBrowserAPIs 函数已移除
+// 请直接使用 isNodeEnvironment() 和 isBrowserEnvironment() 函数
 
 /**
  * 动态导入检测（用于可选依赖）

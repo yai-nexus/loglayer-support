@@ -1,153 +1,113 @@
 /**
- * 浏览器核心引擎
+ * Log Receiver Client
  *
- * 基于浏览器原生 API 的日志引擎，完全独立于服务端
+ * 一个轻量级的客户端，用于将日志发送到 @yai-loglayer/receiver 端点。
  */
-
-import type { LogLevel, LogMetadata, ClientOutput } from '@yai-loglayer/core';
 
 /**
- * 浏览器 Logger（基于浏览器原生 API）
+ * Log Receiver 客户端配置选项
  */
-export class BrowserLogger {
-  private outputs: ClientOutput[];
+export interface LogReceiverClientOptions {
+  /**
+   * 接收器端点的 URL
+   * @default '/api/client-logs'
+   */
+  url?: string;
 
-  constructor(outputs: ClientOutput[]) {
-    this.outputs = outputs;
-  }
+  /**
+   * 自定义请求头
+   */
+  headers?: Record<string, string>;
 
-  debug(message: string, meta: LogMetadata = {}): void {
-    this.log('debug', message, meta);
-  }
+  /**
+   * 批处理大小
+   * @default 10
+   */
+  batchSize?: number;
 
-  info(message: string, meta: LogMetadata = {}): void {
-    this.log('info', message, meta);
-  }
+  /**
+   * 批处理发送间隔（毫秒）
+   * @default 5000
+   */
+  flushInterval?: number;
+}
 
-  warn(message: string, meta: LogMetadata = {}): void {
-    this.log('warn', message, meta);
-  }
+/**
+ * 用于发送日志到 @yai-loglayer/receiver 的客户端
+ */
+export class LogReceiverClient {
+  private options: Required<LogReceiverClientOptions>;
+  private buffer: any[] = [];
+  private flushTimer: NodeJS.Timeout | null = null;
 
-  error(message: string, meta: LogMetadata = {}): void {
-    this.log('error', message, meta);
-  }
+  constructor(options: LogReceiverClientOptions = {}) {
+    this.options = {
+      url: options.url || '/api/client-logs',
+      headers: options.headers || {},
+      batchSize: options.batchSize || 10,
+      flushInterval: options.flushInterval || 5000,
+    };
 
-  private log(level: LogLevel, message: string, meta: LogMetadata): void {
-    this.outputs.forEach((output) => {
-      // 检查级别过滤
-      if (output.level && !this.shouldLog(level, output.level)) {
-        return;
-      }
-
-      switch (output.type) {
-        case 'console':
-          this.writeToConsole(message, meta, level);
-          break;
-        case 'http':
-          this.sendToServer(message, meta, level, output.config);
-          break;
-        case 'localstorage':
-          this.saveToStorage(message, meta, level, output.config);
-          break;
-      }
-    });
-  }
-
-  private shouldLog(messageLevel: LogLevel, outputLevel: LogLevel): boolean {
-    const levels = ['debug', 'info', 'warn', 'error'];
-    return levels.indexOf(messageLevel) >= levels.indexOf(outputLevel);
-  }
-
-  private writeToConsole(message: string, meta: LogMetadata, level: string): void {
-    const timestamp = new Date().toISOString();
-    const style = this.getConsoleStyle(level);
-    const hasMetadata = Object.keys(meta).length > 0;
-
-    if (hasMetadata) {
-      console.groupCollapsed(`%c${timestamp} [${level.toUpperCase()}] ${message}`, style);
-      console.table(meta);
-      console.groupEnd();
-    } else {
-      console.log(`%c${timestamp} [${level.toUpperCase()}] ${message}`, style);
+    if (typeof window !== 'undefined') {
+      this.startFlushTimer();
     }
   }
 
-  private sendToServer(message: string, meta: LogMetadata, level: string, config: any = {}): void {
-    const logData = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      ...meta,
-      userAgent:
-        typeof (globalThis as any).navigator !== 'undefined'
-          ? (globalThis as any).navigator.userAgent
-          : 'unknown',
-      url:
-        typeof (globalThis as any).window !== 'undefined'
-          ? (globalThis as any).window.location.href
-          : 'unknown',
-      sessionId: this.getSessionId(),
-    };
-
-    const endpoint = config?.endpoint || '/api/client-logs';
-    const headers = config?.headers || { 'Content-Type': 'application/json' };
-
-    fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(logData),
-    }).catch(() => {
-      // Log upload failed
-    });
+  /**
+   * 发送单条日志
+   * @param log - 要发送的日志对象
+   */
+  log(log: any): void {
+    this.buffer.push(log);
+    if (this.buffer.length >= this.options.batchSize) {
+      this.flush();
+    }
   }
 
-  private saveToStorage(message: string, meta: LogMetadata, level: string, config: any = {}): void {
-    const key = config?.key || 'app-logs';
-    const maxEntries = config?.maxEntries || 100;
+  /**
+   * 立即发送缓冲区中的所有日志
+   */
+  async flush(): Promise<void> {
+    if (this.buffer.length === 0 || typeof fetch === 'undefined') {
+      return;
+    }
+
+    const logsToSend = [...this.buffer];
+    this.buffer = [];
 
     try {
-      if (typeof (globalThis as any).localStorage === 'undefined') return;
-      const logs = JSON.parse((globalThis as any).localStorage.getItem(key) || '[]');
-      const newLog = {
-        timestamp: new Date().toISOString(),
-        level,
-        message,
-        ...meta,
-      };
-
-      logs.push(newLog);
-
-      // 保持最大条数限制
-      if (logs.length > maxEntries) {
-        logs.splice(0, logs.length - maxEntries);
-      }
-
-      (globalThis as any).localStorage.setItem(key, JSON.stringify(logs));
+      await fetch(this.options.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.options.headers,
+        },
+        body: JSON.stringify(logsToSend),
+        keepalive: true, // 确保在页面卸载时也能发送
+      });
     } catch (error) {
-      // Failed to save to localStorage
+      console.error('[LogReceiverClient] Failed to send logs:', error);
+      // 发送失败，将日志放回缓冲区以便下次重试
+      this.buffer.unshift(...logsToSend);
     }
   }
 
-  private getConsoleStyle(level: string): string {
-    const styles = {
-      debug: 'color: #888',
-      info: 'color: #2196F3',
-      warn: 'color: #FF9800',
-      error: 'color: #F44336',
-    };
-    return styles[level as keyof typeof styles] || '';
+  /**
+   * 启动定时发送器
+   */
+  private startFlushTimer(): void {
+    this.flushTimer = setInterval(() => this.flush(), this.options.flushInterval);
   }
 
-  private getSessionId(): string {
-    if (typeof (globalThis as any).sessionStorage === 'undefined') {
-      return 'sess_' + Math.random().toString(36).substr(2, 9);
+  /**
+   * 销毁实例，清理定时器
+   */
+  destroy(): void {
+    if (this.flushTimer) {
+      clearInterval(this.flushTimer);
+      this.flushTimer = null;
     }
-
-    let sessionId = (globalThis as any).sessionStorage.getItem('log-session-id');
-    if (!sessionId) {
-      sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
-      (globalThis as any).sessionStorage.setItem('log-session-id', sessionId);
-    }
-    return sessionId;
+    // 最后一次尝试发送
+    this.flush();
   }
 }
