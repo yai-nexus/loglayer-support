@@ -6,13 +6,43 @@
 
 import { createServerLogger } from '@yai-loglayer/server';
 import { createDevelopmentConfig } from '@yai-loglayer/core';
-import { createExampleRunner, delay } from '../lib/shared-utils.js';
+import type { LoggerConfig } from '@yai-loglayer/core';
+import { createExampleRunner, delay, getSLSConfig, getLogsDir } from '../lib/shared-utils.js';
 
 /**
  * 增强功能示例
  */
 async function runEnhancedFeaturesExample(): Promise<void> {
-  const config = createDevelopmentConfig();
+  const devConfig = createDevelopmentConfig();
+  const slsConfig = getSLSConfig();
+
+  // 创建包含 SLS 输出的配置
+  const config: LoggerConfig = {
+    level: devConfig.level,
+    server: {
+      outputs: [
+        { type: 'stdout' },
+        {
+          type: 'file',
+          config: {
+            dir: getLogsDir(),
+            filename: 'app.log',
+          },
+        },
+        {
+          type: 'sls',
+          level: 'info', // 只发送 info 及以上级别到 SLS
+          config: slsConfig
+        }
+      ]
+    },
+    client: {
+      outputs: [
+        { type: 'console' }
+      ]
+    }
+  };
+
   const logger = await createServerLogger('enhanced-demo', config);
   
   // 上下文绑定 - LogLayer 不支持这些方法，使用消息前缀和元数据替代

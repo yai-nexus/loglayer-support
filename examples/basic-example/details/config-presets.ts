@@ -6,8 +6,8 @@
 
 import { createServerLogger } from '@yai-loglayer/server';
 import { createDefaultConfig, createDevelopmentConfig } from '@yai-loglayer/core';
-import type { ServerLoggerConfig } from '@yai-loglayer/server';
-import { printExampleTitle, createExampleRunner, getLogsDir } from '../lib/shared-utils.js';
+import type { LoggerConfig } from '@yai-loglayer/core';
+import { printExampleTitle, createExampleRunner, getLogsDir, getSLSConfig } from '../lib/shared-utils.js';
 
 /**
  * 使用预设配置示例
@@ -19,21 +19,35 @@ async function runPresetsExample(): Promise<void> {
   
   logger1.info('使用默认配置的日志', { userId: 123 });
   
-  // 使用开发环境配置（包含文件输出）
+  // 使用开发环境配置（包含文件输出和 SLS 输出）
   const devConfig = createDevelopmentConfig();
-  // 修改文件输出路径为正确的 logs 目录
-  const serverConfig: ServerLoggerConfig = {
+  const slsConfig = getSLSConfig();
+
+  // 修改配置，添加 SLS 输出
+  const serverConfig: LoggerConfig = {
     level: devConfig.level,
-    outputs: [
-      { type: 'stdout' },
-      {
-        type: 'file',
-        config: {
-          dir: getLogsDir(),
-          filename: 'app.log',
+    server: {
+      outputs: [
+        { type: 'stdout' },
+        {
+          type: 'file',
+          config: {
+            dir: getLogsDir(),
+            filename: 'app.log',
+          },
         },
-      },
-    ]
+        {
+          type: 'sls',
+          level: 'info', // 只发送 info 及以上级别到 SLS
+          config: slsConfig
+        }
+      ]
+    },
+    client: {
+      outputs: [
+        { type: 'console' }
+      ]
+    }
   };
   const logger2 = await createServerLogger('api', serverConfig);
   

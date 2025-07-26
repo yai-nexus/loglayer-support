@@ -5,14 +5,16 @@
  */
 
 import { createServerLogger } from '@yai-loglayer/server';
-import type { ServerLoggerConfig } from '@yai-loglayer/server';
-import { createExampleRunner, getLogsDir } from '../lib/shared-utils.js';
+import type { LoggerConfig } from '@yai-loglayer/core';
+import { createExampleRunner, getLogsDir, getSLSConfig } from '../lib/shared-utils.js';
 
 /**
  * 自定义配置示例
  */
 async function runCustomConfigExample(): Promise<void> {
-  const customConfig: ServerLoggerConfig = {
+  const slsConfig = getSLSConfig();
+
+  const customConfig: LoggerConfig = {
     level: {
       default: 'info',
       loggers: {
@@ -21,16 +23,28 @@ async function runCustomConfigExample(): Promise<void> {
         'ui': 'error'         // UI 模块只显示错误
       }
     },
-    outputs: [
-      { type: 'stdout' },                                   // 控制台输出
-      {
-        type: 'file',
-        config: { 
-          dir: getLogsDir(), 
-          filename: 'custom.log' 
+    server: {
+      outputs: [
+        { type: 'stdout' },                                   // 控制台输出
+        {
+          type: 'file',
+          config: {
+            dir: getLogsDir(),
+            filename: 'custom.log'
+          }
+        },
+        {
+          type: 'sls',
+          level: 'warn', // 只发送 warn 及以上级别到 SLS
+          config: slsConfig
         }
-      }
-    ]
+      ]
+    },
+    client: {
+      outputs: [
+        { type: 'console' }
+      ]
+    }
   };
 
   // 创建不同模块的 logger
