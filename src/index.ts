@@ -94,13 +94,10 @@ export type {
   // 浏览器端类型
   BrowserLoggerConfig,
   BrowserLoggerOptions,
-  IBrowserLogger,
-  BrowserLogData,
   BrowserLogLevel,
   ConsoleOutputConfig,
   LocalStorageOutputConfig,
   HttpOutputConfig,
-  IndexedDBOutputConfig,
 
   // 服务端类型
   ServerLoggerConfig,

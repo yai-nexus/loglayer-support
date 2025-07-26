@@ -17,13 +17,10 @@ export {
 export type {
   BrowserLoggerConfig,
   BrowserLoggerOptions,
-  IBrowserLogger,
-  BrowserLogData,
   BrowserLogLevel,
   ConsoleOutputConfig,
   LocalStorageOutputConfig,
-  HttpOutputConfig,
-  IndexedDBOutputConfig
+  HttpOutputConfig
 } from './browser'
 
 // ==================== 服务端日志器 ====================
