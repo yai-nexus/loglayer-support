@@ -17,14 +17,10 @@ const nextConfig = {
     LOG_TO_FILE: process.env.LOG_TO_FILE || 'true',
   },
   
-  // Webpack 配置（处理 loglayer-support 本地引用）
+  // Webpack 配置（处理 monorepo 本地包引用）
   webpack: (config, { isServer }) => {
-    // 确保正确处理本地包引用
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'loglayer-support': require('path').resolve(__dirname, '../../src'),
-    };
-    
+    // 确保正确处理 monorepo 中的本地包引用
+    // 现在使用 packages/ 中的包，不需要特殊的 alias 配置
     return config;
   },
 };

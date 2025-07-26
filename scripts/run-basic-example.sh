@@ -10,19 +10,17 @@ echo "📅 运行时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
 # 确保在项目根目录下运行
-if [[ ! -f "package.json" ]] || [[ ! -d "examples/basic" ]]; then
+if [[ ! -f "package.json" ]] || [[ ! -d "examples/basic-example" ]]; then
     echo "❌ 请在项目根目录下运行此脚本"
     echo "💡 使用方法: ./scripts/run-basic-example.sh"
     exit 1
 fi
 
-# 确保项目已构建
-if [[ ! -f "dist/index.js" ]]; then
-    echo "📦 项目未构建，正在构建..."
-    npm run build
-    echo "✅ 项目构建完成"
-    echo ""
-fi
+# 确保 packages 已构建
+echo "📦 确保 packages 已构建..."
+npm run build:packages
+echo "✅ packages 构建完成"
+echo ""
 
 # 清理旧的日志文件
 echo "🧹 清理旧的基础示例日志..."
@@ -32,13 +30,13 @@ echo ""
 
 # 运行基础示例
 echo "=== 运行基础示例 ==="
-cd examples/basic
+cd examples/basic-example
 echo "📍 当前目录: $(pwd)"
 echo "🔄 运行 index.ts..."
 echo ""
 
 # 执行示例
-if npx ts-node index.ts; then
+if npx tsx index.ts; then
     echo ""
     echo "✅ 基础示例运行成功"
 else

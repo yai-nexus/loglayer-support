@@ -16,13 +16,11 @@ if [[ ! -f "package.json" ]] || [[ ! -d "examples/nextjs" ]]; then
     exit 1
 fi
 
-# 确保项目已构建
-if [[ ! -f "dist/index.js" ]]; then
-    echo "📦 项目未构建，正在构建..."
-    npm run build
-    echo "✅ 项目构建完成"
-    echo ""
-fi
+# 确保 packages 已构建
+echo "📦 确保 packages 已构建..."
+npm run build:packages
+echo "✅ packages 构建完成"
+echo ""
 
 # 检查端口是否被占用
 if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null 2>&1; then
