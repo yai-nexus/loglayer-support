@@ -15,7 +15,7 @@ dotenv.config();
 // 获取当前文件的目录
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '../..');
+const rootDir = path.resolve(__dirname, '..');
 
 /**
  * 获取日志目录路径

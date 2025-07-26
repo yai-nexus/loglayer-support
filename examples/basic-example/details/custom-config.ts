@@ -5,14 +5,14 @@
  */
 
 import { createServerLogger } from '@yai-loglayer/server';
-import type { LoggerConfig } from '@yai-loglayer/core';
-import { createExampleRunner, createFileLogConfig } from '../lib/shared-utils.js';
+import type { ServerLoggerConfig } from '@yai-loglayer/server';
+import { createExampleRunner, getLogsDir } from '../lib/shared-utils.js';
 
 /**
  * 自定义配置示例
  */
 async function runCustomConfigExample(): Promise<void> {
-  const customConfig: LoggerConfig = {
+  const customConfig: ServerLoggerConfig = {
     level: {
       default: 'info',
       loggers: {
@@ -21,25 +21,16 @@ async function runCustomConfigExample(): Promise<void> {
         'ui': 'error'         // UI 模块只显示错误
       }
     },
-    server: {
-      outputs: [
-        { type: 'stdout' },                                   // 控制台输出
-        {
-          type: 'file',
-          config: createFileLogConfig('basic.log')
+    outputs: [
+      { type: 'stdout' },                                   // 控制台输出
+      {
+        type: 'file',
+        config: { 
+          dir: getLogsDir(), 
+          filename: 'custom.log' 
         }
-      ]
-    },
-    client: {
-      outputs: [
-        { type: 'console' },                                  // 浏览器控制台
-        { 
-          type: 'http',
-          level: 'error',                                     // 只上报错误到服务器
-          config: { endpoint: '/api/client-logs' }
-        }
-      ]
-    }
+      }
+    ]
   };
 
   // 创建不同模块的 logger
@@ -57,7 +48,7 @@ async function runCustomConfigExample(): Promise<void> {
   authLogger.warn('认证失败', { attempts: 3 });
   uiLogger.error('组件渲染失败', { component: 'UserProfile' });
   
-  console.log('✅ 自定义配置示例完成');
+  console.log('✅ 自定义配置示例完成 - 日志已保存到 custom.log');
 }
 
 // 导出示例运行器
