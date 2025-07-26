@@ -43,7 +43,8 @@
       "Bash(npm run:*)",
       "Bash(tree:*)",
       "Bash(git tag:*)",
-      "Bash(npm publish:*)"
+      "Bash(npm publish:*)",
+      "Bash(npm version:*)"
     ],
     "deny": []
   }
