@@ -54,42 +54,57 @@ cd ../..
 echo ""
 echo "=== 验证日志文件 ==="
 
-if [[ -f "logs/basic.log" ]]; then
-    echo "✅ basic.log 已生成"
-    
+# 检查多个可能的日志文件位置
+BASIC_LOG_PATHS=("logs/basic.log" "examples/logs/basic.log")
+BASIC_LOG_FOUND=""
+
+for log_path in "${BASIC_LOG_PATHS[@]}"; do
+    if [[ -f "$log_path" ]]; then
+        BASIC_LOG_FOUND="$log_path"
+        break
+    fi
+done
+
+if [[ -n "$BASIC_LOG_FOUND" ]]; then
+    echo "✅ basic.log 已生成: $BASIC_LOG_FOUND"
+
     # 检查文件大小
-    LOG_LINES=$(wc -l < logs/basic.log)
+    LOG_LINES=$(wc -l < "$BASIC_LOG_FOUND")
     echo "📄 文件大小: $LOG_LINES 行"
-    
+
     if [[ $LOG_LINES -gt 0 ]]; then
         echo "✅ 日志文件包含内容"
-        
+
         # 验证本地时间格式
-        FIRST_TIMESTAMP=$(head -1 logs/basic.log | grep -o '^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]\{3\}' || echo "")
+        FIRST_TIMESTAMP=$(head -1 "$BASIC_LOG_FOUND" | grep -o '^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]\{3\}' || echo "")
         if [[ -n "$FIRST_TIMESTAMP" ]]; then
             echo "✅ 时间格式正确: $FIRST_TIMESTAMP (本地时间)"
         else
             echo "❌ 时间格式不正确"
-            echo "   第一行: $(head -1 logs/basic.log)"
+            echo "   第一行: $(head -1 "$BASIC_LOG_FOUND")"
         fi
-        
+
         # 显示日志内容摘要
         echo ""
         echo "🔍 日志内容摘要:"
-        echo "   第一行: $(head -1 logs/basic.log | cut -c1-80)..."
-        echo "   最后行: $(tail -1 logs/basic.log | cut -c1-80)..."
-        
+        echo "   第一行: $(head -1 "$BASIC_LOG_FOUND" | cut -c1-80)..."
+        echo "   最后行: $(tail -1 "$BASIC_LOG_FOUND" | cut -c1-80)..."
+
         # 显示最新几行日志
         echo ""
         echo "🔍 最新日志内容:"
-        tail -3 logs/basic.log | sed 's/^/   /'
-        
+        tail -3 "$BASIC_LOG_FOUND" | sed 's/^/   /'
+
     else
         echo "❌ 日志文件为空"
         exit 1
     fi
 else
     echo "❌ basic.log 未生成"
+    echo "🔍 查找的位置:"
+    for log_path in "${BASIC_LOG_PATHS[@]}"; do
+        echo "   - $log_path"
+    done
     exit 1
 fi
 

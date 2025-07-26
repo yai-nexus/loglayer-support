@@ -5,7 +5,7 @@
  */
 
 import { LogLayer } from 'loglayer';
-import { detectEnvironment } from '../core';
+import { detectEnvironment, serializeMessages } from '../core';
 import { validateConfig, getEffectiveOutputs } from '../config';
 import type {
   LoggerConfig,
@@ -120,10 +120,23 @@ export async function createResilientLogger(
  * 创建服务端 LogLayer 实例
  */
 async function createServerLogLayer(name: string, outputs: ServerOutput[]): Promise<LogLayer> {
-  // 尝试使用 pino transport
+  // 检查是否有文件输出，如果有则使用自定义 transport
+  const hasFileOutput = outputs.some(output => output.type === 'file');
+
+  if (hasFileOutput) {
+    // 使用自定义的 server transport 来处理文件输出
+    const { ServerTransport } = await import('../transports/server');
+    const transport = new ServerTransport(outputs);
+    return new LogLayer({
+      transport
+    });
+  }
+
+  // 如果只有控制台输出，使用标准的 pino/winston transport
   try {
     const { PinoTransport } = await import('@loglayer/transport-pino');
-    const transport = new PinoTransport({ logger: require('pino')() });
+    const pino = await import('pino');
+    const transport = new PinoTransport({ logger: pino.default() });
     return new LogLayer({
       transport
     });
@@ -131,9 +144,9 @@ async function createServerLogLayer(name: string, outputs: ServerOutput[]): Prom
     // 回退到 winston transport
     try {
       const { WinstonTransport } = await import('@loglayer/transport-winston');
-      const winston = require('winston');
-      const logger = winston.createLogger({
-        transports: [new winston.transports.Console()]
+      const winston = await import('winston');
+      const logger = winston.default.createLogger({
+        transports: [new winston.default.transports.Console()]
       });
       const transport = new WinstonTransport({ logger });
       return new LogLayer({
@@ -160,11 +173,15 @@ function createSimpleServerLogLayer(name: string, outputs: ServerOutput[]): LogL
     return new LogLayer({
       transport: {
         shipToLogger: (params) => {
-          console.log(params.messages.join(' '))
+          // 使用统一的消息序列化工具
+          const message = serializeMessages(params.messages)
+          console.log(message)
           return params.messages
         },
         _sendToLogger: (params) => {
-          console.log(params.messages.join(' '))
+          // 使用统一的消息序列化工具
+          const message = serializeMessages(params.messages)
+          console.log(message)
         },
         getLoggerInstance: () => console,
         enabled: true

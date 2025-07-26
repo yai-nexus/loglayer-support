@@ -13,8 +13,10 @@ export * from './environment';
 // 错误处理
 export * from './error-handling';
 
-// 性能优化
-export * from './performance';
+// 性能优化已移除（简化架构）
 
 // 配置验证
 export * from './config-validation';
+
+// 消息处理工具
+export * from './message-utils';

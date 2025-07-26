@@ -286,118 +286,80 @@ export interface ServerLoggerManager {
 // ==================== 工厂函数 ====================
 
 /**
- * 创建服务端日志器
+ * 创建服务端日志器（简化版本）
  *
  * @param name 日志器名称
  * @param config 日志器配置
- * @param options 创建选项
- * @returns 服务端日志器实例
+ * @returns LogLayer 实例
  */
 export async function createServerLogger(
   name: string,
-  config?: ServerLoggerConfig,
-  options?: ServerLoggerOptions
-): Promise<ServerLoggerInstance> {
-  const { ServerLoggerManagerImpl } = await import('./server/server-logger-manager')
-
-  const mergedOptions: ServerLoggerOptions = {
-    immediate: true,
-    initTimeout: 10000,
-    verbose: false,
-    ...options
+  config?: ServerLoggerConfig
+): Promise<LogLayer> {
+  // 简化实现，直接返回 LogLayer 实例
+  const { createLogger } = await import('../factory/core')
+  
+  const loggerConfig: LoggerConfig = {
+    level: config?.level || { default: 'info' },
+    server: {
+      outputs: (config?.outputs || [{ type: 'stdout' }]).map(output => ({
+        type: output.type as any,
+        config: output.config
+      }))
+    },
+    client: {
+      outputs: [{ type: 'console' }]
+    }
   }
 
-  // 创建临时管理器来创建单个实例
-  const manager = new ServerLoggerManagerImpl()
-
-  try {
-    const instance = await manager.create(name, config)
-
-    // 调用初始化钩子
-    if (mergedOptions.onInitialized) {
-      try {
-        await mergedOptions.onInitialized(instance)
-      } catch (error) {
-        if (mergedOptions.onError) {
-          mergedOptions.onError(error as Error)
-        }
-        console.warn('Initialization hook failed:', error)
-      }
-    }
-
-    return instance
-  } catch (error) {
-    if (mergedOptions.onError) {
-      mergedOptions.onError(error as Error)
-    }
-    throw error
-  }
+  return await createLogger(name, loggerConfig)
 }
 
 /**
- * 创建服务端日志器管理器
+ * 创建服务端日志器管理器（简化版本）
  *
  * @param globalConfig 全局配置
- * @returns 日志器管理器
+ * @returns 简化的管理器
  */
 export function createServerLoggerManager(
   globalConfig?: Partial<ServerLoggerConfig>
-): ServerLoggerManager {
-  const { ServerLoggerManagerImpl } = require('./server/server-logger-manager')
-  return new ServerLoggerManagerImpl(globalConfig)
+): any {
+  // 简化实现，返回基础管理器
+  return {
+    create: async (name: string, config?: ServerLoggerConfig) => {
+      return await createServerLogger(name, config)
+    },
+    getManagerStats: () => ({
+      totalInstances: 0,
+      activeInstances: 0,
+      totalLogs: 0,
+      uptime: 0
+    })
+  }
 }
 
 /**
- * 创建 Next.js 服务端日志器
+ * 创建 Next.js 服务端日志器（简化版本）
  *
  * @param config Next.js 特定配置
- * @returns 服务端日志器实例
+ * @returns LogLayer 实例
  */
 export function createNextjsServerLogger(
   config?: Partial<ServerLoggerConfig>
-): Promise<ServerLoggerInstance> {
+): Promise<LogLayer> {
   const nextjsConfig: ServerLoggerConfig = {
     level: { default: 'info' },
     environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
-    paths: {
-      autoDetectRoot: true,
-      pathStrategy: 'auto'
-    },
     outputs: [
       { type: 'stdout' },
       {
         type: 'file',
         config: {
           dir: './logs',
-          filename: 'nextjs.log',
-          rotation: {
-            maxSize: '10m',
-            maxFiles: 5,
-            datePattern: 'YYYY-MM-DD'
-          }
+          filename: 'nextjs.log'
         }
       }
     ],
-    modules: {
-      api: { level: 'info' },
-      database: { level: 'debug' },
-      auth: { level: 'warn' }
-    },
-    initialization: {
-      timeout: 10000,
-      fallbackToConsole: true,
-      logStartupInfo: true
-    },
-    performance: {
-      enabled: process.env.NODE_ENV === 'production',
-      interval: 60000,
-      memoryThreshold: 512,
-      cpuThreshold: 80
-    },
-    errorHandling: {
-      captureUncaughtExceptions: true,
-      captureUnhandledRejections: true
-    },
     ...config
   }
 
@@ -405,14 +367,14 @@ export function createNextjsServerLogger(
 }
 
 /**
- * 创建 Express.js 服务端日志器
+ * 创建 Express.js 服务端日志器（简化版本）
  *
  * @param config Express.js 特定配置
- * @returns 服务端日志器实例
+ * @returns LogLayer 实例
  */
 export function createExpressServerLogger(
   config?: Partial<ServerLoggerConfig>
-): Promise<ServerLoggerInstance> {
+): Promise<LogLayer> {
   const expressConfig: ServerLoggerConfig = {
     level: { default: 'info' },
     environment: (process.env.NODE_ENV as ServerEnvironment) || 'development',
@@ -426,15 +388,6 @@ export function createExpressServerLogger(
         }
       }
     ],
-    modules: {
-      router: { level: 'info' },
-      middleware: { level: 'debug' },
-      database: { level: 'debug' }
-    },
-    initialization: {
-      fallbackToConsole: true,
-      logStartupInfo: true
-    },
     ...config
   }
 

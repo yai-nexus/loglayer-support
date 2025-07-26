@@ -30,10 +30,7 @@ export type {
 import {
   createLogger,
   createLoggerSync,
-  createNextjsLogger,
-  createNextjsLoggerSync,
-  createResilientLogger,
-  LoggerFactory,
+  createResilientLogger
 } from './factory';
 import {
   createDefaultConfig,
@@ -49,10 +46,7 @@ import { presets } from './config';
 export {
   createLogger,
   createLoggerSync,
-  createNextjsLogger,
-  createNextjsLoggerSync,
-  createResilientLogger,
-  LoggerFactory,
+  createResilientLogger
 };
 
 // 配置创建函数
@@ -123,20 +117,7 @@ export type {
 
   // 接收器类型
   LogReceiverConfig,
-  LogReceiverOptions,
-  LogReceiverHandler,
-  ILogReceiver,
-  ClientLogData,
-  ClientInfo,
-  ValidationResult,
-  ProcessResult,
-  ResponseData,
-  FrameworkAdapter,
-  ValidationConfig,
-  ProcessingConfig,
-  SecurityConfig,
-  ResponseConfig,
-  LogReceiverPlugin,
+  NextjsLogReceiver,
 } from './frameworks';
 
 // =============================================================================

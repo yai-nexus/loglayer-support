@@ -7,6 +7,7 @@
 
 import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport'
 import type { LogLayerTransportParams, LogLevelType } from '@loglayer/shared'
+import { serializeMessages } from '../core'
 
 // 浏览器端输出配置
 export interface BrowserOutputConfig {
@@ -92,11 +93,14 @@ export class LoglayerBrowserTransport extends LoggerlessTransport {
   shipToLogger(params: LogLayerTransportParams): any[] {
     const { logLevel, messages, data } = params
     const timestamp = Date.now()
-    
+
+    // 使用统一的消息序列化工具
+    const message = serializeMessages(messages)
+
     // 构造统一的日志对象
     const logEntry = {
       level: logLevel,
-      message: messages.join(' '),
+      message,
       data,
       timestamp
     }

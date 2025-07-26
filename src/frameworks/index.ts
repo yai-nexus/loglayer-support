@@ -64,20 +64,7 @@ export {
 // 接收器类型定义
 export type {
   LogReceiverConfig,
-  LogReceiverOptions,
-  LogReceiverHandler,
-  ILogReceiver,
-  ClientLogData,
-  ClientInfo,
-  ValidationResult,
-  ProcessResult,
-  ResponseData,
-  FrameworkAdapter,
-  ValidationConfig,
-  ProcessingConfig,
-  SecurityConfig,
-  ResponseConfig,
-  LogReceiverPlugin
+  NextjsLogReceiver
 } from './receiver'
 
 // ==================== 便捷导出 ====================

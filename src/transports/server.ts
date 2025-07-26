@@ -4,9 +4,14 @@
  * 使用原生 Node.js API 的零依赖日志引擎
  */
 
+import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport'
+import type { LogLayerTransportParams, LogLevelType } from '@loglayer/shared'
 import type { LogLevel, LogMetadata, ServerOutput } from '../core';
-import { isBrowserEnvironment } from '../core';
+import { isBrowserEnvironment, serializeMessages } from '../core';
 import { getLocalTimestamp } from './utils';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as http from 'http';
 
 /**
  * 服务端核心 Logger（使用原生 Node.js API）
@@ -26,10 +31,10 @@ export class CoreServerLogger {
     // Initialize Node.js modules for server environment
     if (!isBrowserEnvironment()) {
       try {
-        // 同步导入 Node.js 模块
-        this.fs = require('fs');
-        this.path = require('path');
-        this.http = require('http');
+        // 直接使用导入的模块
+        this.fs = fs;
+        this.path = path;
+        this.http = http;
         // Node.js modules loaded successfully
       } catch (error) {
         // Failed to load Node.js modules
@@ -188,5 +193,61 @@ export class CoreServerLogger {
 
     // 这里应该实现实际的 HTTP 发送
     // HTTP transport not fully implemented
+  }
+}
+
+/**
+ * LogLayer 兼容的服务端 Transport
+ */
+export interface ServerTransportConfig extends LoggerlessTransportConfig {
+  outputs: ServerOutput[]
+}
+
+export class ServerTransport extends LoggerlessTransport {
+  private coreLogger: CoreServerLogger
+
+  constructor(outputs: ServerOutput[]) {
+    super({ id: 'server-transport' })
+    this.coreLogger = new CoreServerLogger(outputs)
+  }
+
+  /**
+   * LogLayer 调用此方法发送日志
+   */
+  shipToLogger(params: LogLayerTransportParams): any[] {
+    const { logLevel, messages, data } = params
+
+    // 将 LogLayer 的日志级别映射到我们的类型
+    const level = logLevel as LogLevel
+
+    // 使用统一的消息序列化工具
+    const message = serializeMessages(messages)
+    const meta = data || {}
+
+    // 使用核心 logger 处理日志
+    this.coreLogger.debug = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('debug', msg, metadata)
+    this.coreLogger.info = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('info', msg, metadata)
+    this.coreLogger.warn = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('warn', msg, metadata)
+    this.coreLogger.error = (msg: string, metadata: LogMetadata = {}) => this.coreLogger['log']('error', msg, metadata)
+
+    // 调用对应的日志方法
+    switch (level) {
+      case 'debug':
+        this.coreLogger.debug(message, meta)
+        break
+      case 'info':
+        this.coreLogger.info(message, meta)
+        break
+      case 'warn':
+        this.coreLogger.warn(message, meta)
+        break
+      case 'error':
+        this.coreLogger.error(message, meta)
+        break
+      default:
+        this.coreLogger.info(message, meta)
+    }
+
+    return messages
   }
 }

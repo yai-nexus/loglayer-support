@@ -1,6 +1,6 @@
 {
   "name": "@yai-nexus/loglayer-support",
-  "version": "0.7.0-alpha.2",
+  "version": "0.7.0-alpha.3",
   "description": "企业级日志解决方案，提供开箱即用的框架预设 API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

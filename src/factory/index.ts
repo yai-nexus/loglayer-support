@@ -7,5 +7,4 @@
 // 核心创建函数
 export * from './core';
 
-// 特殊场景函数
-export * from './specialized';
+// 特殊场景函数已移除（简化架构）

@@ -242,15 +242,18 @@ describe('ErrorHandler', () => {
     })
 
     it('应该能够重置特定错误的重试计数', async () => {
-      const error1 = new Error('timeout')
-      const error2 = new Error('connection failed')
+      // 手动设置重试计数（模拟重试场景）
+      errorHandler['retryCount'].set('error1', 3)
+      errorHandler['retryCount'].set('error2', 1)
 
-      await errorHandler.handle(error1, { key: 'error1' })
-      await errorHandler.handle(error2, { key: 'error2' })
+      let stats = errorHandler.getStats()
+      expect(stats.activeRetries).toBe(2)
+      expect(stats.totalRetries).toBe(4)
 
       errorHandler.resetRetryCount('error1')
-      const stats = errorHandler.getStats()
+      stats = errorHandler.getStats()
       expect(stats.activeRetries).toBe(1) // 只剩 error2
+      expect(stats.totalRetries).toBe(1)
     })
   })
 

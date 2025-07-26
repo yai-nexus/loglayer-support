@@ -401,8 +401,7 @@ describe('validateBrowserConfigStrict', () => {
     validateBrowserConfigStrict(config)
     
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Browser logger configuration warnings'),
-      expect.any(String)
+      expect.stringContaining('Browser logger configuration warnings')
     )
 
     consoleSpy.mockRestore()

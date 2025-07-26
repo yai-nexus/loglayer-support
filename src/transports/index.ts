@@ -15,8 +15,4 @@ export * from './client';
 export * from './browser-transport';
 export * from './browser-factory';
 
-// 高性能适配器
-export * from './adapters';
-
-// 引擎加载器
-export * from './loader';
+// 高性能适配器和引擎加载器已移除（简化架构）
