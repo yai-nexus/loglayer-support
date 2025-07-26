@@ -55,32 +55,6 @@ export type NextjsLogReceiver = (request: any) => Promise<{
 // ==================== 工厂函数 ====================
 
 /**
- * 创建日志接收器（简化版本）
- *
- * @param logger 服务端日志器实例
- * @param config 接收器配置
- * @returns 简化的日志接收器
- */
-export function createLogReceiver(
-  logger: LogLayer,
-  config?: LogReceiverConfig
-): any {
-  // 简化实现，直接返回基础处理器
-  return {
-    handle: async (request: any) => {
-      try {
-        const data = await request.json()
-        logger.info('Received log', data)
-        return { success: true }
-      } catch (error) {
-        logger.error('Failed to process log', String(error))
-        return { success: false, error: 'Invalid request' }
-      }
-    }
-  }
-}
-
-/**
  * 创建 Next.js 日志接收器（简化版本）
  *
  * @param logger 服务端日志器实例

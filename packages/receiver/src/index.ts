@@ -9,11 +9,10 @@
 // 这些是用户应该使用的稳定接口
 // =============================================================================
 
-// 日志接收器 API（框架适配器和通用接收器）
+// 日志接收器 API（框架适配器）
 export {
   type LogReceiverConfig,
   type NextjsLogReceiver,
-  createLogReceiver,
   createNextjsLogReceiver,
   createExpressLogReceiver
 } from './receiver';
