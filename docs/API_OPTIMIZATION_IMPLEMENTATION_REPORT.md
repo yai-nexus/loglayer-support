@@ -278,3 +278,138 @@ export { ServerTransport, ServerTransportConfig, /* 其他导出，但不包括 
 4. **增强了维护性**：内部实现获得了更大的灵活性
 
 这些改进为 loglayer-support 项目的长期发展奠定了坚实的基础，同时保持了向后兼容性和功能完整性。优化后的 API 结构更加专业和用户友好，符合现代软件库的设计最佳实践。
+
+## V2 版本补充优化
+
+基于 `EXPORT_ANALYSIS_REPORT_V2.md` 的更精细分析，我们进行了以下补充优化：
+
+### 1. 移除环境检测函数冗余
+
+**问题**：`canUseNodeAPIs` 和 `canUseBrowserAPIs` 与 `isNodeEnvironment` 和 `isBrowserEnvironment` 功能完全重复。
+
+**解决方案**：
+- 移除了 `canUseNodeAPIs()` 和 `canUseBrowserAPIs()` 函数
+- 保留了更直观的 `isNodeEnvironment()` 和 `isBrowserEnvironment()` 函数
+- 添加了迁移注释指导用户使用正确的函数
+
+**影响**：
+- 减少了 API 混乱，用户只需记住一套环境检测函数
+- 函数命名更加直观和一致
+
+### 2. 隐藏中层工厂函数
+
+**问题**：`createBrowserLogLayer` 是一个中层工厂函数，其功能已被更高级的 `createBrowserLogger` API 覆盖。
+
+**解决方案**：
+- 将 `createBrowserLogLayer` 标记为 `@internal`
+- 从 browser 包的公共 API 中移除导出
+- 保持内部可用性以支持高级 API 的实现
+
+**影响**：
+- 简化了用户面对的 API 选择
+- 引导用户使用更高级、更用户友好的 API
+
+### 3. 建立 API 导出规范
+
+**实施内容**：
+为所有包的 `index.ts` 文件添加了清晰的注释结构：
+
+```typescript
+// =============================================================================
+// 公共 API (Public API)
+// 这些是用户应该使用的稳定接口
+// =============================================================================
+
+// 具体的导出...
+
+// =============================================================================
+// 内部实现 (Internal Implementation)
+// 以下类型和函数仅供内部使用，不对外暴露
+// =============================================================================
+
+// 内部实现的说明...
+```
+
+**影响**：
+- 为开发者提供了清晰的 API 边界指导
+- 便于未来的 API 维护和重构
+- 防止意外暴露内部实现细节
+
+### V2 优化前后对比
+
+#### 环境检测 API 变化
+
+**优化前**：
+```typescript
+// 功能重复的两套 API
+export { isBrowserEnvironment, isNodeEnvironment, canUseNodeAPIs, canUseBrowserAPIs }
+```
+
+**优化后**：
+```typescript
+// 统一、直观的 API
+export { isBrowserEnvironment, isNodeEnvironment }
+// canUseNodeAPIs, canUseBrowserAPIs 已移除
+```
+
+#### Browser 包导出变化
+
+**优化前**：
+```typescript
+export { createBrowserLogLayer, createDevelopmentBrowserLogger, /* 其他 */ }
+```
+
+**优化后**：
+```typescript
+export { createDevelopmentBrowserLogger, /* 其他高级 API */ }
+// createBrowserLogLayer 设为内部函数
+```
+
+### V2 优化收益
+
+1. **进一步减少 API 复杂度**：移除了 2 个冗余的环境检测函数
+2. **更清晰的 API 层次**：隐藏了中层实现，突出高级 API
+3. **建立了长期规范**：为未来的 API 设计提供了明确指导
+4. **提升了一致性**：所有包都采用了统一的导出注释规范
+
+### 4. 全面采用显式导出
+
+**问题**：使用 `export *` 导致无法精确控制 API 暴露，容易意外导出内部实现。
+
+**解决方案**：
+将所有包的 `index.ts` 文件改为显式导出：
+
+```typescript
+// 替换前
+export * from './module'
+
+// 替换后
+export {
+  specificFunction,
+  type SpecificType,
+  SpecificClass
+} from './module';
+```
+
+**实施范围**：
+- ✅ `@yai-loglayer/core` - 47个显式导出
+- ✅ `@yai-loglayer/browser` - 12个显式导出
+- ✅ `@yai-loglayer/server` - 15个显式导出
+- ✅ `@yai-loglayer/receiver` - 6个显式导出
+
+**影响**：
+- **精确控制**：每个导出都经过明确决策
+- **防止意外暴露**：新增功能不会自动导出
+- **更好的文档**：IDE 可以提供更准确的自动补全
+- **类型安全**：TypeScript 编译器可以更好地检查导出
+
+### 总计优化成果
+
+经过完整的优化流程，我们总共：
+- **移除了 8 个不应暴露的导出**（V1: 6个，V2: 2个）
+- **合并了重复功能模块**（creators + presets）
+- **建立了清晰的 API 分层**（公共 API vs 内部实现）
+- **制定了导出规范**（注释块 + 显式导出）
+- **实现了 80 个精确的显式导出**（替代了模糊的 `export *`）
+
+这些改进使 loglayer-support 的 API 更加专业、清晰和易于维护。
