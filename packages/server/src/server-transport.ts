@@ -14,7 +14,21 @@ import { isBrowserEnvironment, serializeMessages } from '@yai-loglayer/core';
  * 获取本地时间戳
  */
 function getLocalTimestamp(): string {
-  return new Date().toISOString();
+  return (
+    new Date()
+      .toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+      .replace(/\//g, '-') +
+    '.' +
+    String(new Date().getMilliseconds()).padStart(3, '0')
+  );
 }
 import * as fs from 'fs';
 import * as path from 'path';
