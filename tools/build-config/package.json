@@ -1,0 +1,15 @@
+{
+  "name": "@yai-loglayer/build-config",
+  "version": "0.7.0-alpha.5",
+  "description": "统一的构建配置工具",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "tsup.config.js",
+    "tsconfig.base.json"
+  ],
+  "dependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,7 @@
+packages:
+  # 核心包
+  - 'packages/*'
+  # Examples 作为独立项目
+  - 'examples/*'
+  # 开发工具
+  - 'tools/*'

@@ -1,39 +1,33 @@
 {
-  "name": "@yai-nexus/loglayer-support",
-  "version": "0.7.0-alpha.4",
-  "description": "企业级日志解决方案，提供开箱即用的框架预设 API",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
+  "name": "loglayer-support-monorepo",
+  "version": "0.7.0-alpha.5",
+  "description": "企业级日志解决方案 Monorepo - 包含 @yai-loglayer/* 包",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*",
+    "tools/*"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit",
-    "type-check:publish": "tsc --noEmit --project tsconfig.publish.json",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 500",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\" || true",
-    "prepublishOnly": "npm run clean && npm run build && npm run type-check",
-    "prepack": "npm run build",
-    "publish:beta": "npm publish --tag beta",
-    "publish:latest": "npm publish"
+    "build": "turbo build",
+    "build:packages": "turbo build --filter='./packages/*'",
+    "dev": "turbo dev",
+    "dev:react": "turbo dev --filter=react-example",
+    "dev:nextjs": "turbo dev --filter=nextjs-example",
+    "dev:basic": "turbo dev --filter=basic-example",
+    "clean": "turbo clean",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:packages": "turbo test --filter='./packages/*'",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "release:beta": "pnpm build:packages && pnpm changeset:publish --tag beta",
+    "release:latest": "pnpm build:packages && pnpm changeset:publish"
   },
   "keywords": [
     "logging",
@@ -47,9 +41,10 @@
   ],
   "author": "YAI Nexus Team",
   "license": "MIT",
-  "dependencies": {
-    "@alicloud/log": "^1.2.5",
-    "loglayer": "^6.6.0"
+  "packageManager": "pnpm@10.13.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
   },
   "optionalDependencies": {
     "@loglayer/plugin-redaction": "^2.0.0",
@@ -61,6 +56,8 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.5",
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@types/pino": "^7.0.4",
@@ -74,6 +71,7 @@
     "prettier": "^3.0.0",
     "ts-jest": "^29.0.0",
     "tsup": "^8.0.0",
+    "turbo": "^2.5.5",
     "typescript": "^5.0.0"
   },
   "repository": {

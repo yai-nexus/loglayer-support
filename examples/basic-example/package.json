@@ -1,0 +1,41 @@
+{
+  "name": "basic-example",
+  "version": "0.7.0-alpha.5",
+  "description": "Basic Node.js examples demonstrating @yai-loglayer/server usage",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-modules dist/index.js",
+    "dev": "npx tsx index.ts",
+    "build": "npx tsc",
+    "clean": "rm -rf dist/ *.js *.d.ts",
+    "test": "npm run build && npm run start",
+    "example:presets": "npx tsx details/config-presets.ts",
+    "example:custom": "npx tsx details/custom-config.ts",
+    "example:enhanced": "npx tsx details/enhanced-features.ts",
+    "example:production": "npx tsx details/production-config.ts",
+    "example:multiple": "npx tsx details/multiple-outputs.ts"
+  },
+  "dependencies": {
+    "@yai-loglayer/server": "workspace:*",
+    "@yai-loglayer/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "logging",
+    "loglayer",
+    "examples",
+    "nodejs",
+    "typescript",
+    "modular"
+  ]
+}

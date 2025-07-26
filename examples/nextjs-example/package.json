@@ -1,0 +1,35 @@
+{
+  "name": "nextjs-example",
+  "version": "0.7.0-alpha.5",
+  "description": "Next.js example demonstrating @yai-loglayer/browser and @yai-loglayer/server usage",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:e2e": "playwright test",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "next": "^15.4.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "@yai-loglayer/browser": "workspace:*",
+    "@yai-loglayer/server": "workspace:*",
+    "@yai-loglayer/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "@playwright/test": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

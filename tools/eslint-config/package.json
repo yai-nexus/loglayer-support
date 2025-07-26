@@ -1,0 +1,23 @@
+{
+  "name": "@yai-loglayer/eslint-config",
+  "version": "0.7.0-alpha.5",
+  "description": "统一的 ESLint 配置",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "base.js",
+    "react.js"
+  ],
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0"
+  },
+  "peerDependencies": {
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

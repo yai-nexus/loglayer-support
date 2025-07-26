@@ -44,7 +44,14 @@
       "Bash(tree:*)",
       "Bash(git tag:*)",
       "Bash(npm publish:*)",
-      "Bash(npm version:*)"
+      "Bash(npm version:*)",
+      "Bash(echo:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npx changeset:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm build:packages:*)",
+      "Bash(pnpm dev:basic:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": []
   }

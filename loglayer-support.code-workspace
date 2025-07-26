@@ -1,0 +1,190 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Root",
+      "path": "."
+    },
+    {
+      "name": "📦 Core Package", 
+      "path": "./packages/core"
+    },
+    {
+      "name": "🌐 Browser Package",
+      "path": "./packages/browser"
+    },
+    {
+      "name": "🖥️ Server Package", 
+      "path": "./packages/server"
+    },
+    {
+      "name": "📡 Receiver Package",
+      "path": "./packages/receiver"
+    },
+    {
+      "name": "⚛️ React Example",
+      "path": "./examples/react-example"
+    },
+    {
+      "name": "▲ Next.js Example", 
+      "path": "./examples/nextjs-example"
+    },
+    {
+      "name": "🔧 Basic Example",
+      "path": "./examples/basic-example"
+    },
+    {
+      "name": "🛠️ Tools",
+      "path": "./tools"
+    }
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.workspaceSymbols.scope": "allOpenProjects",
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.turbo": true,
+      "**/coverage": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.turbo": true
+    },
+    "typescript.preferences.allowIncompleteCompletions": true,
+    "typescript.suggest.autoImports": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🏗️ Build All Packages",
+        "type": "shell",
+        "command": "turbo build --filter='./packages/*'",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": ["$tsc"]
+      },
+      {
+        "label": "🧪 Test All Packages", 
+        "type": "shell",
+        "command": "turbo test --filter='./packages/*'",
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🚀 Start React Example",
+        "type": "shell", 
+        "command": "pnpm dev",
+        "options": {
+          "cwd": "${workspaceFolder}/examples/react-example"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "▲ Start Next.js Example",
+        "type": "shell",
+        "command": "pnpm dev", 
+        "options": {
+          "cwd": "${workspaceFolder}/examples/nextjs-example"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🔧 Run Basic Example",
+        "type": "shell",
+        "command": "pnpm dev",
+        "options": {
+          "cwd": "${workspaceFolder}/examples/basic-example"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🧹 Clean All",
+        "type": "shell",
+        "command": "turbo clean",
+        "group": "build"
+      },
+      {
+        "label": "📝 Lint All",
+        "type": "shell",
+        "command": "turbo lint",
+        "group": "build"
+      },
+      {
+        "label": "🔍 Type Check All",
+        "type": "shell",
+        "command": "turbo type-check",
+        "group": "build"
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🧪 Debug Jest Tests",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/node_modules/.bin/jest",
+        "args": ["--runInBand"],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "skipFiles": ["<node_internals>/**"]
+      },
+      {
+        "name": "🔧 Debug Basic Example",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/examples/basic-example/dist/index.js",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "preLaunchTask": "🏗️ Build All Packages"
+      },
+      {
+        "name": "🧪 Debug Package Tests",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/node_modules/.bin/jest",
+        "args": [
+          "--runInBand",
+          "--testPathPattern=packages"
+        ],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.vscode-typescript-next",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-json",
+      "bradlc.vscode-tailwindcss",
+      "ms-vscode.vscode-eslint"
+    ]
+  }
+}
