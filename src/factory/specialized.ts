@@ -4,12 +4,12 @@
  * 提供针对特定场景的 Logger 创建功能，如 Next.js 优化、批量创建等
  */
 
+import { LogLayer } from 'loglayer';
 import { detectEnvironment } from '../core';
 import { validateConfig, getEffectiveOutputs } from '../config';
 import { EngineLoader } from '../transports';
-import { LogLayerWrapper } from '../wrapper';
-import { createLogger } from './core';
-import type { LoggerConfig, IEnhancedLogger, ILogger, ServerOutput, ClientOutput } from '../core';
+import { createLogger, createLogLayerForEnvironment } from './core';
+import type { LoggerConfig, ServerOutput, ClientOutput } from '../core';
 
 /**
  * 为 Next.js 创建优化的 Logger
@@ -17,7 +17,7 @@ import type { LoggerConfig, IEnhancedLogger, ILogger, ServerOutput, ClientOutput
 export async function createNextjsLogger(
   name: string,
   config: LoggerConfig
-): Promise<IEnhancedLogger> {
+): Promise<LogLayer> {
   // Next.js 环境检测和优化
   const env = detectEnvironment();
 
@@ -28,15 +28,11 @@ export async function createNextjsLogger(
 
   // Next.js 特殊处理：确保客户端代码不引用服务端模块
   if (env.isClient) {
-    const clientLogger = EngineLoader.loadClientEngine(config.client.outputs);
-    const wrapper = new LogLayerWrapper(clientLogger, name, config);
+    const logger = await createLogLayerForEnvironment(name, config, env);
 
-    wrapper.debug('Next.js client logger initialized', {
-      loggerName: name,
-      outputTypes: config.client.outputs.map((o) => o.type),
-    });
+    logger.debug('Next.js client logger initialized');
 
-    return wrapper;
+    return logger;
   } else {
     // 服务端使用标准流程
     return await createLogger(name, config);
@@ -46,7 +42,7 @@ export async function createNextjsLogger(
 /**
  * 同步版本的 Next.js Logger 创建
  */
-export function createNextjsLoggerSync(name: string): IEnhancedLogger {
+export function createNextjsLoggerSync(name: string): LogLayer {
   const env = detectEnvironment();
 
   const nextjsConfig: LoggerConfig = {
@@ -82,24 +78,13 @@ export function createNextjsLoggerSync(name: string): IEnhancedLogger {
 
   const outputs = getEffectiveOutputs(nextjsConfig, env);
 
-  let logger: ILogger;
-  if (env.isServer) {
-    const { CoreServerLogger } = require('../transports');
-    logger = new CoreServerLogger(outputs as ServerOutput[]);
-  } else {
-    const { BrowserLogger } = require('../transports');
-    logger = new BrowserLogger(outputs as ClientOutput[]);
-  }
+  // 使用简化的同步创建逻辑
+  const { createLoggerSync } = require('./core');
+  const logger = createLoggerSync(name);
 
-  const wrapper = new LogLayerWrapper(logger, name, nextjsConfig);
+  logger.debug('Next.js logger initialized (sync)');
 
-  wrapper.debug('Next.js logger initialized (sync)', {
-    loggerName: name,
-    environment: env.environment,
-    outputCount: outputs.length,
-  });
-
-  return wrapper;
+  return logger;
 }
 
 /**
@@ -107,8 +92,8 @@ export function createNextjsLoggerSync(name: string): IEnhancedLogger {
  */
 export async function createLoggers(
   configs: Array<{ name: string; config: LoggerConfig }>
-): Promise<Record<string, IEnhancedLogger>> {
-  const loggers: Record<string, IEnhancedLogger> = {};
+): Promise<Record<string, LogLayer>> {
+  const loggers: Record<string, LogLayer> = {};
 
   for (const { name, config } of configs) {
     try {
@@ -126,12 +111,12 @@ export async function createLoggers(
  * Logger 工厂类（面向对象接口）
  */
 export class LoggerFactory {
-  private static instances: Map<string, IEnhancedLogger> = new Map();
+  private static instances: Map<string, LogLayer> = new Map();
 
   /**
    * 获取或创建 Logger 实例（单例模式）
    */
-  static async getInstance(name: string, config: LoggerConfig): Promise<IEnhancedLogger> {
+  static async getInstance(name: string, config: LoggerConfig): Promise<LogLayer> {
     if (this.instances.has(name)) {
       return this.instances.get(name)!;
     }
@@ -151,8 +136,8 @@ export class LoggerFactory {
   /**
    * 获取所有实例
    */
-  static getAllInstances(): Record<string, IEnhancedLogger> {
-    const result: Record<string, IEnhancedLogger> = {};
+  static getAllInstances(): Record<string, LogLayer> {
+    const result: Record<string, LogLayer> = {};
     for (const [name, logger] of this.instances) {
       result[name] = logger;
     }

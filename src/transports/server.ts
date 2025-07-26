@@ -4,14 +4,14 @@
  * 使用原生 Node.js API 的零依赖日志引擎
  */
 
-import type { LogLevel, LogMetadata, ILogger, ServerOutput } from '../core';
+import type { LogLevel, LogMetadata, ServerOutput } from '../core';
 import { isBrowserEnvironment } from '../core';
 import { getLocalTimestamp } from './utils';
 
 /**
  * 服务端核心 Logger（使用原生 Node.js API）
  */
-export class CoreServerLogger implements ILogger {
+export class CoreServerLogger {
   private outputs: ServerOutput[];
   private fs?: typeof import('fs');
   private path?: typeof import('path');

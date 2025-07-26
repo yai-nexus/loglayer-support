@@ -3,7 +3,7 @@
  * 提供框架特定的处理函数
  */
 
-import type { IEnhancedLogger } from '../../core'
+import type { LogLayer } from 'loglayer'
 import type {
   LogReceiverHandler,
   LogReceiverConfig,
@@ -15,11 +15,11 @@ import { LogReceiver } from './log-receiver'
 
 export class LogReceiverHandlerImpl implements LogReceiverHandler {
   private readonly receiver: LogReceiver
-  private readonly logger: IEnhancedLogger
+  private readonly logger: LogLayer
   private readonly config: LogReceiverConfig
 
   constructor(
-    logger: IEnhancedLogger,
+    logger: LogLayer,
     config: LogReceiverConfig = {},
     adapterType: 'nextjs' | 'express' | 'generic' | 'auto' = 'auto'
   ) {
@@ -32,7 +32,7 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
    * Next.js API Route 处理器
    */
   async nextjs(request: any): Promise<any> {
-    const logReceiver = this.logger.forModule('client-log-receiver')
+    const logReceiver = this.logger
     const adapter = this.receiver.getAdapter()
 
     try {
@@ -56,12 +56,13 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
       
     } catch (error) {
       // 记录处理错误
-      logReceiver.logError(error as Error, {
+      logReceiver.error('处理客户端日志时发生错误', {
         endpoint: adapter.getURL(request),
         method: adapter.getMethod(request),
         userAgent: adapter.getHeader(request, 'user-agent'),
-        contentType: adapter.getHeader(request, 'content-type')
-      }, '处理客户端日志时发生错误')
+        contentType: adapter.getHeader(request, 'content-type'),
+        error: error as Error
+      })
 
       const errorResponse = this.receiver.buildResponse({
         success: false,
@@ -78,7 +79,7 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
    * Express.js 中间件处理器
    */
   async express(req: any, res: any, next?: any): Promise<void> {
-    const logReceiver = this.logger.forModule('client-log-receiver')
+    const logReceiver = this.logger
     const adapter = this.receiver.getAdapter()
 
     try {
@@ -103,12 +104,13 @@ export class LogReceiverHandlerImpl implements LogReceiverHandler {
       
     } catch (error) {
       // 记录处理错误
-      logReceiver.logError(error as Error, {
+      logReceiver.error('处理客户端日志时发生错误', {
         endpoint: adapter.getURL(req),
         method: adapter.getMethod(req),
         userAgent: adapter.getHeader(req, 'user-agent'),
-        contentType: adapter.getHeader(req, 'content-type')
-      }, '处理客户端日志时发生错误')
+        contentType: adapter.getHeader(req, 'content-type'),
+        error: error as Error
+      })
 
       const errorResponse = this.receiver.buildResponse({
         success: false,

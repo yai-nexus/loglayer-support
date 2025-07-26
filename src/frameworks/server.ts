@@ -5,7 +5,8 @@
  * 解决 Proxy 方案的问题，提供更优雅的异步初始化
  */
 
-import type { LoggerConfig, IEnhancedLogger, LogLevel } from '../core'
+import type { LogLayer } from 'loglayer'
+import type { LoggerConfig, LogLevel } from '../core'
 
 // ==================== 核心类型定义 ====================
 
@@ -179,7 +180,7 @@ export interface ServerLoggerOptions {
 /**
  * 模块日志器接口
  */
-export interface ModuleLogger extends IEnhancedLogger {
+export interface ModuleLogger extends LogLayer {
   /** 模块名称 */
   readonly moduleName: string
   /** 获取模块配置 */
@@ -193,7 +194,7 @@ export interface ModuleLogger extends IEnhancedLogger {
  */
 export interface ServerLoggerInstance {
   /** 主日志器实例 */
-  readonly logger: IEnhancedLogger
+  readonly logger: LogLayer
 
   /** 获取模块日志器 */
   forModule(moduleName: string): ModuleLogger
@@ -202,7 +203,7 @@ export interface ServerLoggerInstance {
   isReady(): boolean
 
   /** 等待初始化完成 */
-  waitForReady(): Promise<IEnhancedLogger>
+  waitForReady(): Promise<LogLayer>
 
   /** 获取所有模块名称 */
   getModuleNames(): string[]

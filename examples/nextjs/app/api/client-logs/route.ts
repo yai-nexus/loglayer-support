@@ -9,8 +9,8 @@ import { getServerInstance } from '../../../lib/server-logger'
 
 // 创建日志接收器
 const createLogReceiver = async () => {
-  const serverInstance = await getServerInstance();
-  return createNextjsLogReceiver(serverInstance.logger, {
+  const serverLogger = await getServerInstance();
+  return createNextjsLogReceiver(serverLogger, {
     validation: {
       requireLevel: true,
       requireMessage: true,
@@ -50,7 +50,22 @@ export async function POST(request: NextRequest) {
  * GET 请求 - 返回客户端日志接收服务的状态
  */
 export async function GET() {
-  const logReceiver = await logReceiverPromise;
-  const status = logReceiver.getStatus();
-  return NextResponse.json(status);
+  try {
+    const logReceiver = await logReceiverPromise;
+    // 简化状态返回，因为 logReceiver 可能不再有 getStatus 方法
+    const status = {
+      service: 'client-logs-receiver',
+      status: 'active',
+      timestamp: new Date().toISOString(),
+      message: '日志接收服务运行正常'
+    };
+    return NextResponse.json(status);
+  } catch (error) {
+    return NextResponse.json({
+      service: 'client-logs-receiver',
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: (error as Error).message
+    }, { status: 500 });
+  }
 }

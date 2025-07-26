@@ -2,7 +2,7 @@
  * 服务端日志器实现
  */
 
-import type { IEnhancedLogger } from '../../core'
+import type { LogLayer } from 'loglayer'
 import type { 
   ServerLoggerInstance, 
   ServerLoggerConfig, 
@@ -20,7 +20,7 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
   private isDestroyed = false
 
   constructor(
-    public readonly logger: IEnhancedLogger,
+    public readonly logger: LogLayer,
     private config: ServerLoggerConfig
   ) {
     this.pathResolver = new PathResolver(config.paths)
@@ -51,7 +51,7 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
     return !this.isDestroyed
   }
 
-  async waitForReady(): Promise<IEnhancedLogger> {
+  async waitForReady(): Promise<LogLayer> {
     if (this.isDestroyed) {
       throw new Error('ServerLogger has been destroyed')
     }
@@ -251,11 +251,14 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
 
     if (captureUncaughtExceptions) {
       process.on('uncaughtException', (error) => {
-        this.logger.logError(error, {
+        this.logger.error('捕获到未处理的异常', {
           source: 'uncaughtException',
           pid: process.pid,
-          timestamp: new Date().toISOString()
-        }, '捕获到未处理的异常')
+          timestamp: new Date().toISOString(),
+          error,
+          errorName: error.name,
+          errorStack: error.stack
+        })
 
         if (errorHandler) {
           try {
@@ -271,12 +274,15 @@ export class ServerLoggerInstanceImpl implements ServerLoggerInstance {
       process.on('unhandledRejection', (reason, promise) => {
         const error = reason instanceof Error ? reason : new Error(String(reason))
         
-        this.logger.logError(error, {
+        this.logger.error('捕获到未处理的 Promise 拒绝', {
           source: 'unhandledRejection',
           promise: promise.toString(),
           pid: process.pid,
-          timestamp: new Date().toISOString()
-        }, '捕获到未处理的 Promise 拒绝')
+          timestamp: new Date().toISOString(),
+          error,
+          errorName: error.name,
+          errorStack: error.stack
+        })
 
         if (errorHandler) {
           try {

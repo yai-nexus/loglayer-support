@@ -5,7 +5,7 @@
  * 提供通用的日志接收器，支持不同框架的适配
  */
 
-import type { IEnhancedLogger } from '../core'
+import type { LogLayer } from 'loglayer'
 
 // ==================== 核心类型定义 ====================
 
@@ -323,7 +323,7 @@ export interface LogReceiverPlugin {
  * @returns 日志接收器处理器
  */
 export function createLogReceiver(
-  logger: IEnhancedLogger,
+  logger: LogLayer,
   config?: LogReceiverConfig,
   options?: LogReceiverOptions
 ): LogReceiverHandler {
@@ -350,7 +350,7 @@ export function createLogReceiver(
  * @returns Next.js API Route 处理函数
  */
 export function createNextjsLogReceiver(
-  logger: IEnhancedLogger,
+  logger: LogLayer,
   config?: LogReceiverConfig
 ): (request: any) => Promise<any> {
   const { LogReceiverHandlerImpl } = require('./receiver/handler')
@@ -366,7 +366,7 @@ export function createNextjsLogReceiver(
  * @returns Express.js 中间件函数
  */
 export function createExpressLogReceiver(
-  logger: IEnhancedLogger,
+  logger: LogLayer,
   config?: LogReceiverConfig
 ): (req: any, res: any, next?: any) => Promise<void> {
   const { LogReceiverHandlerImpl } = require('./receiver/handler')

@@ -34,7 +34,13 @@
       "mcp__filesystem__write_file",
       "mcp__filesystem__read_file",
       "mcp__filesystem__directory_tree",
-      "mcp__filesystem__create_directory"
+      "mcp__filesystem__create_directory",
+      "WebFetch(domain:loglayer.dev)",
+      "Bash(grep:*)",
+      "Bash(npx tsup:*)",
+      "Bash(npm test)",
+      "Bash(npm run test:unit:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

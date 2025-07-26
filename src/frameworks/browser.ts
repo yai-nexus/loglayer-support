@@ -5,7 +5,8 @@
  * 提供开箱即用的浏览器端日志解决方案
  */
 
-import type { LogLevel, LogMetadata } from '../core'
+import type { LogLayer } from 'loglayer'
+import type { LogLevel, LogMetadata, ClientOutput } from '../core'
 
 // ==================== 核心类型定义 ====================
 
@@ -257,6 +258,58 @@ export interface LogOutput {
   destroy?(): Promise<void>
 }
 
+// ==================== 工具函数 ====================
+
+/**
+ * 将 BrowserLoggerConfig 转换为 ClientOutput[]
+ */
+function convertBrowserConfigToClientOutputs(config: BrowserLoggerConfig): ClientOutput[] {
+  const outputs: ClientOutput[] = []
+  
+  if (!config.outputs) {
+    // 默认只启用控制台输出
+    return [{ type: 'console' }]
+  }
+  
+  // 转换 console 配置
+  if (config.outputs.console) {
+    if (typeof config.outputs.console === 'boolean') {
+      outputs.push({ type: 'console' })
+    } else {
+      outputs.push({ 
+        type: 'console', 
+        config: config.outputs.console as any 
+      })
+    }
+  }
+  
+  // 转换 localStorage 配置
+  if (config.outputs.localStorage) {
+    if (typeof config.outputs.localStorage === 'boolean') {
+      outputs.push({ type: 'localstorage' })
+    } else {
+      outputs.push({ 
+        type: 'localstorage', 
+        config: config.outputs.localStorage as any
+      })
+    }
+  }
+  
+  // 转换 http 配置
+  if (config.outputs.http) {
+    if (typeof config.outputs.http === 'boolean') {
+      outputs.push({ type: 'http' })
+    } else {
+      outputs.push({ 
+        type: 'http', 
+        config: config.outputs.http as any
+      })
+    }
+  }
+  
+  return outputs.length > 0 ? outputs : [{ type: 'console' }]
+}
+
 // ==================== 工厂函数 ====================
 
 /**
@@ -269,26 +322,19 @@ export interface LogOutput {
 export async function createBrowserLogger(
   config?: BrowserLoggerConfig,
   options?: BrowserLoggerOptions
-): Promise<IBrowserLogger> {
-  const { BrowserLogger } = await import('./browser/browser-logger')
-
-  const mergedOptions: BrowserLoggerOptions = {
-    immediate: true,
-    initTimeout: 5000,
-    verbose: false,
-    ...options
+): Promise<LogLayer> {
+  const { LogLayer } = await import('loglayer')
+  const { createBrowserLogLayer } = await import('../transports/browser-factory')
+  
+  // 如果没有提供配置，使用默认配置
+  if (!config) {
+    const { createDevelopmentBrowserLogger } = await import('../transports/browser-factory')
+    return createDevelopmentBrowserLogger()
   }
 
-  // 创建日志器实例
-  const logger = new BrowserLogger(config)
-
-  // 如果需要立即初始化，等待初始化完成
-  if (mergedOptions.immediate) {
-    // 这里可以添加异步初始化逻辑，比如 IndexedDB 初始化
-    // 目前的实现是同步的，所以直接返回
-  }
-
-  return logger
+  // 转换配置格式并使用新的 browser factory 创建 LogLayer 实例
+  const clientOutputs = convertBrowserConfigToClientOutputs(config)
+  return createBrowserLogLayer(clientOutputs)
 }
 
 /**
@@ -301,9 +347,17 @@ export async function createBrowserLogger(
 export function createBrowserLoggerSync(
   config?: BrowserLoggerConfig,
   options?: BrowserLoggerOptions
-): IBrowserLogger {
-  // 动态导入在同步函数中不可用，使用 require
-  const { BrowserLogger } = require('./browser/browser-logger')
+): LogLayer {
+  const { LogLayer } = require('loglayer')
+  const { createBrowserLogLayer } = require('../transports/browser-factory')
+  
+  // 如果没有提供配置，使用默认配置
+  if (!config || !config.outputs) {
+    const { createDevelopmentBrowserLogger } = require('../transports/browser-factory')
+    return createDevelopmentBrowserLogger()
+  }
 
-  return new BrowserLogger(config)
+  // 转换配置格式并使用新的 browser factory 创建 LogLayer 实例
+  const clientOutputs = convertBrowserConfigToClientOutputs(config)
+  return createBrowserLogLayer(clientOutputs)
 }

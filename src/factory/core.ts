@@ -1,18 +1,15 @@
 /**
  * 核心 Logger 工厂函数
  *
- * 提供基础的 Logger 创建功能，包括异步创建、同步创建和容错创建
+ * 直接使用 LogLayer 和 Transport，不再使用包装器
  */
 
+import { LogLayer } from 'loglayer';
 import { detectEnvironment } from '../core';
 import { validateConfig, getEffectiveOutputs } from '../config';
-import { EngineLoader } from '../transports';
-import { LogLayerWrapper } from '../wrapper';
 import type {
   LoggerConfig,
   EnvironmentInfo,
-  IEnhancedLogger,
-  ILogger,
   ServerOutput,
   ClientOutput,
 } from '../core';
@@ -20,7 +17,7 @@ import type {
 /**
  * 创建 Logger 的主要工厂函数
  */
-export async function createLogger(name: string, config: LoggerConfig): Promise<IEnhancedLogger> {
+export async function createLogger(name: string, config: LoggerConfig): Promise<LogLayer> {
   // 1. 验证配置
   if (!validateConfig(config)) {
     throw new Error('Invalid logger configuration');
@@ -30,45 +27,38 @@ export async function createLogger(name: string, config: LoggerConfig): Promise<
   const env = detectEnvironment();
 
   // 3. 根据环境创建相应的 logger
-  const logger = await createLoggerForEnvironment(name, config, env);
+  const logger = await createLogLayerForEnvironment(name, config, env);
 
-  // 4. 创建增强包装器
-  const wrapper = new LogLayerWrapper(logger, name, config);
+  // 4. 记录初始化信息
+  logger.debug('Logger initialized');
 
-  // 5. 记录初始化信息
-  wrapper.debug('Logger initialized', {
-    loggerName: name,
-    environment: env.environment,
-    isServer: env.isServer,
-    outputCount: getEffectiveOutputs(config, env).length,
-  });
-
-  return wrapper;
+  return logger;
 }
 
 /**
- * 为特定环境创建 Logger
+ * 为特定环境创建 LogLayer 实例
  */
-export async function createLoggerForEnvironment(
+export async function createLogLayerForEnvironment(
   name: string,
   config: LoggerConfig,
   env: EnvironmentInfo
-): Promise<ILogger> {
+): Promise<LogLayer> {
   const outputs = getEffectiveOutputs(config, env);
 
   if (env.isServer) {
-    // 服务端：智能引擎选择
-    return await EngineLoader.loadServerEngine(outputs as ServerOutput[]);
+    // 服务端：使用 loglayer transport
+    return await createServerLogLayer(name, outputs as ServerOutput[]);
   } else {
-    // 客户端：固定使用浏览器引擎
-    return EngineLoader.loadClientEngine(outputs as ClientOutput[]);
+    // 客户端：使用新的 LoglayerBrowserTransport
+    const { createBrowserLogLayer } = await import('../transports/browser-factory');
+    return createBrowserLogLayer(outputs as ClientOutput[]);
   }
 }
 
 /**
  * 同步创建 Logger（使用默认配置）
  */
-export function createLoggerSync(name: string): IEnhancedLogger {
+export function createLoggerSync(name: string): LogLayer {
   const env = detectEnvironment();
 
   // 创建简单的默认配置
@@ -84,19 +74,14 @@ export function createLoggerSync(name: string): IEnhancedLogger {
 
   const outputs = getEffectiveOutputs(defaultConfig, env);
 
-  // 同步创建基础引擎
-  let logger: ILogger;
   if (env.isServer) {
-    // 服务端使用核心引擎（同步）
-    const { CoreServerLogger } = require('../transports');
-    logger = new CoreServerLogger(outputs as ServerOutput[]);
+    // 服务端使用简单的 LogLayer 实例
+    return createSimpleServerLogLayer(name, outputs as ServerOutput[]);
   } else {
-    // 客户端使用浏览器引擎
-    const { BrowserLogger } = require('../transports');
-    logger = new BrowserLogger(outputs as ClientOutput[]);
+    // 客户端使用新的 browser factory
+    const { createBrowserLogLayer } = require('../transports/browser-factory');
+    return createBrowserLogLayer(outputs as ClientOutput[]);
   }
-
-  return new LogLayerWrapper(logger, name, defaultConfig);
 }
 
 /**
@@ -105,7 +90,7 @@ export function createLoggerSync(name: string): IEnhancedLogger {
 export async function createResilientLogger(
   name: string,
   config: LoggerConfig
-): Promise<IEnhancedLogger> {
+): Promise<LogLayer> {
   try {
     return await createLogger(name, config);
   } catch (error) {
@@ -123,14 +108,69 @@ export async function createResilientLogger(
     };
 
     const env = detectEnvironment();
-    const logger = await createLoggerForEnvironment(name, fallbackConfig, env);
-    const wrapper = new LogLayerWrapper(logger, name, fallbackConfig);
+    const logger = await createLogLayerForEnvironment(name, fallbackConfig, env);
 
-    wrapper.warn('Logger created with fallback configuration', {
-      loggerName: name,
-      originalError: (error as Error).message,
-    });
+    logger.warn('Logger created with fallback configuration');
 
-    return wrapper;
+    return logger;
   }
 }
+
+/**
+ * 创建服务端 LogLayer 实例
+ */
+async function createServerLogLayer(name: string, outputs: ServerOutput[]): Promise<LogLayer> {
+  // 尝试使用 pino transport
+  try {
+    const { PinoTransport } = await import('@loglayer/transport-pino');
+    const transport = new PinoTransport({ logger: require('pino')() });
+    return new LogLayer({
+      transport
+    });
+  } catch (error) {
+    // 回退到 winston transport
+    try {
+      const { WinstonTransport } = await import('@loglayer/transport-winston');
+      const winston = require('winston');
+      const logger = winston.createLogger({
+        transports: [new winston.transports.Console()]
+      });
+      const transport = new WinstonTransport({ logger });
+      return new LogLayer({
+        transport
+      });
+    } catch (winstonError) {
+      throw new Error('Neither pino nor winston transport available');
+    }
+  }
+}
+
+/**
+ * 创建简单的服务端 LogLayer 实例（同步）
+ */
+function createSimpleServerLogLayer(name: string, outputs: ServerOutput[]): LogLayer {
+  // 使用控制台 transport
+  try {
+    const { ConsoleTransport } = require('@loglayer/transport-simple-pretty-terminal');
+    return new LogLayer({
+      transport: new ConsoleTransport({})
+    });
+  } catch (error) {
+    // 如果没有可用的 transport，创建基础配置
+    return new LogLayer({
+      transport: {
+        shipToLogger: (params) => {
+          console.log(params.messages.join(' '))
+          return params.messages
+        },
+        _sendToLogger: (params) => {
+          console.log(params.messages.join(' '))
+        },
+        getLoggerInstance: () => console,
+        enabled: true
+      }
+    });
+  }
+}
+
+// 临时包装器函数已移除，现在直接使用 LoglayerBrowserTransport

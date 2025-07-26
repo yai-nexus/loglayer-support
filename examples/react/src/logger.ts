@@ -1,6 +1,6 @@
 /**
  * React 应用日志器配置
- * 使用新的 createBrowserLogger API
+ * 适配 v0.7.0-alpha.2 LogLayer API
  */
 
 import { createBrowserLoggerSync } from '@yai-nexus/loglayer-support'
@@ -87,7 +87,10 @@ export const logApiCall = (url: string, method: string, duration: number, status
 }
 
 export const logPerformance = (operation: string, duration: number, metadata = {}) => {
-  logger.logPerformance(operation, duration, {
+  logger.info(`Performance: ${operation}`, {
+    operation,
+    duration,
+    performanceType: 'measurement',
     type: 'performance',
     ...metadata
   })

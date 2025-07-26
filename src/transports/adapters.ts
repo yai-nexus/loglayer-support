@@ -5,13 +5,13 @@
  * 结合自定义输出配置实现混合日志架构
  */
 
-import type { LogMetadata, ILogger, ServerOutput } from '../core';
+import type { LogMetadata, ServerOutput } from '../core';
 import { CoreServerLogger } from './server';
 
 /**
  * Pino 增强适配器 - 支持自定义输出配置
  */
-export class PinoAdapter implements ILogger {
+export class PinoAdapter {
   private pino: any;
   private outputs: ServerOutput[];
   private coreLogger: CoreServerLogger;
@@ -51,7 +51,7 @@ export class PinoAdapter implements ILogger {
 /**
  * Winston 增强适配器 - 支持自定义输出配置
  */
-export class WinstonAdapter implements ILogger {
+export class WinstonAdapter {
   private winston: any;
   private outputs: ServerOutput[];
   private coreLogger: CoreServerLogger;

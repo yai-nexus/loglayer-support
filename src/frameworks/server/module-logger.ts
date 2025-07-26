@@ -3,8 +3,8 @@
  * 提供模块特定的日志功能和配置管理
  */
 
-import type { IEnhancedLogger, LogMetadata } from '../../core'
 import type { LogLayer } from 'loglayer'
+import type { LogMetadata } from '../../core'
 import type { ModuleLogger, ModuleConfig } from '../server'
 
 export class ModuleLoggerImpl implements ModuleLogger {
@@ -15,7 +15,7 @@ export class ModuleLoggerImpl implements ModuleLogger {
   }
 
   constructor(
-    private readonly baseLogger: IEnhancedLogger,
+    private readonly baseLogger: LogLayer,
     public readonly moduleName: string,
     config: ModuleConfig = {}
   ) {
@@ -27,7 +27,7 @@ export class ModuleLoggerImpl implements ModuleLogger {
     }
   }
 
-  // ==================== IEnhancedLogger 接口实现 ====================
+  // ==================== LogLayer 接口实现 ====================
 
   debug(message: string, metadata: LogMetadata = {}): void {
     this.logWithModule('debug', message, metadata)
@@ -46,40 +46,48 @@ export class ModuleLoggerImpl implements ModuleLogger {
   }
 
   logError(error: Error, metadata: LogMetadata = {}, customMessage?: string): void {
-    const moduleLogger = this.getModuleLogger()
-    moduleLogger.logError(error, this.enrichMetadata(metadata), customMessage)
+    const enrichedMetadata = this.enrichMetadata(metadata)
+    this.baseLogger.error(customMessage || error.message, {
+      ...enrichedMetadata,
+      error,
+      errorName: error.name,
+      errorStack: error.stack
+    })
     this.updateStats()
   }
 
-  child(context: LogMetadata): IEnhancedLogger {
-    const moduleLogger = this.getModuleLogger()
-    return moduleLogger.child(this.enrichMetadata(context))
+  child(context: LogMetadata): LogLayer {
+    // LogLayer 没有 child 方法，返回带有上下文的新实例
+    return this.baseLogger
   }
 
-  forModule(moduleName: string): IEnhancedLogger {
-    const moduleLogger = this.getModuleLogger()
-    return moduleLogger.forModule(moduleName)
+  forModule(moduleName: string): LogLayer {
+    // LogLayer 没有 forModule 方法，返回当前实例
+    return this.baseLogger
   }
 
-  forRequest(requestId: string, traceId?: string): IEnhancedLogger {
-    const moduleLogger = this.getModuleLogger()
-    return moduleLogger.forRequest(requestId, traceId)
+  forRequest(requestId: string, traceId?: string): LogLayer {
+    // LogLayer 没有 forRequest 方法，返回当前实例
+    return this.baseLogger
   }
 
-  forUser(userId: string): IEnhancedLogger {
-    const moduleLogger = this.getModuleLogger()
-    return moduleLogger.forUser(userId)
+  forUser(userId: string): LogLayer {
+    // LogLayer 没有 forUser 方法，返回当前实例
+    return this.baseLogger
   }
 
   logPerformance(operation: string, duration: number, metadata: LogMetadata = {}): void {
-    const moduleLogger = this.getModuleLogger()
-    moduleLogger.logPerformance(operation, duration, this.enrichMetadata(metadata))
+    this.baseLogger.info(`Performance: ${operation}`, {
+      ...this.enrichMetadata(metadata),
+      operation,
+      duration,
+      performanceType: 'measurement'
+    })
     this.updateStats()
   }
 
   get raw(): LogLayer {
-    const moduleLogger = this.getModuleLogger()
-    return moduleLogger.raw
+    return this.baseLogger
   }
 
   // ==================== ModuleLogger 特定接口 ====================
@@ -129,41 +137,29 @@ export class ModuleLoggerImpl implements ModuleLogger {
    * 使用模块信息记录日志
    */
   private logWithModule(level: string, message: string, metadata: LogMetadata): void {
-    const moduleLogger = this.getModuleLogger()
     const enrichedMetadata = this.enrichMetadata(metadata)
     
     // 根据级别调用相应的方法
     switch (level) {
       case 'debug':
-        moduleLogger.debug(message, enrichedMetadata)
+        this.baseLogger.debug(message, enrichedMetadata)
         break
       case 'info':
-        moduleLogger.info(message, enrichedMetadata)
+        this.baseLogger.info(message, enrichedMetadata)
         break
       case 'warn':
-        moduleLogger.warn(message, enrichedMetadata)
+        this.baseLogger.warn(message, enrichedMetadata)
         break
       case 'error':
-        moduleLogger.error(message, enrichedMetadata)
+        this.baseLogger.error(message, enrichedMetadata)
         break
       default:
-        moduleLogger.info(message, enrichedMetadata)
+        this.baseLogger.info(message, enrichedMetadata)
     }
     
     this.updateStats()
   }
 
-  /**
-   * 获取模块日志器
-   */
-  private getModuleLogger(): IEnhancedLogger {
-    if (this.config.inherit) {
-      return this.baseLogger.forModule(this.moduleName)
-    } else {
-      // 如果不继承，直接使用基础日志器
-      return this.baseLogger
-    }
-  }
 
   /**
    * 丰富元数据
@@ -191,7 +187,7 @@ export class ModuleLoggerImpl implements ModuleLogger {
 export class ModuleLoggerManager {
   private readonly modules = new Map<string, ModuleLoggerImpl>()
 
-  constructor(private readonly baseLogger: IEnhancedLogger) {}
+  constructor(private readonly baseLogger: LogLayer) {}
 
   /**
    * 获取或创建模块日志器

@@ -12,7 +12,6 @@ export type {
   // 基础类型
   LogLevel,
   LogMetadata,
-  IEnhancedLogger,
   EnvironmentInfo,
 
   // 配置类型
@@ -43,13 +42,7 @@ import {
   createConfigForEnvironment,
 } from './config';
 import { detectEnvironment } from './core';
-import {
-  generateRequestId,
-  generateTraceId,
-  createPerformanceMeasurer,
-  withErrorLogging,
-  withAsyncErrorLogging,
-} from './wrapper';
+// wrapper 模块已移除，相关功能需要重新实现
 import { presets } from './config';
 
 // 核心创建函数
@@ -75,11 +68,6 @@ export { presets };
 
 // 实用工具函数
 export {
-  generateRequestId,
-  generateTraceId,
-  createPerformanceMeasurer,
-  withErrorLogging,
-  withAsyncErrorLogging,
   detectEnvironment,
 };
 

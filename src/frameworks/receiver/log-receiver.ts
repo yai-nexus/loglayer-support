@@ -2,7 +2,7 @@
  * 日志接收器实现
  */
 
-import type { IEnhancedLogger } from '../../core'
+import type { LogLayer } from 'loglayer'
 import type {
   ILogReceiver,
   LogReceiverConfig,
@@ -16,28 +16,25 @@ import type {
 } from '../receiver'
 
 import { LogDataValidator } from './validator'
-import { LogProcessor } from './processor'
 import { AdapterFactory } from './adapters'
 
 export class LogReceiver implements ILogReceiver {
-  private readonly logger: IEnhancedLogger
+  private readonly logger: LogLayer
   private readonly config: LogReceiverConfig
   private readonly validator: LogDataValidator
-  private readonly processor: LogProcessor
   private readonly adapter: FrameworkAdapter
   private _isDestroyed = false
 
   constructor(
-    logger: IEnhancedLogger,
+    logger: LogLayer,
     config: LogReceiverConfig = {},
     adapterType: 'nextjs' | 'express' | 'generic' | 'auto' = 'auto'
   ) {
     this.logger = logger
     this.config = this.normalizeConfig(config)
     
-    // 初始化组件
+    // 初始化组件（简化）
     this.validator = new LogDataValidator(this.config.validation)
-    this.processor = new LogProcessor(logger, this.config.processing)
     this.adapter = AdapterFactory.create(adapterType)
   }
 
@@ -92,14 +89,14 @@ export class LogReceiver implements ILogReceiver {
   }
 
   /**
-   * 处理单条日志
+   * 处理单条日志（简化版）
    */
   async processSingle(data: ClientLogData, context?: any): Promise<ProcessResult> {
     if (this._isDestroyed) {
       throw new Error('LogReceiver has been destroyed')
     }
 
-    // 验证数据
+    // 基本验证
     const validationResult = this.validate(data)
     if (!validationResult.valid) {
       return {
@@ -113,65 +110,70 @@ export class LogReceiver implements ILogReceiver {
       }
     }
 
-    // 提取客户端信息
-    const clientInfo = this.extractClientInfo(data, context?.request)
+    try {
+      // 直接转发到 LogLayer 实例
+      const level = data.level as 'debug' | 'info' | 'warn' | 'error'
+      const message = `[Client] ${data.message}`
 
-    // 处理日志
-    return await this.processor.processSingle(data, clientInfo, context)
+      this.logger[level](message)
+
+      return {
+        success: true,
+        processed: 1,
+        failed: 0
+      }
+    } catch (error) {
+      return {
+        success: false,
+        processed: 0,
+        failed: 1,
+        errors: [{
+          item: data,
+          error: (error as Error).message
+        }]
+      }
+    }
   }
 
   /**
-   * 处理批量日志
+   * 处理批量日志（简化版）
    */
   async processBatch(data: ClientLogData[], context?: any): Promise<ProcessResult> {
     if (this._isDestroyed) {
       throw new Error('LogReceiver has been destroyed')
     }
 
-    if (!this.config.processing?.supportBatch) {
-      throw new Error('Batch processing is not enabled')
-    }
-
-    // 验证所有数据
-    const validationResults = this.validator.validateBatch(data)
-    const validData: ClientLogData[] = []
+    let processed = 0
+    let failed = 0
     const errors: Array<{ item: any; error: string }> = []
 
-    validationResults.forEach((result, index) => {
-      if (result.valid) {
-        validData.push(data[index])
-      } else {
+    // 逐条处理日志
+    for (const logData of data) {
+      try {
+        const result = await this.processSingle(logData, context)
+        if (result.success) {
+          processed++
+        } else {
+          failed++
+          if (result.errors) {
+            errors.push(...result.errors)
+          }
+        }
+      } catch (error) {
+        failed++
         errors.push({
-          item: data[index],
-          error: `Validation failed: ${result.errors.join(', ')}`
+          item: logData,
+          error: (error as Error).message
         })
       }
-    })
-
-    // 如果没有有效数据，返回失败结果
-    if (validData.length === 0) {
-      return {
-        success: false,
-        processed: 0,
-        failed: data.length,
-        errors
-      }
     }
 
-    // 提取客户端信息
-    const clientInfo = this.extractClientInfo(data[0], context?.request)
-
-    // 处理有效的日志
-    const processResult = await this.processor.processBatch(validData, clientInfo, context)
-
-    // 合并验证错误和处理错误
-    if (errors.length > 0) {
-      processResult.errors = [...(processResult.errors || []), ...errors]
-      processResult.failed += errors.length
-      processResult.success = processResult.failed === 0
+    return {
+      success: failed === 0,
+      processed,
+      failed,
+      errors: errors.length > 0 ? errors : undefined
     }
-
-    return processResult
   }
 
   /**
@@ -268,9 +270,6 @@ export class LogReceiver implements ILogReceiver {
     // 更新子组件配置
     if (config.validation) {
       this.validator.updateConfig(config.validation)
-    }
-    if (config.processing) {
-      this.processor.updateConfig(config.processing)
     }
   }
 

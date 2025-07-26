@@ -3,7 +3,7 @@
  * 负责将客户端日志转换并记录到服务端日志器
  */
 
-import type { IEnhancedLogger } from '../../core'
+import type { LogLayer } from 'loglayer'
 import type { 
   ClientLogData, 
   ClientInfo, 
@@ -12,10 +12,10 @@ import type {
 } from '../receiver'
 
 export class LogProcessor {
-  private readonly logger: IEnhancedLogger
+  private readonly logger: LogLayer
   private readonly config: ProcessingConfig
 
-  constructor(logger: IEnhancedLogger, config: ProcessingConfig = {}) {
+  constructor(logger: LogLayer, config: ProcessingConfig = {}) {
     this.logger = logger
     this.config = {
       preserveClientLevel: true,
@@ -113,15 +113,12 @@ export class LogProcessor {
     // 构建元数据
     const metadata = this.buildMetadata(data, clientInfo, context)
     
-    // 获取日志器实例
-    const logReceiver = this.logger.forModule('client-log-receiver')
-
     // 根据级别记录日志
-    await this.logByLevel(logReceiver, data.level, message, metadata, data.error)
+    await this.logByLevel(this.logger, data.level, message, metadata, data.error)
 
     // 记录成功接收的统计信息
     if (this.config.logSuccessfulReceives) {
-      logReceiver.debug('客户端日志接收成功', {
+      this.logger.debug('客户端日志接收成功', {
         logLevel: data.level,
         messageLength: data.message.length,
         hasMetadata: !!(data.metadata && Object.keys(data.metadata).length > 0),
@@ -181,7 +178,7 @@ export class LogProcessor {
    * 根据级别记录日志
    */
   private async logByLevel(
-    logger: IEnhancedLogger,
+    logger: LogLayer,
     level: string,
     message: string,
     metadata: Record<string, any>,
@@ -206,11 +203,12 @@ export class LogProcessor {
         if (error && this.config.reconstructErrors) {
           // 重建错误对象
           const reconstructedError = this.reconstructError(error, message)
-          logger.logError(reconstructedError, {
+          logger.error(`客户端错误: ${message}`, {
             ...metadata,
             clientErrorName: error.name,
-            clientErrorStack: error.stack
-          }, `客户端错误: ${message}`)
+            clientErrorStack: error.stack,
+            error: reconstructedError
+          })
         } else {
           logger.error(message, metadata)
         }

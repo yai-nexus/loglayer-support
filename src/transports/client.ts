@@ -4,12 +4,12 @@
  * 基于浏览器原生 API 的日志引擎，完全独立于服务端
  */
 
-import type { LogLevel, LogMetadata, ILogger, ClientOutput } from '../core';
+import type { LogLevel, LogMetadata, ClientOutput } from '../core';
 
 /**
  * 浏览器 Logger（基于浏览器原生 API）
  */
-export class BrowserLogger implements ILogger {
+export class BrowserLogger {
   private outputs: ClientOutput[];
 
   constructor(outputs: ClientOutput[]) {

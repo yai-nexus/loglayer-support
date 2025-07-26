@@ -11,6 +11,10 @@ export * from './utils';
 export * from './server';
 export * from './client';
 
+// 新的 LogLayer Transport 实现
+export * from './browser-transport';
+export * from './browser-factory';
+
 // 高性能适配器
 export * from './adapters';
 

@@ -35,10 +35,13 @@ export default function HomePage() {
   const handleErrorLog = () => {
     setErrorCount(prev => prev + 1)
     const error = new Error(`模拟错误 #${errorCount + 1}`)
-    logger.logError(error, {
+    logger.error('用户触发的测试错误', {
       errorCount: errorCount + 1,
-      userTriggered: true
-    }, '用户触发的测试错误')
+      userTriggered: true,
+      error,
+      errorName: error.name,
+      errorStack: error.stack
+    })
     addLog(`❌ 已触发 Error 日志 (#${errorCount + 1})`)
   }
 

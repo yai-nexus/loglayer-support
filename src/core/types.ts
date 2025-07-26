@@ -16,29 +16,7 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
  */
 export type LogMetadata = Record<string, unknown>;
 
-/**
- * 增强 Logger 接口
- */
-export interface IEnhancedLogger {
-  // 基础日志方法
-  debug(message: string, metadata?: LogMetadata): void;
-  info(message: string, metadata?: LogMetadata): void;
-  warn(message: string, metadata?: LogMetadata): void;
-  error(message: string, metadata?: LogMetadata): void;
-
-  // 上下文绑定方法
-  child(bindings: LogMetadata): IEnhancedLogger;
-  forRequest(requestId: string, traceId?: string): IEnhancedLogger;
-  forUser(userId: string): IEnhancedLogger;
-  forModule(moduleName: string): IEnhancedLogger;
-
-  // 增强方法
-  logError(error: Error, context?: LogMetadata, message?: string): void;
-  logPerformance(operation: string, duration: number, metadata?: LogMetadata): void;
-
-  // 原始 logger 访问
-  get raw(): LogLayer;
-}
+// IEnhancedLogger 已移除，直接使用 LogLayer
 
 /**
  * 环境检测结果
@@ -154,15 +132,7 @@ export interface ClientOutputConfig {
 export type ServerEngineType = 'pino' | 'winston' | 'core';
 export type ClientEngineType = 'browser';
 
-/**
- * 内部日志引擎接口
- */
-export interface ILogger {
-  debug(message: string, meta?: LogMetadata): void;
-  info(message: string, meta?: LogMetadata): void;
-  warn(message: string, meta?: LogMetadata): void;
-  error(message: string, meta?: LogMetadata): void;
-}
+// ILogger 已移除，直接使用 LogLayer
 
 /**
  * 引擎选择策略

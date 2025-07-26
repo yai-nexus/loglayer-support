@@ -8,7 +8,7 @@ function App() {
   useEffect(() => {
     logComponentMount('App')
     logger.info('React 应用启动', {
-      version: '0.6.0',
+      version: '0.7.0-alpha.2',
       framework: 'React + Vite'
     })
 
@@ -42,8 +42,15 @@ function App() {
     try {
       throw new Error(`模拟错误 - 计数: ${count}`)
     } catch (error) {
-      logger.logError(error as Error, { count, context: 'demo' }, '演示错误处理')
-      setLogs(prev => [...prev, `[ERROR] ${(error as Error).message}`])
+      const err = error as Error
+      logger.error('演示错误处理', { 
+        count, 
+        context: 'demo',
+        error: err,
+        errorName: err.name,
+        errorStack: err.stack
+      })
+      setLogs(prev => [...prev, `[ERROR] ${err.message}`])
     }
   }
 
@@ -109,7 +116,7 @@ function App() {
   return (
     <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h1>LogLayer React 示例</h1>
-      <p>展示新的 createBrowserLogger API 功能</p>
+      <p>展示 v0.7.0-alpha.2 LogLayer API 功能</p>
 
       <div className="demo-section">
         <h3>🎯 基础功能演示</h3>

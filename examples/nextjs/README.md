@@ -1,30 +1,36 @@
-# LogLayer NextJS 演示 - 框架预设 API
+# LogLayer NextJS 演示 - v0.7.0-alpha.2
 
-这是一个完整的 Next.js 应用示例，展示了 loglayer-support v0.6.0 新的框架预设 API 功能。
+这是一个完整的 Next.js 应用示例，展示了 loglayer-support v0.7.0-alpha.2 的新 LogLayer API 功能。
 
 ## 🆕 新功能展示
 
-### 🌐 浏览器端日志器 (createBrowserLogger)
+### 🌐 浏览器端日志器 (createBrowserLoggerSync)
+- ✅ 直接返回 LogLayer 实例
 - ✅ 多输出支持（Console + LocalStorage + HTTP）
 - ✅ 智能采样策略
 - ✅ 自动错误捕获
-- ✅ 性能监控
-- ✅ 批量发送和重试机制
+- ✅ 类型安全的 TypeScript 支持
 - ✅ 彩色控制台输出
 
-### 🖥️ 服务端日志器 (createNextjsServerLogger)
-- ✅ 模块化日志管理
-- ✅ 健康检查和性能监控
-- ✅ 优雅关闭和资源清理
-- ✅ 运行时统计
+### 🖥️ 服务端日志器 (createLogger)
+- ✅ 直接返回 LogLayer 实例
+- ✅ 自动 pino/winston transport 回退
+- ✅ 统一的配置格式
+- ✅ 更好的错误处理
 - ✅ 文件和控制台输出
 
 ### 📨 日志接收器 (createNextjsLogReceiver)
+- ✅ 适配新的 LogLayer API
 - ✅ 自动验证和安全检查
 - ✅ 批量处理支持
 - ✅ 速率限制
 - ✅ 错误重建
-- ✅ 一行代码创建完整 API
+
+## 🆕 v0.7.0-alpha.2 主要变更
+
+- **API 简化**：直接使用 LogLayer 实例，不再使用包装器
+- **方法更新**：`logError` → `error` + metadata
+- **类型安全**：更好的 TypeScript 支持
 
 ## 快速开始
 
@@ -44,6 +50,36 @@ npm run dev
 ### 3. 访问应用
 
 打开浏览器访问: http://localhost:3000
+
+## 📝 API 迁移示例
+
+该示例展示了如何从 v0.6.x 迁移到 v0.7.0-alpha.2：
+
+### 服务端变更
+```typescript
+// 老 API
+import { createNextjsServerLogger } from '@yai-nexus/loglayer-support'
+const serverInstance = await createNextjsServerLogger(config)
+const logger = serverInstance.logger
+
+// 新 API
+import { createLogger } from '@yai-nexus/loglayer-support'
+const logger = await createLogger('nextjs-server', config)
+```
+
+### 错误处理变更
+```typescript
+// 老 API
+logger.logError(error, metadata, 'Custom message')
+
+// 新 API
+logger.error('Custom message', {
+  ...metadata,
+  error,
+  errorName: error.name,
+  errorStack: error.stack
+})
+```
 
 ## 日志输出位置
 
