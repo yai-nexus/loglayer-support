@@ -3,8 +3,9 @@
  * 提供基于 LogLayer 的浏览器端日志解决方案
  */
 
-import type { LogLayer } from 'loglayer'
+import { LogLayer } from 'loglayer'
 import type { LogMetadata, ClientOutput } from '@yai-loglayer/core'
+import { createBrowserLogLayer, createDevelopmentBrowserLogger } from './browser-factory'
 
 // ==================== 核心类型定义 ====================
 
@@ -160,11 +161,7 @@ export async function createBrowserLogger(
   config?: BrowserLoggerConfig,
   options?: BrowserLoggerOptions
 ): Promise<LogLayer> {
-  const { LogLayer } = await import('loglayer')
-  const { createBrowserLogLayer } = await import('./browser-factory')
-  
   if (!config) {
-    const { createDevelopmentBrowserLogger } = await import('./browser-factory')
     return createDevelopmentBrowserLogger()
   }
 
@@ -179,11 +176,7 @@ export function createBrowserLoggerSync(
   config?: BrowserLoggerConfig,
   options?: BrowserLoggerOptions
 ): LogLayer {
-  const { LogLayer } = require('loglayer')
-  const { createBrowserLogLayer } = require('./browser-factory')
-  
   if (!config || !config.outputs) {
-    const { createDevelopmentBrowserLogger } = require('./browser-factory')
     return createDevelopmentBrowserLogger()
   }
 
