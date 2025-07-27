@@ -38,7 +38,8 @@
   ],
   "dependencies": {
     "@yai-loglayer/core": "workspace:*",
-    "loglayer": "^6.6.0"
+    "loglayer": "^6.6.0",
+    "@loglayer/transport": "^2.2.1"
   },
   "devDependencies": {
     "@yai-loglayer/build-config": "workspace:*",

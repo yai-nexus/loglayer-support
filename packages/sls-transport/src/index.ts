@@ -4,8 +4,17 @@
  */
 
 export { SlsTransport } from './SlsTransport';
-export { createSlsConfigFromEnv, checkSlsConfig } from './config';
+
+export {
+  createSlsConfigFromEnv,
+  checkSlsConfig,
+  getEnvDiagnosticInfo,
+  compareEnvConfigs,
+  type EnvDiagnosticInfo
+} from './config';
+
 export { configureInternalLogger } from './logger';
+
 export type {
   SlsTransportConfig,
   SlsTransportInternalConfig,

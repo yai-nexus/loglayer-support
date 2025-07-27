@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 console.log('[DEBUG] API route: importing server-logger...');
-import { apiLogger, dbLogger } from '../../../lib/server-logger'
+import { dbLogger, getServerInstance } from '../../../lib/server-logger'
 console.log('[DEBUG] API route: server-logger imported successfully');
 
 /**
@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
   // 创建请求特定的 logger
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`
   console.log('[DEBUG] About to call apiLogger.info with:', requestId);
-  // 直接使用 apiLogger，不使用 forRequest 方法
-  const requestLogger = apiLogger;
+  // 使用异步方式获取日志器实例，避免初始化竞态条件
+  const serverInstance = await getServerInstance();
+  const requestLogger = serverInstance.withContext({ module: 'api' });
   console.log('[DEBUG] requestLogger created successfully');
 
   try {
@@ -126,7 +127,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   const requestId = `health_${Date.now()}`
-  const requestLogger = apiLogger
+  // 使用异步方式获取日志器实例，避免初始化竞态条件
+  const serverInstance = await getServerInstance();
+  const requestLogger = serverInstance.withContext({ module: 'api' });
 
   requestLogger.withMetadata({
     method: 'GET',

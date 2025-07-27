@@ -4,8 +4,7 @@
  * 提供批量发送、重试机制、错误处理等企业级特性
  */
 
-import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport';
-import type { LogLayerTransportParams, LogLevelType, MessageDataType } from '@loglayer/shared';
+import { LoggerlessTransport, type LoggerlessTransportConfig, type LogLayerTransportParams, type LogLevelType } from '@loglayer/transport';
 
 import type {
   SlsTransportConfig,
@@ -84,7 +83,7 @@ export class SlsTransport extends LoggerlessTransport {
   /**
    * LogLayer 调用此方法发送日志
    */
-  shipToLogger(params: LogLayerTransportParams): MessageDataType[] {
+  shipToLogger(params: LogLayerTransportParams): any[] {
     const { messages, data } = params;
     
     // 直接使用 LogLayer 参数，无需自定义 Log 对象

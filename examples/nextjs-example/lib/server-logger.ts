@@ -6,12 +6,19 @@
 
 import { LogLayer } from 'loglayer'
 import { ServerTransport } from '@yai-loglayer/server'
-import { SlsTransport, createSlsConfigFromEnv } from '@yai-loglayer/sls-transport'
+import { SlsTransport, createSlsConfigFromEnv, configureInternalLogger } from '@yai-loglayer/sls-transport'
 import type { LoggerConfig } from '@yai-loglayer/core'
 import dotenv from 'dotenv'
 
 // 加载环境变量
 dotenv.config()
+
+// 【调试增强】启用详细的 SLS Transport 内部日志
+configureInternalLogger({
+  enabled: true,
+  level: 'debug',
+  prefix: '[NextJS-SlsTransport]'
+})
 
 // 获取项目根目录路径（相对于当前工作目录）
 const getProjectLogsDir = () => {

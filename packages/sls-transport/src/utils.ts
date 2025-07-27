@@ -3,7 +3,7 @@
  */
 
 // 使用 LogLayer 原生类型，无需自定义 Log 接口
-import type { LogLevelType } from '@loglayer/shared';
+import type { LogLevelType } from '@loglayer/transport';
 import type { 
   SlsTransportConfig, 
   SlsTransportInternalConfig, 
@@ -30,9 +30,9 @@ export function validateSlsConfig(config: SlsTransportConfig): void {
     }
   }
 
-  // 验证 endpoint 格式
-  if (!config.endpoint.startsWith('http')) {
-    throw new Error(`SLS Transport endpoint 必须是完整的 HTTP(S) URL: ${config.endpoint}`);
+  // 验证 endpoint 格式（支持完整 URL 或域名格式）
+  if (!config.endpoint.startsWith('http') && !config.endpoint.includes('.log.aliyuncs.com')) {
+    throw new Error(`SLS Transport endpoint 必须是完整的 HTTP(S) URL 或阿里云 SLS 域名: ${config.endpoint}`);
   }
 
   // 验证数值参数
