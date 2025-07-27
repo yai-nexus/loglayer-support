@@ -38,9 +38,7 @@
   ],
   "dependencies": {
     "@yai-loglayer/core": "workspace:*",
-    "loglayer": "^6.6.0",
-    "@alicloud/sls20201230": "^5.7.2",
-    "@alicloud/openapi-core": "^1.0.0"
+    "loglayer": "^6.6.0"
   },
   "devDependencies": {
     "@yai-loglayer/build-config": "workspace:*",

@@ -6,7 +6,6 @@
 
 import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport';
 import type { LogLayerTransportParams, LogLevelType, MessageDataType } from '@loglayer/shared';
-import Sls20201230 from '@alicloud/sls20201230';
 
 import type {
   SlsTransportConfig,
@@ -27,12 +26,17 @@ import {
   formatBytes
 } from './utils';
 import { internalLogger } from './logger';
+import { SlsRestClient } from './SlsRestClient';
 
 /**
  * 阿里云 SLS Transport 实现类
  */
+/**
+ * 阿里云 SLS Transport 实现类
+ * 使用纯 REST API 实现，无原生模块依赖，解决 Next.js 兼容性问题
+ */
 export class SlsTransport extends LoggerlessTransport {
-  private client: Sls20201230;
+  private restClient: SlsRestClient;
   private config: SlsTransportInternalConfig;
   private logBuffer: SlsLogItem[] = [];
   private flushTimer: NodeJS.Timeout | null = null;
@@ -62,8 +66,16 @@ export class SlsTransport extends LoggerlessTransport {
       retryBaseDelay: config.retryBaseDelay || 1000,
     };
     
-    this.client = new Sls20201230(this.config.sdkConfig as any);
+    // 使用 REST 客户端替代 SDK，避免原生模块依赖
+    this.restClient = new SlsRestClient(this.config);
     this.stats = this.initStats();
+    
+    internalLogger.debug('SlsTransport 初始化完成 (REST API 模式)', {
+      project: this.config.project,
+      logstore: this.config.logstore,
+      batchSize: this.config.batchSize,
+      flushInterval: this.config.flushInterval
+    });
     
     this.setupFlushTimer();
     this.setupProcessHandlers();
@@ -181,24 +193,17 @@ export class SlsTransport extends LoggerlessTransport {
   }
 
   /**
-   * 实际发送日志到 SLS
+   * 实际发送日志到 SLS (使用 REST API)
    */
   private async sendLogs(logs: SlsLogItem[]): Promise<void> {
-    const logGroup = {
-      logs,
-      topic: this.config.topic,
-      source: this.config.source,
-    };
-
-    const request = {
+    // 使用新的 REST 客户端发送日志
+    await this.restClient.putLogs(logs);
+    
+    internalLogger.debug('成功发送日志到 SLS', { 
+      logsCount: logs.length,
       project: this.config.project,
-      logstore: this.config.logstore,
-      body: {
-        logGroup: logGroup,
-      },
-    };
-
-    await (this.client as any).putLogs(this.config.project, this.config.logstore, request as any);
+      logstore: this.config.logstore 
+    });
   }
 
   /**
