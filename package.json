@@ -48,12 +48,7 @@
   },
   "optionalDependencies": {
     "@loglayer/plugin-redaction": "^2.0.0",
-    "@loglayer/transport-pino": "^2.0.0",
-    "@loglayer/transport-simple-pretty-terminal": "^2.0.0",
-    "@loglayer/transport-winston": "^2.0.0",
-    "pino": "^9.0.0",
-    "pino-pretty": "^11.0.0",
-    "winston": "^3.0.0"
+    "@loglayer/transport-simple-pretty-terminal": "^2.0.0"
   },
   "devDependencies": {
     "@alicloud/log": "^1.2.5",
@@ -61,7 +56,6 @@
     "@changesets/cli": "^2.29.5",
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
-    "@types/pino": "^7.0.4",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",

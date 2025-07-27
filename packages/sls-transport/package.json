@@ -1,7 +1,7 @@
 {
-  "name": "@yai-loglayer/server",
+  "name": "@yai-loglayer/sls-transport",
   "version": "0.7.0-beta.1",
-  "description": "服务端的 loglayer 封装，提供 Node.js 环境的日志解决方案",
+  "description": "阿里云 SLS (Simple Log Service) transport for LogLayer - 企业级日志传输组件",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -25,13 +25,22 @@
     "test:watch": "jest --watch",
     "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0"
   },
+  "keywords": [
+    "logging",
+    "logger",
+    "loglayer",
+    "sls",
+    "alicloud",
+    "aliyun",
+    "transport",
+    "batch",
+    "retry"
+  ],
   "dependencies": {
     "@yai-loglayer/core": "workspace:*",
-    "loglayer": "^6.6.0"
-  },
-  "optionalDependencies": {
-    "@loglayer/plugin-redaction": "^2.0.0",
-    "@loglayer/transport-simple-pretty-terminal": "^2.0.0"
+    "loglayer": "^6.6.0",
+    "@alicloud/sls20201230": "^5.7.2",
+    "@alicloud/openapi-core": "^1.0.0"
   },
   "devDependencies": {
     "@yai-loglayer/build-config": "workspace:*",
@@ -45,5 +54,14 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yai-nexus/loglayer-support.git",
+    "directory": "packages/sls-transport"
+  },
+  "bugs": {
+    "url": "https://github.com/yai-nexus/loglayer-support/issues"
+  },
+  "homepage": "https://github.com/yai-nexus/loglayer-support/tree/main/packages/sls-transport#readme"
 }

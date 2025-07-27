@@ -7,7 +7,7 @@
 /**
  * 内部引擎类型
  */
-export type ServerEngineType = 'pino' | 'winston' | 'core';
+export type ServerEngineType = 'core';
 export type ClientEngineType = 'browser';
 
 /**
