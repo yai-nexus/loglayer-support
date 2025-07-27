@@ -59,8 +59,8 @@ async function runCustomConfigExample(): Promise<void> {
   uiLogger.info('页面渲染完成');           // 不会输出（ui 配置为 error）
   apiLogger.info('API 调用成功');          // 会输出（使用默认级别 info）
   
-  authLogger.warn('认证失败', { attempts: 3 });
-  uiLogger.error('组件渲染失败', { component: 'UserProfile' });
+  authLogger.withMetadata({ attempts: 3 }).warn('认证失败');
+  uiLogger.withMetadata({ component: 'UserProfile' }).error('组件渲染失败');
   
   console.log('✅ 自定义配置示例完成 - 日志已保存到 custom.log');
 }

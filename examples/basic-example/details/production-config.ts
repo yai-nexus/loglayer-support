@@ -56,22 +56,22 @@ async function runProductionConfigExample(): Promise<void> {
 
   const prodLogger = await createServerLogger('production-app', productionConfig);
   
-  prodLogger.info('生产环境应用启动', { 
+  prodLogger.withMetadata({
     version: '1.2.0',
     environment: 'production',
     node_version: process.version
-  });
+  }).info('生产环境应用启动');
   
-  prodLogger.warn('配置警告', { 
+  prodLogger.withMetadata({
     message: 'Using default database connection pool size',
     defaultSize: 10
-  });
-  
-  prodLogger.error('生产环境错误', {
+  }).warn('配置警告');
+
+  prodLogger.withMetadata({
     error: 'Database connection timeout',
     retryCount: 3,
     lastAttempt: new Date().toISOString()
-  });
+  }).error('生产环境错误');
   
   console.log('✅ 生产环境配置示例完成');
 }

@@ -25,8 +25,7 @@ echo ""
 
 # 清理旧的日志文件
 echo "🧹 清理旧的日志文件..."
-rm -f logs/basic.log
-rm -f logs/nextjs.log
+rm -f logs/*.log
 echo "✅ 清理完成"
 echo ""
 
@@ -61,14 +60,23 @@ echo "=== 4. 检查生成的日志文件 ==="
 echo "📁 日志文件位置: ./logs/"
 echo ""
 
-if [[ -f "logs/basic.log" ]]; then
-    echo "✅ basic.log 已生成"
-    echo "📄 文件大小: $(wc -l < logs/basic.log) 行"
+# 检查基础示例的日志文件
+BASIC_LOG_FOUND=""
+for log_file in logs/app.log logs/custom.log logs/*.log; do
+    if [[ -f "$log_file" ]]; then
+        BASIC_LOG_FOUND="$log_file"
+        break
+    fi
+done
+
+if [[ -n "$BASIC_LOG_FOUND" ]]; then
+    echo "✅ 基础示例日志已生成: $(basename "$BASIC_LOG_FOUND")"
+    echo "📄 文件大小: $(wc -l < "$BASIC_LOG_FOUND") 行"
     echo "🔍 最后几行内容:"
-    tail -3 logs/basic.log | sed 's/^/   /'
+    tail -3 "$BASIC_LOG_FOUND" | sed 's/^/   /'
     echo ""
 else
-    echo "❌ basic.log 未生成"
+    echo "❌ 基础示例日志未生成"
 fi
 
 
@@ -86,7 +94,7 @@ fi
 # 5. 验证日志文件前缀
 echo "=== 5. 验证日志文件前缀与示例名称一致 ==="
 echo "📋 期望的日志文件:"
-echo "   - basic.log   ← basic 示例"
+echo "   - app.log/custom.log   ← basic 示例"
 echo "   - nextjs.log  ← nextjs 示例"
 echo ""
 
@@ -99,7 +107,7 @@ echo "=== 6. 验证本地时间格式 ==="
 echo "🕐 期望格式: YYYY-MM-DD HH:MM:SS.mmm (本地时间)"
 echo "🔍 检查日志文件中的时间格式:"
 
-for logfile in logs/basic.log logs/nextjs.log; do
+for logfile in logs/*.log; do
     if [[ -f "$logfile" ]]; then
         filename=$(basename "$logfile")
         echo "   📄 $filename:"

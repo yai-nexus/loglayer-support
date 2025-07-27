@@ -17,7 +17,7 @@ async function runPresetsExample(): Promise<void> {
   const defaultConfig = createDefaultConfig();
   const logger1 = await createServerLogger('app', defaultConfig);
   
-  logger1.info('使用默认配置的日志', { userId: 123 });
+  logger1.withMetadata({ userId: 123 }).info('使用默认配置的日志');
   
   // 使用开发环境配置（包含文件输出和 SLS 输出）
   const devConfig = createDevelopmentConfig();
@@ -51,8 +51,8 @@ async function runPresetsExample(): Promise<void> {
   };
   const logger2 = await createServerLogger('api', serverConfig);
   
-  logger2.debug('开发环境调试信息', { endpoint: '/api/users' });
-  logger2.info('API 请求完成', { statusCode: 200, duration: 150 });
+  logger2.withMetadata({ endpoint: '/api/users' }).debug('开发环境调试信息');
+  logger2.withMetadata({ statusCode: 200, duration: 150 }).info('API 请求完成');
   
   console.log('✅ 预设配置示例完成 - 日志已保存到 ./logs/app.log');
 }

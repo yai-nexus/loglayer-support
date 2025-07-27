@@ -7,10 +7,10 @@ function App() {
 
   useEffect(() => {
     logComponentMount('App')
-    logger.info('React 应用启动', {
+    logger.withMetadata({
       version: '0.7.0-alpha.2',
       framework: 'React + Vite'
-    })
+    }).info('React 应用启动')
 
     return () => {
       logger.debug('App 组件卸载')
@@ -28,13 +28,13 @@ function App() {
 
   const handleInfoLog = () => {
     const message = `信息日志 - 当前计数: ${count}`
-    logger.info(message, { count, timestamp: new Date().toISOString() })
+    logger.withMetadata({ count, timestamp: new Date().toISOString() }).info(message)
     setLogs(prev => [...prev, `[INFO] ${message}`])
   }
 
   const handleWarningLog = () => {
     const message = `警告日志 - 计数过高: ${count}`
-    logger.warn(message, { count, threshold: 10 })
+    logger.withMetadata({ count, threshold: 10 }).warn(message)
     setLogs(prev => [...prev, `[WARN] ${message}`])
   }
 
@@ -43,13 +43,13 @@ function App() {
       throw new Error(`模拟错误 - 计数: ${count}`)
     } catch (error) {
       const err = error as Error
-      logger.error('演示错误处理', { 
-        count, 
+      logger.withMetadata({
+        count,
         context: 'demo',
         error: err,
         errorName: err.name,
         errorStack: err.stack
-      })
+      }).error('演示错误处理')
       setLogs(prev => [...prev, `[ERROR] ${err.message}`])
     }
   }
@@ -71,7 +71,7 @@ function App() {
       }
     } catch (error) {
       const duration = performance.now() - start
-      logger.error('API 调用失败', { error: (error as Error).message, duration })
+      logger.withMetadata({ error: (error as Error).message, duration }).error('API 调用失败')
       setLogs(prev => [...prev, `[API] 调用失败: ${(error as Error).message}`])
     }
   }
@@ -100,16 +100,16 @@ function App() {
       const storedLogs = localStorage.getItem('react-app-logs')
       if (storedLogs) {
         const parsedLogs = JSON.parse(storedLogs)
-        logger.info('本地存储日志检查', { 
+        logger.withMetadata({
           count: parsedLogs.length,
           sample: parsedLogs.slice(-3)
-        })
+        }).info('本地存储日志检查')
         setLogs(prev => [...prev, `[STORAGE] 找到 ${parsedLogs.length} 条本地日志`])
       } else {
         setLogs(prev => [...prev, `[STORAGE] 暂无本地日志`])
       }
     } catch (error) {
-      logger.error('检查本地存储失败', { error: (error as Error).message })
+      logger.withMetadata({ error: (error as Error).message }).error('检查本地存储失败')
     }
   }
 

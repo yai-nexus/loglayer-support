@@ -24,7 +24,7 @@ echo ""
 
 # 清理旧的日志文件
 echo "🧹 清理旧的基础示例日志..."
-rm -f logs/basic.log
+rm -f logs/*.log
 echo "✅ 清理完成"
 echo ""
 
@@ -46,25 +46,30 @@ else
     exit 1
 fi
 
-cd ../..
+# 保持在示例目录中进行验证
 
 # 验证日志文件
 echo ""
 echo "=== 验证日志文件 ==="
 
-# 检查多个可能的日志文件位置
-BASIC_LOG_PATHS=("logs/basic.log" "examples/logs/basic.log")
+# 检查基础示例生成的日志文件
 BASIC_LOG_FOUND=""
-
-for log_path in "${BASIC_LOG_PATHS[@]}"; do
-    if [[ -f "$log_path" ]]; then
-        BASIC_LOG_FOUND="$log_path"
-        break
-    fi
-done
+if [[ -f "logs/app.log" ]]; then
+    BASIC_LOG_FOUND="logs/app.log"
+elif [[ -f "logs/custom.log" ]]; then
+    BASIC_LOG_FOUND="logs/custom.log"
+else
+    # 查找任何 .log 文件
+    for log_file in logs/*.log; do
+        if [[ -f "$log_file" ]]; then
+            BASIC_LOG_FOUND="$log_file"
+            break
+        fi
+    done
+fi
 
 if [[ -n "$BASIC_LOG_FOUND" ]]; then
-    echo "✅ basic.log 已生成: $BASIC_LOG_FOUND"
+    echo "✅ 日志文件已生成: $BASIC_LOG_FOUND"
 
     # 检查文件大小
     LOG_LINES=$(wc -l < "$BASIC_LOG_FOUND")
@@ -98,11 +103,8 @@ if [[ -n "$BASIC_LOG_FOUND" ]]; then
         exit 1
     fi
 else
-    echo "❌ basic.log 未生成"
-    echo "🔍 查找的位置:"
-    for log_path in "${BASIC_LOG_PATHS[@]}"; do
-        echo "   - $log_path"
-    done
+    echo "❌ 日志文件未生成"
+    echo "🔍 查找的位置: logs/*.log"
     exit 1
 fi
 
