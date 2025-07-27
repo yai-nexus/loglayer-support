@@ -21,6 +21,10 @@
       "path": "./packages/receiver"
     },
     {
+      "name": "☁️ SLS Transport Package",
+      "path": "./packages/sls-transport"
+    },
+    {
       "name": "⚛️ React Example",
       "path": "./examples/react-example"
     },
