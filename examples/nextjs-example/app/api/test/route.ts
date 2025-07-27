@@ -29,6 +29,25 @@ export async function POST(request: NextRequest) {
       clientMessage: body.message
     }).info('收到 API 请求')
 
+    // 如果消息包含特定关键词，触发警告日志（用于测试 SLS）
+    if (body.message && body.message.includes('warning')) {
+      requestLogger.withMetadata({
+        testType: 'sls-warning-test',
+        requestId,
+        message: body.message,
+        timestamp: new Date().toISOString()
+      }).warn('触发测试警告日志 - 这条日志应该发送到 SLS')
+    }
+
+    if (body.message && body.message.includes('error')) {
+      requestLogger.withMetadata({
+        testType: 'sls-error-test',
+        requestId,
+        message: body.message,
+        timestamp: new Date().toISOString()
+      }).error('触发测试错误日志 - 这条日志应该发送到 SLS')
+    }
+
     // 模拟一些业务逻辑处理时间
     const processingStart = performance.now()
     

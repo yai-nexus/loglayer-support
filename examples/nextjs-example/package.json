@@ -13,10 +13,12 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
+    "@alicloud/log": "^1.2.5",
     "@yai-loglayer/browser": "workspace:*",
     "@yai-loglayer/core": "workspace:*",
     "@yai-loglayer/receiver": "workspace:*",
     "@yai-loglayer/server": "workspace:*",
+    "dotenv": "^16.6.1",
     "loglayer": "^6.6.0",
     "next": "^15.4.2",
     "react": "^19.1.0",

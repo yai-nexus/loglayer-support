@@ -1,11 +1,39 @@
 /**
  * 服务端专用日志功能 - 适配 v0.7.0-alpha.2 LogLayer API
  * 在 API 路由中使用，支持文件输出到项目根目录的 logs 目录
+ * 支持 SLS (Simple Log Service) 日志收集
  */
 
 import { createServerLogger } from '@yai-loglayer/server'
 import type { LoggerConfig } from '@yai-loglayer/core'
 import { LogLayer } from 'loglayer'
+import dotenv from 'dotenv'
+
+// 加载环境变量
+dotenv.config()
+
+/**
+ * 获取 SLS 配置
+ * 从环境变量中读取 SLS 配置，如果缺少必需变量则返回空对象
+ */
+function getSLSConfig(): Record<string, string> {
+  const requiredVars = ['SLS_ENDPOINT', 'SLS_PROJECT', 'SLS_LOGSTORE', 'SLS_ACCESS_KEY_ID', 'SLS_ACCESS_KEY_SECRET', 'SLS_APP_NAME'];
+  const missingVars = requiredVars.filter(v => !process.env[v]);
+
+  if (missingVars.length > 0) {
+    console.warn(`[LogLayer WARN] Missing SLS environment variables: ${missingVars.join(', ')}. SLS logging will be disabled.`);
+    return {};
+  }
+
+  return {
+    endpoint: process.env.SLS_ENDPOINT!,
+    project: process.env.SLS_PROJECT!,
+    logstore: process.env.SLS_LOGSTORE!,
+    accessKeyId: process.env.SLS_ACCESS_KEY_ID!,
+    accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET!,
+    appName: process.env.SLS_APP_NAME!
+  };
+}
 
 // 获取项目根目录路径（相对于当前工作目录）
 const getProjectLogsDir = () => {
@@ -28,19 +56,34 @@ console.log('[DEBUG] Logs directory:', logsDir);
 
 // 使用 v0.7.0-alpha.2 createServerLogger API 创建服务端日志器
 const createServerInstance = async (): Promise<LogLayer> => {
+  const slsConfig = getSLSConfig();
+  const outputs: LoggerConfig['server']['outputs'] = [
+    { type: 'stdout' }, // 控制台输出
+    {
+      type: 'file',
+      config: {
+        dir: logsDir,
+        filename: 'nextjs.log'
+      }
+    }
+  ];
+
+  // 动态添加 SLS 输出（仅当所有必需的环境变量都存在时）
+  if (slsConfig.endpoint) {
+    outputs.push({
+      type: 'sls',
+      level: 'warn', // 与 basic-example 对齐，只收集警告及以上级别
+      config: slsConfig
+    });
+    console.log('[DEBUG] SLS logging enabled for nextjs-server');
+  } else {
+    console.log('[DEBUG] SLS logging disabled - missing environment variables');
+  }
+
   const logger = await createServerLogger('nextjs-server', {
     level: { default: process.env.NODE_ENV === 'production' ? 'info' : 'debug' },
     server: {
-      outputs: [
-        { type: 'stdout' }, // 控制台输出
-        {
-          type: 'file',
-          config: {
-            dir: logsDir,
-            filename: 'nextjs.log'
-          }
-        }
-      ]
+      outputs: outputs // 使用更新后的 outputs 数组
     },
     client: {
       outputs: [{ type: 'console' }] // 必需的客户端配置
