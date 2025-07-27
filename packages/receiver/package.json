@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/receiver",
-  "version": "0.7.0-alpha.5",
+  "version": "0.7.0-beta.1",
   "description": "日志接收器，用于接收和处理来自客户端的日志数据",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -5,6 +5,52 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.0-beta.1] - 2025-01-27
+
+### 🚀 重大架构简化 - Beta 版本
+
+这是一个重大的架构简化版本，移除了复杂的包装器和多余的配置格式，统一使用 LogLayer 原生 API。
+
+#### 💥 破坏性变更
+
+- **移除 `CompatibleLogger` 接口**: 不再提供 `logger.info(message, metadata)` 格式的包装器
+- **移除 `ServerLoggerConfig` 接口**: 统一使用 `LoggerConfig` 配置格式
+- **API 变更**: 所有日志调用需要使用 `logger.withMetadata(metadata).info(message)` 格式
+
+#### ✨ 新增功能
+
+- **便捷配置创建函数**: 新增 `createServerConfig()`, `createClientConfig()`, `createDevConfig()`, `createProdConfig()` 等便捷函数
+- **统一配置格式**: 只使用 `LoggerConfig` 一种配置格式，简化用户理解成本
+- **原生 LogLayer API**: 直接使用 LogLayer 的标准 API，更好的生态兼容性
+
+#### 🔧 改进
+
+- **性能提升**: 移除包装器层，减少函数调用开销
+- **类型安全**: 更好的 TypeScript 类型推断和检查
+- **代码简化**: 减少抽象层，代码更直接易懂
+- **标准化**: 与 LogLayer 生态标准保持一致
+
+#### 📚 迁移指南
+
+详细的迁移指南请参考 `docs/architecture-simplification-guide.md`
+
+**主要变更**:
+```typescript
+// 旧版本
+const logger: CompatibleLogger = await createServerLogger('app', config);
+logger.info('用户登录', { userId: '123' });
+
+// 新版本
+const logger: LogLayer = await createServerLogger('app', config);
+logger.withMetadata({ userId: '123' }).info('用户登录');
+```
+
+#### ✅ 验证
+
+- 所有示例项目已更新并测试通过
+- 基础示例、Next.js 示例、React 示例全部运行正常
+- 浏览器实际访问测试通过
+
 ## [0.6.0-alpha.2] - 2025-01-28
 
 ### 🔧 修复版本 - TypeScript 编译错误修复

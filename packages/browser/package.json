@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/browser",
-  "version": "0.7.0-alpha.5",
+  "version": "0.7.0-beta.1",
   "description": "浏览器端的 loglayer 封装，提供开箱即用的日志解决方案",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

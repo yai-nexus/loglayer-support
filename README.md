@@ -5,13 +5,14 @@
 [![npm version](https://badge.fury.io/js/@yai-nexus%2Floglayer-support.svg)](https://www.npmjs.com/package/@yai-nexus/loglayer-support)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## ✨ 新功能亮点 (v0.6.0-beta.1)
+## ✨ 新功能亮点 (v0.7.0-beta.1)
 
-🎉 **三大核心功能增强** - 企业级日志系统升级！
+🚀 **重大架构简化** - 更简洁、更高效、更标准化！
 
-- **🛡️ 统一错误处理系统** - 智能错误分类、自动恢复策略、标准化错误码
-- **⚡ 全面性能优化** - 智能批处理、快速序列化、内存管理（性能提升 74%）
-- **✅ 全面配置验证** - 详细错误提示、智能建议、分级验证结果
+- **🗑️ 移除复杂包装器** - 统一使用 LogLayer 原生 API，性能提升，代码更简洁
+- **🔧 统一配置格式** - 只保留 LoggerConfig 一种格式，降低学习成本
+- **⚡ 便捷配置函数** - 新增 createServerConfig、createDevConfig 等便捷函数
+- **📚 完整迁移指南** - 详细的迁移文档，帮助平滑升级
 
 ### 🚀 框架预设 API
 
