@@ -60,7 +60,14 @@
       "Bash(pnpm run:*)",
       "Bash(npm ls:*)",
       "Bash(pnpm ls:*)",
-      "Bash(npm info:*)"
+      "Bash(npm info:*)",
+      "Bash(pkill:*)",
+      "Bash(env)",
+      "Bash(timeout 30s npm run dev)",
+      "Bash(gtimeout 30s npm run dev)",
+      "Bash(cat:*)",
+      "Bash(true)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }
