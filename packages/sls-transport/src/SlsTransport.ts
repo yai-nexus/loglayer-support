@@ -5,12 +5,10 @@
  */
 
 import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport';
-import type { LogLayerTransportParams } from '@loglayer/shared';
-import type { LogMetadata } from '@yai-loglayer/core';
+import type { LogLayerTransportParams, LogLevelType, MessageDataType } from '@loglayer/shared';
 import Sls20201230 from '@alicloud/sls20201230';
 
 import type {
-  Log,
   SlsTransportConfig,
   SlsTransportInternalConfig,
   SlsLogItem,
@@ -19,7 +17,7 @@ import type {
 } from './types';
 
 import {
-  createInternalConfig,
+  validateSlsConfig,
   convertLogToSlsItem,
   calculateRetryDelay,
   delay,
@@ -28,6 +26,7 @@ import {
   getCurrentTimestamp,
   formatBytes
 } from './utils';
+import { internalLogger } from './logger';
 
 /**
  * 阿里云 SLS Transport 实现类
@@ -43,7 +42,26 @@ export class SlsTransport extends LoggerlessTransport {
   constructor(config: SlsTransportConfig) {
     super({ id: 'sls-transport' });
     
-    this.config = createInternalConfig(config);
+    // 验证配置
+    validateSlsConfig(config);
+    
+    // 直接创建内部配置，无需额外函数
+    this.config = {
+      sdkConfig: {
+        endpoint: config.endpoint,
+        accessKeyId: config.accessKeyId,
+        accessKeySecret: config.accessKeySecret,
+      },
+      project: config.project,
+      logstore: config.logstore,
+      topic: config.topic || 'loglayer',
+      source: config.source || 'nodejs',
+      batchSize: config.batchSize || 100,
+      flushInterval: config.flushInterval || 5000,
+      maxRetries: config.maxRetries || 3,
+      retryBaseDelay: config.retryBaseDelay || 1000,
+    };
+    
     this.client = new Sls20201230(this.config.sdkConfig as any);
     this.stats = this.initStats();
     
@@ -54,12 +72,12 @@ export class SlsTransport extends LoggerlessTransport {
   /**
    * LogLayer 调用此方法发送日志
    */
-  shipToLogger(params: LogLayerTransportParams): any[] {
+  shipToLogger(params: LogLayerTransportParams): MessageDataType[] {
     const { messages, data } = params;
     
-    // 构建 Log 对象
-    const log: Log = {
-      level: params.logLevel as any,
+    // 直接使用 LogLayer 参数，无需自定义 Log 对象
+    const logData = {
+      level: params.logLevel as LogLevelType,
       message: Array.isArray(messages) ? messages.join(' ') : String(messages),
       time: new Date(),
       context: data || {},
@@ -67,7 +85,7 @@ export class SlsTransport extends LoggerlessTransport {
     };
 
     // 添加到批量缓冲区
-    this.addToBuffer(log);
+    this.addToBuffer(logData);
 
     return Array.isArray(messages) ? messages : [messages];
   }
@@ -75,13 +93,19 @@ export class SlsTransport extends LoggerlessTransport {
   /**
    * 添加日志到缓冲区
    */
-  private addToBuffer(log: Log): void {
+  private addToBuffer(logData: {
+    level: LogLevelType;
+    message: string;
+    time: Date;
+    context: Record<string, unknown>;
+    err?: Error;
+  }): void {
     if (this.isShuttingDown) {
       return;
     }
 
     try {
-      const slsItem = convertLogToSlsItem(log);
+      const slsItem = convertLogToSlsItem(logData);
       this.logBuffer.push(slsItem);
 
       // 检查是否需要立即刷新
@@ -90,7 +114,7 @@ export class SlsTransport extends LoggerlessTransport {
       }
     } catch (error) {
       // 转换失败时的处理
-      console.warn(`[SlsTransport] 日志转换失败: ${extractErrorMessage(error)}`);
+      internalLogger.warn(`日志转换失败: ${extractErrorMessage(error)}`);
     }
   }
 
@@ -153,9 +177,7 @@ export class SlsTransport extends LoggerlessTransport {
 
     // 所有重试都失败了
     const errorMsg = extractErrorMessage(lastError);
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(`[SlsTransport] 发送失败，已重试 ${this.config.maxRetries} 次: ${errorMsg}`);
-    }
+    internalLogger.warn(`发送失败，已重试 ${this.config.maxRetries} 次: ${errorMsg}`);
   }
 
   /**
@@ -187,9 +209,7 @@ export class SlsTransport extends LoggerlessTransport {
       if (this.logBuffer.length > 0) {
         this.flushBuffer().catch(error => {
           const errorMsg = extractErrorMessage(error);
-          if (process.env.NODE_ENV !== 'production') {
-            console.warn(`[SlsTransport] 定时刷新失败: ${errorMsg}`);
-          }
+          internalLogger.warn(`定时刷新失败: ${errorMsg}`);
         });
       }
     }, this.config.flushInterval);
@@ -236,7 +256,7 @@ export class SlsTransport extends LoggerlessTransport {
   /**
    * 从消息中提取错误对象
    */
-  private extractError(messages: any): Error | undefined {
+  private extractError(messages: unknown): Error | undefined {
     if (!Array.isArray(messages)) {
       return messages instanceof Error ? messages : undefined;
     }

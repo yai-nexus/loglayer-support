@@ -2,8 +2,8 @@
  * SLS Transport 工具函数
  */
 
-// 类型导入已内联到 types.ts 中
-import type { Log } from './types';
+// 使用 LogLayer 原生类型，无需自定义 Log 接口
+import type { LogLevelType } from '@loglayer/shared';
 import type { 
   SlsTransportConfig, 
   SlsTransportInternalConfig, 
@@ -49,54 +49,36 @@ export function validateSlsConfig(config: SlsTransportConfig): void {
   }
 }
 
-/**
- * 创建内部配置（填充默认值）
- */
-export function createInternalConfig(config: SlsTransportConfig): SlsTransportInternalConfig {
-  validateSlsConfig(config);
-
-  const sdkConfig = {
-    endpoint: config.endpoint,
-    accessKeyId: config.accessKeyId,
-    accessKeySecret: config.accessKeySecret,
-  };
-
-  return {
-    sdkConfig,
-    project: config.project,
-    logstore: config.logstore,
-    topic: config.topic || 'loglayer',
-    source: config.source || 'nodejs',
-    batchSize: config.batchSize || 100,
-    flushInterval: config.flushInterval || 5000,
-    maxRetries: config.maxRetries || 3,
-    retryBaseDelay: config.retryBaseDelay || 1000,
-  };
-}
 
 /**
- * 将 LogLayer 日志对象转换为 SLS 日志条目
+ * 将日志数据转换为 SLS 日志条目
  */
-export function convertLogToSlsItem(log: Log): SlsLogItem {
+export function convertLogToSlsItem(logData: {
+  level: LogLevelType;
+  message: string;
+  time: Date;
+  context: Record<string, unknown>;
+  err?: Error;
+}): SlsLogItem {
   const contents: SlsLogContent[] = [
-    { key: 'level', value: log.level },
-    { key: 'message', value: log.message },
+    { key: 'level', value: logData.level },
+    { key: 'message', value: logData.message },
   ];
 
   // 添加错误信息
-  if (log.err) {
-    contents.push({ key: 'error_message', value: log.err.message });
-    if (log.err.stack) {
-      contents.push({ key: 'error_stack', value: log.err.stack });
+  if (logData.err) {
+    contents.push({ key: 'error_message', value: logData.err.message });
+    if (logData.err.stack) {
+      contents.push({ key: 'error_stack', value: logData.err.stack });
     }
-    if (log.err.name) {
-      contents.push({ key: 'error_name', value: log.err.name });
+    if (logData.err.name) {
+      contents.push({ key: 'error_name', value: logData.err.name });
     }
   }
 
   // 添加上下文元数据
-  if (log.context && typeof log.context === 'object') {
-    Object.entries(log.context).forEach(([key, value]) => {
+  if (logData.context && typeof logData.context === 'object') {
+    Object.entries(logData.context).forEach(([key, value]) => {
       // 确保键名安全
       const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, '_');
       let stringValue: string;
@@ -112,7 +94,7 @@ export function convertLogToSlsItem(log: Log): SlsLogItem {
   }
 
   return {
-    time: Math.floor(log.time.getTime() / 1000), // SLS 需要秒级时间戳
+    time: Math.floor(logData.time.getTime() / 1000), // SLS 需要秒级时间戳
     contents,
   };
 }

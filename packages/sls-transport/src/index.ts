@@ -4,6 +4,8 @@
  */
 
 export { SlsTransport } from './SlsTransport';
+export { createSlsConfigFromEnv, checkSlsConfig } from './config';
+export { configureInternalLogger } from './logger';
 export type {
   SlsTransportConfig,
   SlsTransportInternalConfig,
@@ -16,7 +18,6 @@ export type {
 
 export {
   validateSlsConfig,
-  createInternalConfig,
   convertLogToSlsItem,
   calculateRetryDelay,
   delay,

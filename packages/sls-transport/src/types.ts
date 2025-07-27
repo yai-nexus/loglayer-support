@@ -5,17 +5,6 @@
 // 避免类型导入问题，直接定义配置接口
 
 /**
- * 日志条目接口
- */
-export interface Log {
-  level: string;
-  message: string;  
-  time: Date;
-  context?: Record<string, unknown>;
-  err?: Error;
-}
-
-/**
  * SLS Transport 配置接口
  */
 export interface SlsTransportConfig {
@@ -44,19 +33,14 @@ export interface SlsTransportConfig {
 }
 
 /**
- * SDK 配置接口
- */
-export interface SdkConfig {
-  endpoint: string;
-  accessKeyId: string;
-  accessKeySecret: string;
-}
-
-/**
  * 内部配置接口（经过处理和默认值填充）
  */
 export interface SlsTransportInternalConfig {
-  sdkConfig: SdkConfig;
+  sdkConfig: {
+    endpoint: string;
+    accessKeyId: string;
+    accessKeySecret: string;
+  };
   project: string;
   logstore: string;
   topic: string;

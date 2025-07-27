@@ -54,7 +54,10 @@
       "Bash(pnpm dev:*)",
       "Bash(pnpm view:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm why:*)"
+      "Bash(pnpm why:*)",
+      "Bash(turbo build:*)",
+      "Bash(pnpm turbo build:*)",
+      "Bash(pnpm run:*)"
     ],
     "deny": []
   }

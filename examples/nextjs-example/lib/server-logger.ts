@@ -6,34 +6,12 @@
 
 import { LogLayer } from 'loglayer'
 import { ServerTransport } from '@yai-loglayer/server'
-import { SlsTransport } from '@yai-loglayer/sls-transport'
+import { SlsTransport, createSlsConfigFromEnv } from '@yai-loglayer/sls-transport'
 import type { LoggerConfig } from '@yai-loglayer/core'
 import dotenv from 'dotenv'
 
 // 加载环境变量
 dotenv.config()
-
-/**
- * 检查 SLS 配置是否完整
- */
-function checkSLSConfig(): boolean {
-  const requiredVars = [
-    'SLS_ENDPOINT', 
-    'SLS_PROJECT', 
-    'SLS_LOGSTORE', 
-    'SLS_ACCESS_KEY_ID', 
-    'SLS_ACCESS_KEY_SECRET'
-  ];
-  
-  const missingVars = requiredVars.filter(v => !process.env[v]);
-
-  if (missingVars.length > 0) {
-    console.warn(`[LogLayer] 缺少 SLS 环境变量: ${missingVars.join(', ')}。SLS 日志传输已禁用。`);
-    return false;
-  }
-
-  return true;
-}
 
 // 获取项目根目录路径（相对于当前工作目录）
 const getProjectLogsDir = () => {
@@ -83,18 +61,14 @@ const createServerInstance = async (): Promise<LogLayer> => {
   transports.push(serverTransport);
 
   // 2. 添加 SLS 传输器（如果配置完整）
-  if (checkSLSConfig()) {
+  const slsConfig = createSlsConfigFromEnv();
+  if (slsConfig) {
+    // 覆盖特定应用的默认值
     const slsTransport = new SlsTransport({
-      endpoint: process.env.SLS_ENDPOINT!,
-      accessKeyId: process.env.SLS_ACCESS_KEY_ID!,
-      accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET!,
-      project: process.env.SLS_PROJECT!,
-      logstore: process.env.SLS_LOGSTORE!,
+      ...slsConfig,
       topic: process.env.SLS_TOPIC || 'nextjs-app',
       source: process.env.SLS_SOURCE || 'nextjs-server',
-      batchSize: parseInt(process.env.SLS_BATCH_SIZE || '50'),
-      flushInterval: parseInt(process.env.SLS_FLUSH_INTERVAL || '5000'),
-      maxRetries: parseInt(process.env.SLS_MAX_RETRIES || '3'),
+      batchSize: parseInt(process.env.SLS_BATCH_SIZE || '50'), // 为 Next.js 优化的批量大小
     });
     
     transports.push(slsTransport);
