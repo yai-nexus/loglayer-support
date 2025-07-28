@@ -67,7 +67,8 @@
       "Bash(gtimeout 30s npm run dev)",
       "Bash(cat:*)",
       "Bash(true)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(gh release create:*)"
     ],
     "deny": []
   }
