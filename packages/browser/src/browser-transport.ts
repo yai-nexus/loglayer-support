@@ -49,7 +49,7 @@ export class LoglayerBrowserTransport extends LoggerlessTransport {
   private outputs: BrowserOutputConfig
   private httpBuffer: Array<{ level: LogLevelType; message: string; data?: any; timestamp: number }> = []
   private flushTimer: NodeJS.Timeout | null = null
-  private isOnline = navigator?.onLine ?? true
+  private isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   constructor(config: LoglayerBrowserTransportConfig) {
     super(config)
