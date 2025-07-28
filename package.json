@@ -1,6 +1,6 @@
 {
   "name": "loglayer-support-monorepo",
-  "version": "0.7.0-beta.2",
+  "version": "0.7.9",
   "description": "企业级日志解决方案 Monorepo - 包含 @yai-loglayer/* 包",
   "private": true,
   "workspaces": [

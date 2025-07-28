@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/build-config",
-  "version": "0.7.0-alpha.5",
+  "version": "0.7.9",
   "description": "统一的构建配置工具",
   "private": true,
   "type": "module",

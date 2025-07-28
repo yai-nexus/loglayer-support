@@ -1,6 +1,6 @@
 {
   "name": "react-example",
-  "version": "0.7.0-alpha.5",
+  "version": "0.7.9",
   "description": "React example demonstrating @yai-loglayer/browser usage",
   "private": true,
   "type": "module",

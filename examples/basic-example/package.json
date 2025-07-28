@@ -1,6 +1,6 @@
 {
   "name": "basic-example",
-  "version": "0.7.0-alpha.5",
+  "version": "0.7.9",
   "description": "Basic Node.js examples demonstrating @yai-loglayer/server usage",
   "private": true,
   "type": "module",
