@@ -28,20 +28,38 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
           
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          
+      - name: 获取 pnpm store 目录
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          
+      - name: 设置 pnpm 缓存
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          
       - name: 安装依赖
-        run: npm ci
+        run: pnpm install --frozen-lockfile
           
       - name: 构建项目
-        run: npm run build
+        run: pnpm build
         
       - name: 发布到 NPM (latest)
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'latest')
-        run: npm publish
+        run: pnpm publish --recursive --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
       - name: 发布到 NPM (beta)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'beta'
-        run: npm publish --tag beta
+        run: pnpm publish --recursive --access public --no-git-checks --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
