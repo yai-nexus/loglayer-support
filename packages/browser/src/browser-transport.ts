@@ -5,8 +5,7 @@
  * 整合现有的 console、http、localStorage 功能
  */
 
-import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport'
-import type { LogLayerTransportParams, LogLevelType } from '@loglayer/shared'
+import { LoggerlessTransport, type LoggerlessTransportConfig, type LogLayerTransportParams, type LogLevelType } from '@loglayer/transport'
 import { serializeMessages } from '@yai-loglayer/core'
 
 // 浏览器端输出配置

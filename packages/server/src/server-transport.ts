@@ -4,8 +4,7 @@
  * 使用原生 Node.js API 的零依赖日志传输实现
  */
 
-import { LoggerlessTransport, type LoggerlessTransportConfig } from '@loglayer/transport'
-import type { LogLayerTransportParams, LogLevelType } from '@loglayer/shared'
+import { LoggerlessTransport, type LoggerlessTransportConfig, type LogLayerTransportParams, type LogLevelType } from '@loglayer/transport'
 import type { LogLevel, LogMetadata, ServerOutput } from '@yai-loglayer/core';
 import { isBrowserEnvironment, serializeMessages } from '@yai-loglayer/core';
 // import { getLocalTimestamp } from './utils'; // 暂时移除，使用内联实现

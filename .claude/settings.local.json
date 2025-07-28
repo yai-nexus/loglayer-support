@@ -68,7 +68,12 @@
       "Bash(cat:*)",
       "Bash(true)",
       "Bash(git checkout:*)",
-      "Bash(gh release create:*)"
+      "Bash(gh release create:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }

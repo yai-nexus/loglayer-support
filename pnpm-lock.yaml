@@ -192,6 +192,9 @@ importers:
 
   packages/browser:
     dependencies:
+      '@loglayer/transport':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@yai-loglayer/core':
         specifier: workspace:*
         version: link:../core
@@ -294,6 +297,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@loglayer/transport':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@yai-loglayer/core':
         specifier: workspace:*
         version: link:../core

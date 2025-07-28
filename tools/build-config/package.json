@@ -3,7 +3,8 @@
   "version": "0.7.0-alpha.5",
   "description": "统一的构建配置工具",
   "private": true,
-  "main": "index.js",
+  "type": "module",
+  "main": "tsup.config.js",
   "files": [
     "tsup.config.js",
     "tsconfig.base.json"

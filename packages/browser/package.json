@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@yai-loglayer/core": "workspace:*",
+    "@loglayer/transport": "^2.2.1",
     "loglayer": "^6.6.0"
   },
   "devDependencies": {
