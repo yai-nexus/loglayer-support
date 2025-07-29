@@ -111,31 +111,31 @@ describe('工具函数测试', () => {
       expect(extractSpanId({})).toBeNull();
     });
 
-    it('getTraceIdForLog 应该优先使用上下文中的TraceId', () => {
+    it('getTraceIdForLog 应该优先使用上下文中的TraceId', async () => {
       const context = { traceId: 'context-trace-123' };
-      const traceId = getTraceIdForLog(context);
+      const traceId = await getTraceIdForLog(context);
 
       expect(traceId).toBe('context-trace-123');
       // 应该更新全局上下文
       expect(traceContext.getCurrentTraceId()).toBe('context-trace-123');
     });
 
-    it('getTraceIdForLog 应该生成新TraceId当上下文中没有时', () => {
-      const traceId = getTraceIdForLog({});
+    it('getTraceIdForLog 应该生成新TraceId当上下文中没有时', async () => {
+      const traceId = await getTraceIdForLog({});
 
       expect(traceId).toMatch(/^[0-9a-f]{32}$/);
       expect(traceContext.getCurrentTraceId()).toBe(traceId);
     });
 
-    it('getSpanIdForLog 应该优先使用上下文中的SpanId', () => {
+    it('getSpanIdForLog 应该优先使用上下文中的SpanId', async () => {
       const context = { spanId: 'context-span-123' };
-      const spanId = getSpanIdForLog(context);
+      const spanId = await getSpanIdForLog(context);
 
       expect(spanId).toBe('context-span-123');
     });
 
-    it('getSpanIdForLog 应该生成新SpanId当上下文中没有时', () => {
-      const spanId = getSpanIdForLog({});
+    it('getSpanIdForLog 应该生成新SpanId当上下文中没有时', async () => {
+      const spanId = await getSpanIdForLog({});
 
       expect(spanId).toMatch(/^[0-9a-f]{16}$/);
     });
@@ -161,8 +161,8 @@ describe('工具函数测试', () => {
       );
     });
 
-    it('应该包含系统字段', () => {
-      const result = convertLogToSlsItem(mockLogData);
+    it('应该包含系统字段', async () => {
+      const result = await convertLogToSlsItem(mockLogData);
 
       const contentKeys = result.contents.map(c => c.key);
       expect(contentKeys).toContain('environment');
@@ -201,7 +201,7 @@ describe('工具函数测试', () => {
       expect(actionContent?.value).toBe('login');
     });
 
-    it('应该支持字段配置', () => {
+    it('应该支持字段配置', async () => {
       const fieldConfig: SlsFieldConfig = {
         includeEnvironment: false,
         includeVersion: false,
@@ -213,7 +213,7 @@ describe('工具函数测试', () => {
         customFields: { service: 'test-service' },
       };
 
-      const result = convertLogToSlsItem(mockLogData, fieldConfig, 'test-logger');
+      const result = await convertLogToSlsItem(mockLogData, fieldConfig, 'test-logger');
       const contentKeys = result.contents.map(c => c.key);
 
       expect(contentKeys).not.toContain('environment');
@@ -229,7 +229,7 @@ describe('工具函数测试', () => {
       expect(serviceContent?.value).toBe('test-service');
     });
 
-    it('应该处理上下文中的TraceId', () => {
+    it('应该处理上下文中的TraceId', async () => {
       const mockDataWithTrace = {
         ...mockLogData,
         context: {
@@ -239,7 +239,7 @@ describe('工具函数测试', () => {
         }
       };
 
-      const result = convertLogToSlsItem(mockDataWithTrace);
+      const result = await convertLogToSlsItem(mockDataWithTrace);
 
       const traceIdContent = result.contents.find(c => c.key === 'traceId');
       expect(traceIdContent?.value).toBe('custom-trace-123');

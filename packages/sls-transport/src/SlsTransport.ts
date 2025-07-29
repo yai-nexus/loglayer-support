@@ -109,7 +109,12 @@ export class SlsTransport extends LoggerlessTransport {
     };
 
     // 添加到批量缓冲区
-    this.addToBuffer(logData);
+    this.addToBuffer(logData).catch(error => {
+      internalLogger.error('异步添加日志到缓冲区失败', {
+        error: extractErrorMessage(error),
+        logLevel: logData.level
+      });
+    });
 
     return Array.isArray(messages) ? messages : [messages];
   }
@@ -117,19 +122,19 @@ export class SlsTransport extends LoggerlessTransport {
   /**
    * 添加日志到缓冲区
    */
-  private addToBuffer(logData: {
+  private async addToBuffer(logData: {
     level: LogLevelType;
     message: string;
     time: Date;
     context: Record<string, unknown>;
     err?: Error;
-  }): void {
+  }): Promise<void> {
     if (this.isShuttingDown) {
       return;
     }
 
     try {
-      const slsItem = convertLogToSlsItem(logData, this.config.fields, 'sls-transport');
+      const slsItem = await convertLogToSlsItem(logData, this.config.fields, 'sls-transport');
       this.logBuffer.push(slsItem);
 
       // 检查是否需要立即刷新

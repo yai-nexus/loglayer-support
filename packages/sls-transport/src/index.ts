@@ -62,3 +62,7 @@ export {
   getOrGenerateTraceId,
   getOrGenerateSpanId
 } from './TraceIdGenerator';
+
+export {
+  OpenTelemetryIntegration
+} from './OpenTelemetryIntegration';

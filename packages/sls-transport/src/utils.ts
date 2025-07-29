@@ -17,6 +17,7 @@ import { networkInterfaces } from 'os';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getOrGenerateTraceId, getOrGenerateSpanId, traceContext } from './TraceIdGenerator';
+import { OpenTelemetryIntegration } from './OpenTelemetryIntegration';
 
 /**
  * 验证 SLS 配置参数
@@ -208,9 +209,9 @@ export function extractSpanId(context?: Record<string, unknown>): string | null 
 
 /**
  * 获取或生成TraceId用于日志
- * 优先级：上下文中的TraceId > 全局TraceId > 生成新的TraceId
+ * 优先级：上下文中的TraceId > OpenTelemetry TraceId > 全局TraceId > 生成新的TraceId
  */
-export function getTraceIdForLog(context?: Record<string, unknown>): string {
+export async function getTraceIdForLog(context?: Record<string, unknown>): Promise<string> {
   // 1. 尝试从上下文中提取
   const contextTraceId = extractTraceId(context);
   if (contextTraceId) {
@@ -220,22 +221,45 @@ export function getTraceIdForLog(context?: Record<string, unknown>): string {
     return contextTraceId;
   }
 
-  // 2. 使用全局TraceId或生成新的
+  // 2. 尝试从 OpenTelemetry 获取
+  try {
+    const otelTraceId = await OpenTelemetryIntegration.getCurrentTraceId();
+    if (otelTraceId && OpenTelemetryIntegration.isValidOTelTraceId(otelTraceId)) {
+      // 同时获取 SpanId 并更新全局上下文
+      const otelSpanId = await OpenTelemetryIntegration.getCurrentSpanId();
+      traceContext.setCurrentTrace(otelTraceId, otelSpanId || undefined);
+      return otelTraceId;
+    }
+  } catch (error) {
+    // OpenTelemetry 获取失败，继续使用其他方法
+  }
+
+  // 3. 使用全局TraceId或生成新的
   return getOrGenerateTraceId();
 }
 
 /**
  * 获取或生成SpanId用于日志
- * 优先级：上下文中的SpanId > 全局SpanId > 生成新的SpanId
+ * 优先级：上下文中的SpanId > OpenTelemetry SpanId > 全局SpanId > 生成新的SpanId
  */
-export function getSpanIdForLog(context?: Record<string, unknown>): string {
+export async function getSpanIdForLog(context?: Record<string, unknown>): Promise<string> {
   // 1. 尝试从上下文中提取
   const contextSpanId = extractSpanId(context);
   if (contextSpanId) {
     return contextSpanId;
   }
 
-  // 2. 使用全局SpanId或生成新的
+  // 2. 尝试从 OpenTelemetry 获取
+  try {
+    const otelSpanId = await OpenTelemetryIntegration.getCurrentSpanId();
+    if (otelSpanId && OpenTelemetryIntegration.isValidOTelSpanId(otelSpanId)) {
+      return otelSpanId;
+    }
+  } catch (error) {
+    // OpenTelemetry 获取失败，继续使用其他方法
+  }
+
+  // 3. 使用全局SpanId或生成新的
   return getOrGenerateSpanId();
 }
 
@@ -243,7 +267,7 @@ export function getSpanIdForLog(context?: Record<string, unknown>): string {
 /**
  * 将日志数据转换为 SLS 日志条目
  */
-export function convertLogToSlsItem(
+export async function convertLogToSlsItem(
   logData: {
     level: LogLevelType;
     message: string;
@@ -253,7 +277,7 @@ export function convertLogToSlsItem(
   },
   fieldConfig?: SlsFieldConfig,
   loggerName?: string
-): SlsLogItem {
+): Promise<SlsLogItem> {
   const contents: SlsLogContent[] = [
     { key: 'level', value: logData.level },
     { key: 'message', value: logData.message },
@@ -298,13 +322,13 @@ export function convertLogToSlsItem(
 
   // 添加TraceId支持
   if (config.includeTraceId) {
-    const traceId = getTraceIdForLog(logData.context);
+    const traceId = await getTraceIdForLog(logData.context);
     contents.push({ key: 'traceId', value: traceId });
   }
 
   // 添加SpanId支持
   if (config.includeSpanId) {
-    const spanId = getSpanIdForLog(logData.context);
+    const spanId = await getSpanIdForLog(logData.context);
     contents.push({ key: 'spanId', value: spanId });
   }
 
