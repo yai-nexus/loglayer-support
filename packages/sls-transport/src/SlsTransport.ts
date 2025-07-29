@@ -11,6 +11,7 @@ import type {
   SlsTransportInternalConfig,
   SlsLogItem,
   SlsLogGroup,
+  SlsLogTag,
   TransportStats
 } from './types';
 
@@ -26,6 +27,7 @@ import {
 } from './utils';
 import { internalLogger } from './logger';
 import { SlsRestClient } from './SlsRestClient';
+import { getGlobalPackIdGenerator } from './PackIdGenerator';
 
 /**
  * 阿里云 SLS Transport 实现类
@@ -63,6 +65,15 @@ export class SlsTransport extends LoggerlessTransport {
       flushInterval: config.flushInterval || 5000,
       maxRetries: config.maxRetries || 3,
       retryBaseDelay: config.retryBaseDelay || 1000,
+      fields: {
+        enablePackId: config.fields?.enablePackId ?? true,
+        includeEnvironment: config.fields?.includeEnvironment ?? true,
+        includeVersion: config.fields?.includeVersion ?? true,
+        includeHostIP: config.fields?.includeHostIP ?? true,
+        includeCategory: config.fields?.includeCategory ?? true,
+        includeLogger: config.fields?.includeLogger ?? false,
+        customFields: config.fields?.customFields ?? {},
+      },
     };
     
     // 使用 REST 客户端替代 SDK，避免原生模块依赖
@@ -116,7 +127,7 @@ export class SlsTransport extends LoggerlessTransport {
     }
 
     try {
-      const slsItem = convertLogToSlsItem(logData);
+      const slsItem = convertLogToSlsItem(logData, this.config.fields, 'sls-transport');
       this.logBuffer.push(slsItem);
 
       // 检查是否需要立即刷新
@@ -195,13 +206,25 @@ export class SlsTransport extends LoggerlessTransport {
    * 实际发送日志到 SLS (使用 REST API)
    */
   private async sendLogs(logs: SlsLogItem[]): Promise<void> {
+    // 准备LogTags
+    const logTags: SlsLogTag[] = [];
+
+    // 添加PackID支持
+    if (this.config.fields.enablePackId) {
+      const packIdGenerator = getGlobalPackIdGenerator();
+      const packId = packIdGenerator.generateNewPackId();
+      logTags.push({ key: '__pack_id__', value: packId });
+    }
+
     // 使用新的 REST 客户端发送日志
-    await this.restClient.putLogs(logs);
-    
-    internalLogger.debug('成功发送日志到 SLS', { 
+    await this.restClient.putLogs(logs, logTags);
+
+    internalLogger.debug('成功发送日志到 SLS', {
       logsCount: logs.length,
       project: this.config.project,
-      logstore: this.config.logstore 
+      logstore: this.config.logstore,
+      packIdEnabled: this.config.fields.enablePackId,
+      logTagsCount: logTags.length
     });
   }
 

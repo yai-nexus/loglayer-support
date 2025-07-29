@@ -21,6 +21,8 @@ export type {
   SlsLogItem,
   SlsLogContent,
   SlsLogGroup,
+  SlsLogTag,
+  SlsFieldConfig,
   RetryConfig,
   TransportStats
 } from './types';
@@ -33,5 +35,17 @@ export {
   extractErrorMessage,
   isRetriableError,
   getCurrentTimestamp,
-  formatBytes
+  formatBytes,
+  getHostname,
+  getLocalIP,
+  getAppVersion,
+  getEnvironment,
+  inferCategory
 } from './utils';
+
+export {
+  PackIdGenerator,
+  getGlobalPackIdGenerator,
+  resetGlobalPackIdGenerator,
+  generatePackId
+} from './PackIdGenerator';

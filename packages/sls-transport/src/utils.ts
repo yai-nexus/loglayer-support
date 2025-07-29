@@ -4,13 +4,18 @@
 
 // 使用 LogLayer 原生类型，无需自定义 Log 接口
 import type { LogLevelType } from '@loglayer/transport';
-import type { 
-  SlsTransportConfig, 
-  SlsTransportInternalConfig, 
-  SlsLogItem, 
+import type {
+  SlsTransportConfig,
+  SlsTransportInternalConfig,
+  SlsLogItem,
   SlsLogContent,
-  RetryConfig 
+  SlsFieldConfig,
+  RetryConfig
 } from './types';
+import { hostname } from 'os';
+import { networkInterfaces } from 'os';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * 验证 SLS 配置参数
@@ -49,21 +54,171 @@ export function validateSlsConfig(config: SlsTransportConfig): void {
   }
 }
 
+// 缓存系统信息，避免重复获取
+let cachedHostname: string | null = null;
+let cachedHostIP: string | null = null;
+let cachedVersion: string | null = null;
+
+/**
+ * 获取主机名（缓存）
+ */
+export function getHostname(): string {
+  if (cachedHostname === null) {
+    try {
+      cachedHostname = hostname();
+    } catch (error) {
+      cachedHostname = 'unknown';
+    }
+  }
+  return cachedHostname;
+}
+
+/**
+ * 获取本机IP地址（缓存）
+ */
+export function getLocalIP(): string {
+  if (cachedHostIP === null) {
+    try {
+      const interfaces = networkInterfaces();
+
+      // 优先获取非回环地址
+      for (const name of Object.keys(interfaces)) {
+        const iface = interfaces[name];
+        if (iface) {
+          for (const alias of iface) {
+            if (alias.family === 'IPv4' && !alias.internal) {
+              cachedHostIP = alias.address;
+              return cachedHostIP;
+            }
+          }
+        }
+      }
+
+      // 如果没有找到外部IP，使用回环地址
+      cachedHostIP = '127.0.0.1';
+    } catch (error) {
+      cachedHostIP = '127.0.0.1';
+    }
+  }
+  return cachedHostIP;
+}
+
+/**
+ * 获取应用版本（缓存）
+ */
+export function getAppVersion(): string {
+  if (cachedVersion === null) {
+    try {
+      // 尝试从环境变量获取
+      if (process.env.APP_VERSION) {
+        cachedVersion = process.env.APP_VERSION;
+      } else {
+        // 尝试从package.json获取
+        const packagePath = join(process.cwd(), 'package.json');
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+        cachedVersion = packageJson.version || 'unknown';
+      }
+    } catch (error) {
+      cachedVersion = 'unknown';
+    }
+  }
+  return cachedVersion;
+}
+
+/**
+ * 获取环境标识
+ */
+export function getEnvironment(): string {
+  return process.env.NODE_ENV || process.env.ENVIRONMENT || 'unknown';
+}
+
+/**
+ * 根据logger名称或上下文推断日志分类
+ */
+export function inferCategory(loggerName?: string, context?: Record<string, unknown>): string {
+  // 从上下文中推断
+  if (context) {
+    if (context.module) return String(context.module);
+    if (context.category) return String(context.category);
+    if (context.component) return String(context.component);
+  }
+
+  // 从logger名称推断
+  if (loggerName) {
+    if (loggerName.includes('api')) return 'api';
+    if (loggerName.includes('db') || loggerName.includes('database')) return 'database';
+    if (loggerName.includes('auth')) return 'auth';
+    if (loggerName.includes('cache')) return 'cache';
+    if (loggerName.includes('queue')) return 'queue';
+  }
+
+  return 'application';
+}
+
 
 /**
  * 将日志数据转换为 SLS 日志条目
  */
-export function convertLogToSlsItem(logData: {
-  level: LogLevelType;
-  message: string;
-  time: Date;
-  context: Record<string, unknown>;
-  err?: Error;
-}): SlsLogItem {
+export function convertLogToSlsItem(
+  logData: {
+    level: LogLevelType;
+    message: string;
+    time: Date;
+    context: Record<string, unknown>;
+    err?: Error;
+  },
+  fieldConfig?: SlsFieldConfig,
+  loggerName?: string
+): SlsLogItem {
   const contents: SlsLogContent[] = [
     { key: 'level', value: logData.level },
     { key: 'message', value: logData.message },
   ];
+
+  // 设置默认字段配置
+  const config = {
+    enablePackId: true,
+    includeEnvironment: true,
+    includeVersion: true,
+    includeHostIP: true,
+    includeCategory: true,
+    includeLogger: false,
+    customFields: {},
+    ...fieldConfig
+  };
+
+  // 添加系统字段
+  if (config.includeEnvironment) {
+    contents.push({ key: 'environment', value: getEnvironment() });
+  }
+
+  if (config.includeVersion) {
+    contents.push({ key: 'version', value: getAppVersion() });
+  }
+
+  contents.push({ key: 'hostname', value: getHostname() });
+
+  if (config.includeHostIP) {
+    contents.push({ key: 'host_ip', value: getLocalIP() });
+  }
+
+  if (config.includeCategory) {
+    contents.push({ key: 'category', value: inferCategory(loggerName, logData.context) });
+  }
+
+  if (config.includeLogger && loggerName) {
+    contents.push({ key: 'logger', value: loggerName });
+  }
+
+  // 添加进程ID（替代thread字段）
+  contents.push({ key: 'pid', value: String(process.pid) });
+
+  // 添加自定义字段
+  if (config.customFields) {
+    Object.entries(config.customFields).forEach(([key, value]) => {
+      contents.push({ key, value });
+    });
+  }
 
   // 添加错误信息
   if (logData.err) {

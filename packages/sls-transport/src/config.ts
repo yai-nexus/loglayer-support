@@ -151,6 +151,14 @@ export function createSlsConfigFromEnv(): SlsTransportConfig | null {
     batchSize: parseInt(process.env.SLS_BATCH_SIZE || '100'),
     flushInterval: parseInt(process.env.SLS_FLUSH_INTERVAL || '5000'),
     maxRetries: parseInt(process.env.SLS_MAX_RETRIES || '3'),
+    fields: {
+      enablePackId: process.env.SLS_ENABLE_PACK_ID !== 'false',
+      includeEnvironment: process.env.SLS_INCLUDE_ENVIRONMENT !== 'false',
+      includeVersion: process.env.SLS_INCLUDE_VERSION !== 'false',
+      includeHostIP: process.env.SLS_INCLUDE_HOST_IP !== 'false',
+      includeCategory: process.env.SLS_INCLUDE_CATEGORY !== 'false',
+      includeLogger: process.env.SLS_INCLUDE_LOGGER === 'true',
+    },
   };
 
   // 【调试增强】记录最终生成的配置

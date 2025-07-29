@@ -4,7 +4,7 @@
  */
 
 import * as crypto from 'crypto';
-import type { SlsTransportInternalConfig, SlsLogItem } from './types';
+import type { SlsTransportInternalConfig, SlsLogItem, SlsLogTag } from './types';
 import { internalLogger } from './logger';
 
 export class SlsRestClient {
@@ -16,8 +16,10 @@ export class SlsRestClient {
 
   /**
    * 发送日志到 SLS
+   * @param logs 日志条目数组
+   * @param logTags 日志标签数组（可选，包含PackID等）
    */
-  async putLogs(logs: SlsLogItem[]): Promise<void> {
+  async putLogs(logs: SlsLogItem[], logTags?: SlsLogTag[]): Promise<void> {
     // 注意：根据阿里云 SLS 官方文档，PutLogs API 需要：
     // 1. 使用 POST 方法（不是 PUT）
     // 2. 端点为 /logstores/{logstore}/shards/lb
@@ -26,13 +28,22 @@ export class SlsRestClient {
     //
     // 当前实现使用 JSON 格式作为临时方案，需要后续升级为 PB 格式
     // 根据 SLS API 要求，使用正确的数据格式
-    const body = JSON.stringify({
+    const logGroup: any = {
       __logs__: logs.map(log => ({
         __time__: log.time, // SLS 时间戳（秒）
         __source__: '', // 日志来源
         ...Object.fromEntries(log.contents.map(c => [c.key, c.value]))
       }))
-    });
+    };
+
+    // 添加LogTags支持（包含PackID等）
+    if (logTags && logTags.length > 0) {
+      logGroup.__tags__ = Object.fromEntries(
+        logTags.map(tag => [tag.key, tag.value])
+      );
+    }
+
+    const body = JSON.stringify(logGroup);
     const uri = `/logstores/${this.config.logstore}/shards/lb`;
     const headers = this.buildHeaders(body);
 
@@ -52,6 +63,9 @@ export class SlsRestClient {
       },
       requestInfo: {
         uri,
+        logsCount: logs.length,
+        logTagsCount: logTags?.length || 0,
+        hasPackId: logTags?.some(tag => tag.key === '__pack_id__') || false
         method: 'POST',
         bodyLength: body.length,
         logsCount: logs.length

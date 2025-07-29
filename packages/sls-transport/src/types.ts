@@ -5,6 +5,26 @@
 // 避免类型导入问题，直接定义配置接口
 
 /**
+ * SLS 字段配置接口
+ */
+export interface SlsFieldConfig {
+  /** 是否启用PackID机制，默认 true */
+  enablePackId?: boolean;
+  /** 是否包含环境信息，默认 true */
+  includeEnvironment?: boolean;
+  /** 是否包含版本信息，默认 true */
+  includeVersion?: boolean;
+  /** 是否包含主机IP，默认 true */
+  includeHostIP?: boolean;
+  /** 是否包含日志分类，默认 true */
+  includeCategory?: boolean;
+  /** 是否包含日志器名称，默认 false */
+  includeLogger?: boolean;
+  /** 自定义字段 */
+  customFields?: Record<string, string>;
+}
+
+/**
  * SLS Transport 配置接口
  */
 export interface SlsTransportConfig {
@@ -30,6 +50,8 @@ export interface SlsTransportConfig {
   maxRetries?: number;
   /** 重试基础延迟(毫秒)，默认 1000 */
   retryBaseDelay?: number;
+  /** 字段配置 */
+  fields?: SlsFieldConfig;
 }
 
 /**
@@ -49,6 +71,7 @@ export interface SlsTransportInternalConfig {
   flushInterval: number;
   maxRetries: number;
   retryBaseDelay: number;
+  fields: Required<SlsFieldConfig>;
 }
 
 /**
@@ -70,6 +93,14 @@ export interface SlsLogContent {
 }
 
 /**
+ * SLS 日志标签
+ */
+export interface SlsLogTag {
+  key: string;
+  value: string;
+}
+
+/**
  * 批量日志组
  */
 export interface SlsLogGroup {
@@ -79,6 +110,8 @@ export interface SlsLogGroup {
   topic: string;
   /** 日志来源 */
   source: string;
+  /** 日志标签（包含PackID等） */
+  logTags?: SlsLogTag[];
 }
 
 /**
