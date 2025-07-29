@@ -20,6 +20,10 @@ export interface SlsFieldConfig {
   includeCategory?: boolean;
   /** 是否包含日志器名称，默认 false */
   includeLogger?: boolean;
+  /** 是否包含TraceId，默认 true */
+  includeTraceId?: boolean;
+  /** 是否包含SpanId，默认 false */
+  includeSpanId?: boolean;
   /** 自定义字段 */
   customFields?: Record<string, string>;
 }

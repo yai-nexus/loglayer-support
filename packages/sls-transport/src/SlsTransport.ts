@@ -72,6 +72,8 @@ export class SlsTransport extends LoggerlessTransport {
         includeHostIP: config.fields?.includeHostIP ?? true,
         includeCategory: config.fields?.includeCategory ?? true,
         includeLogger: config.fields?.includeLogger ?? false,
+        includeTraceId: config.fields?.includeTraceId ?? true,
+        includeSpanId: config.fields?.includeSpanId ?? false,
         customFields: config.fields?.customFields ?? {},
       },
     };

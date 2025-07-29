@@ -158,6 +158,8 @@ export function createSlsConfigFromEnv(): SlsTransportConfig | null {
       includeHostIP: process.env.SLS_INCLUDE_HOST_IP !== 'false',
       includeCategory: process.env.SLS_INCLUDE_CATEGORY !== 'false',
       includeLogger: process.env.SLS_INCLUDE_LOGGER === 'true',
+      includeTraceId: process.env.SLS_INCLUDE_TRACE_ID !== 'false',
+      includeSpanId: process.env.SLS_INCLUDE_SPAN_ID === 'true',
     },
   };
 

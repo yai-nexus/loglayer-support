@@ -2,17 +2,25 @@
  * 工具函数测试
  */
 
-import { 
-  convertLogToSlsItem, 
-  getHostname, 
-  getLocalIP, 
-  getAppVersion, 
-  getEnvironment, 
-  inferCategory 
+import {
+  convertLogToSlsItem,
+  getHostname,
+  getLocalIP,
+  getAppVersion,
+  getEnvironment,
+  inferCategory,
+  extractTraceId,
+  extractSpanId,
+  getTraceIdForLog,
+  getSpanIdForLog
 } from '../utils';
 import type { SlsFieldConfig } from '../types';
+import { traceContext } from '../TraceIdGenerator';
 
 describe('工具函数测试', () => {
+  beforeEach(() => {
+    traceContext.clearCurrentTrace();
+  });
   describe('系统信息获取', () => {
     it('getHostname 应该返回主机名', () => {
       const hostname = getHostname();
@@ -73,6 +81,66 @@ describe('工具函数测试', () => {
     });
   });
 
+  describe('TraceId 提取', () => {
+    it('应该从上下文提取TraceId', () => {
+      const context1 = { traceId: 'trace-123' };
+      const context2 = { trace_id: 'trace-456' };
+      const context3 = { requestId: 'req-789' };
+      const context4 = { 'x-trace-id': 'x-trace-abc' };
+
+      expect(extractTraceId(context1)).toBe('trace-123');
+      expect(extractTraceId(context2)).toBe('trace-456');
+      expect(extractTraceId(context3)).toBe('req-789');
+      expect(extractTraceId(context4)).toBe('x-trace-abc');
+    });
+
+    it('应该从上下文提取SpanId', () => {
+      const context1 = { spanId: 'span-123' };
+      const context2 = { span_id: 'span-456' };
+      const context3 = { parentId: 'parent-789' };
+
+      expect(extractSpanId(context1)).toBe('span-123');
+      expect(extractSpanId(context2)).toBe('span-456');
+      expect(extractSpanId(context3)).toBe('parent-789');
+    });
+
+    it('应该处理空上下文', () => {
+      expect(extractTraceId()).toBeNull();
+      expect(extractTraceId({})).toBeNull();
+      expect(extractSpanId()).toBeNull();
+      expect(extractSpanId({})).toBeNull();
+    });
+
+    it('getTraceIdForLog 应该优先使用上下文中的TraceId', () => {
+      const context = { traceId: 'context-trace-123' };
+      const traceId = getTraceIdForLog(context);
+
+      expect(traceId).toBe('context-trace-123');
+      // 应该更新全局上下文
+      expect(traceContext.getCurrentTraceId()).toBe('context-trace-123');
+    });
+
+    it('getTraceIdForLog 应该生成新TraceId当上下文中没有时', () => {
+      const traceId = getTraceIdForLog({});
+
+      expect(traceId).toMatch(/^[0-9a-f]{32}$/);
+      expect(traceContext.getCurrentTraceId()).toBe(traceId);
+    });
+
+    it('getSpanIdForLog 应该优先使用上下文中的SpanId', () => {
+      const context = { spanId: 'context-span-123' };
+      const spanId = getSpanIdForLog(context);
+
+      expect(spanId).toBe('context-span-123');
+    });
+
+    it('getSpanIdForLog 应该生成新SpanId当上下文中没有时', () => {
+      const spanId = getSpanIdForLog({});
+
+      expect(spanId).toMatch(/^[0-9a-f]{16}$/);
+    });
+  });
+
   describe('convertLogToSlsItem', () => {
     const mockLogData = {
       level: 'info' as const,
@@ -95,7 +163,7 @@ describe('工具函数测试', () => {
 
     it('应该包含系统字段', () => {
       const result = convertLogToSlsItem(mockLogData);
-      
+
       const contentKeys = result.contents.map(c => c.key);
       expect(contentKeys).toContain('environment');
       expect(contentKeys).toContain('version');
@@ -103,6 +171,7 @@ describe('工具函数测试', () => {
       expect(contentKeys).toContain('host_ip');
       expect(contentKeys).toContain('category');
       expect(contentKeys).toContain('pid');
+      expect(contentKeys).toContain('traceId');
     });
 
     it('应该处理错误信息', () => {
@@ -139,21 +208,41 @@ describe('工具函数测试', () => {
         includeHostIP: false,
         includeCategory: false,
         includeLogger: true,
+        includeTraceId: false,
+        includeSpanId: true,
         customFields: { service: 'test-service' },
       };
-      
+
       const result = convertLogToSlsItem(mockLogData, fieldConfig, 'test-logger');
       const contentKeys = result.contents.map(c => c.key);
-      
+
       expect(contentKeys).not.toContain('environment');
       expect(contentKeys).not.toContain('version');
       expect(contentKeys).not.toContain('host_ip');
       expect(contentKeys).not.toContain('category');
+      expect(contentKeys).not.toContain('traceId');
       expect(contentKeys).toContain('logger');
+      expect(contentKeys).toContain('spanId');
       expect(contentKeys).toContain('service');
-      
+
       const serviceContent = result.contents.find(c => c.key === 'service');
       expect(serviceContent?.value).toBe('test-service');
+    });
+
+    it('应该处理上下文中的TraceId', () => {
+      const mockDataWithTrace = {
+        ...mockLogData,
+        context: {
+          ...mockLogData.context,
+          traceId: 'custom-trace-123',
+          spanId: 'custom-span-456'
+        }
+      };
+
+      const result = convertLogToSlsItem(mockDataWithTrace);
+
+      const traceIdContent = result.contents.find(c => c.key === 'traceId');
+      expect(traceIdContent?.value).toBe('custom-trace-123');
     });
   });
 });

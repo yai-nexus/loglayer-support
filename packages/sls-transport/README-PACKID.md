@@ -36,6 +36,8 @@ const transport = new SlsTransport({
     includeHostIP: true,          // 包含主机IP
     includeCategory: true,        // 包含日志分类
     includeLogger: false,         // 包含日志器名称
+    includeTraceId: true,         // 包含TraceId
+    includeSpanId: false,         // 包含SpanId
     customFields: {               // 自定义字段
       service: 'user-service',
       region: 'cn-hangzhou'
@@ -61,6 +63,8 @@ export SLS_INCLUDE_VERSION=true
 export SLS_INCLUDE_HOST_IP=true
 export SLS_INCLUDE_CATEGORY=true
 export SLS_INCLUDE_LOGGER=false
+export SLS_INCLUDE_TRACE_ID=true
+export SLS_INCLUDE_SPAN_ID=false
 
 # 应用信息
 export NODE_ENV=production
@@ -123,9 +127,11 @@ async function handleUserRequest(requestId: string) {
 - `version`: 应用版本
 - `host_ip`: 主机IP地址
 - `category`: 日志分类 (api, database, auth, etc.)
+- `traceId`: OpenTelemetry标准的TraceId (32位十六进制)
 
 ### 可选字段
 - `logger`: 日志器名称
+- `spanId`: OpenTelemetry标准的SpanId (16位十六进制)
 - `pid`: 进程ID
 - 自定义字段
 
@@ -182,14 +188,37 @@ const transport = new SlsTransport({
 });
 ```
 
-### 3. 动态字段
+### 3. TraceId 集成
+
+```typescript
+import { generateTraceId, generateSpanId, traceContext } from '@yai-loglayer/sls-transport';
+
+// 手动生成TraceId
+const traceId = generateTraceId(); // 32位十六进制
+const spanId = generateSpanId();   // 16位十六进制
+
+// 设置全局Trace上下文
+traceContext.setCurrentTrace(traceId, spanId);
+
+// 后续日志会自动包含TraceId
+logger.info('操作开始'); // 自动包含traceId字段
+
+// 在日志上下文中传递TraceId
+logger.withContext({
+  traceId: 'custom-trace-123',
+  spanId: 'custom-span-456',
+  userId: 'user_789'
+}).info('用户操作完成');
+```
+
+### 4. 动态字段
 
 ```typescript
 // 在日志上下文中添加动态信息
 logger.withContext({
-  traceId: 'trace_123',
-  spanId: 'span_456',
-  userId: 'user_789'
+  requestId: 'req_123',
+  userId: 'user_789',
+  operation: 'user-login'
 }).info('用户操作完成');
 ```
 

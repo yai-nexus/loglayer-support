@@ -40,7 +40,11 @@ export {
   getLocalIP,
   getAppVersion,
   getEnvironment,
-  inferCategory
+  inferCategory,
+  extractTraceId,
+  extractSpanId,
+  getTraceIdForLog,
+  getSpanIdForLog
 } from './utils';
 
 export {
@@ -49,3 +53,12 @@ export {
   resetGlobalPackIdGenerator,
   generatePackId
 } from './PackIdGenerator';
+
+export {
+  TraceIdGenerator,
+  traceContext,
+  generateTraceId,
+  generateSpanId,
+  getOrGenerateTraceId,
+  getOrGenerateSpanId
+} from './TraceIdGenerator';
