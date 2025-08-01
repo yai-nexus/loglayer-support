@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/sls-transport",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "阿里云 SLS (Simple Log Service) transport for LogLayer - 企业级日志传输组件",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

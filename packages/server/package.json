@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/server",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "服务端的 loglayer 封装，提供 Node.js 环境的日志解决方案",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

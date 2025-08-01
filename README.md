@@ -1,18 +1,19 @@
-# @yai-nexus/loglayer-support
+# @yai-loglayer/* - 企业级日志解决方案
 
-🚀 **企业级日志解决方案** - 为现代 Web 应用提供开箱即用的日志功能
+🚀 **模块化企业级日志解决方案** - 为现代 Web 应用提供开箱即用的日志功能
 
-[![npm version](https://badge.fury.io/js/@yai-nexus%2Floglayer-support.svg)](https://www.npmjs.com/package/@yai-nexus/loglayer-support)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## ✨ 新功能亮点 (v0.7.0-beta.1)
+> ⚠️ **重要通知**: `@yai-nexus/loglayer-support` 统一包已停止维护，请使用下面的独立模块包，按需安装使用。
 
-🚀 **重大架构简化** - 更简洁、更高效、更标准化！
+## ✨ 新功能亮点 (v0.8.0)
 
-- **🗑️ 移除复杂包装器** - 统一使用 LogLayer 原生 API，性能提升，代码更简洁
-- **🔧 统一配置格式** - 只保留 LoggerConfig 一种格式，降低学习成本
-- **⚡ 便捷配置函数** - 新增 createServerConfig、createDevConfig 等便捷函数
-- **📚 完整迁移指南** - 详细的迁移文档，帮助平滑升级
+🚀 **模块化架构稳定版** - 企业级、生产就绪、开源贡献！
+
+- **📦 独立模块包** - 按需安装，减少包体积，支持精确的 tree-shaking
+- **📝 完善文档系统** - 每个包都有详细的 README、API 文档和使用示例
+- **🔧 统一版本管理** - 所有包版本统一，便于维护和升级
+- **🤝 开源社区贡献** - 正式向开源社区贡献企业级日志解决方案
 
 ### 🚀 框架预设 API
 
@@ -29,18 +30,56 @@
 - **📈 生产就绪**：经过实际项目验证，支持高并发和复杂场景
 - **⚡ 高性能**：序列化性能提升 74%，内存使用减少 35%
 
-## 📦 安装
+## 📦 可用模块
 
+我们提供以下独立模块，请根据需要选择安装：
+
+### 🔧 核心模块
 ```bash
-npm install @yai-nexus/loglayer-support
+npm install @yai-loglayer/core
 ```
+- 核心类型定义和工具函数
+- 配置验证工具
+- 环境检测功能
+
+### 🌐 浏览器端模块
+```bash
+npm install @yai-loglayer/browser
+```
+- 浏览器端日志封装
+- 开箱即用的日志解决方案
+- 多输出支持、采样、性能监控
+
+### 🖥️ 服务端模块
+```bash
+npm install @yai-loglayer/server
+```
+- Node.js 环境日志解决方案
+- 模块化、健康检查、优雅关闭
+- 企业级服务端日志器
+
+### 📨 日志接收器模块
+```bash
+npm install @yai-loglayer/receiver
+```
+- 接收和处理客户端日志数据
+- 多框架支持、安全验证、批量处理
+- 通用日志接收器
+
+### ☁️ SLS 传输模块
+```bash
+npm install @yai-loglayer/sls-transport
+```
+- 阿里云 SLS (Simple Log Service) 传输组件
+- 批量发送、重试机制、错误处理
+- 企业级日志传输
 
 ## 🚀 快速开始
 
 ### 🌐 浏览器端日志器
 
 ```typescript
-import { createBrowserLogger } from '@yai-nexus/loglayer-support';
+import { createBrowserLogger } from '@yai-loglayer/browser';
 
 // 创建功能强大的浏览器端日志器
 const logger = await createBrowserLogger({
@@ -89,7 +128,7 @@ console.log('恢复策略:', handledError.recovery);   // retry
 
 ```typescript
 // lib/server-logger.ts
-import { createNextjsServerLogger } from '@yai-nexus/loglayer-support';
+import { createNextjsServerLogger } from '@yai-loglayer/server';
 
 export const serverInstance = await createNextjsServerLogger({
   modules: {
@@ -118,7 +157,7 @@ export async function GET() {
 
 ```typescript
 // app/api/logs/route.ts
-import { createNextjsLogReceiver } from '@yai-nexus/loglayer-support';
+import { createNextjsLogReceiver } from '@yai-loglayer/receiver';
 import { serverLogger } from '../../../lib/server-logger';
 
 // 一行代码创建完整的日志接收 API
@@ -210,4 +249,4 @@ export async function GET() {
 
 ---
 
-**快速开始**: `npm install @yai-nexus/loglayer-support` → [查看框架预设指南](./src/frameworks/USAGE.md)
+**快速开始**: 选择需要的模块安装 → [查看各模块使用指南](./packages/)

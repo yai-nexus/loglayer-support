@@ -1,6 +1,11 @@
 # @yai-loglayer/sls-transport
 
-阿里云 SLS (Simple Log Service) Transport for LogLayer - 企业级日志传输组件
+[![npm version](https://badge.fury.io/js/@yai-loglayer%2Fsls-transport.svg)](https://www.npmjs.com/package/@yai-loglayer/sls-transport)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+☁️ **阿里云 SLS 传输组件** - 企业级日志传输解决方案
+
+> 这是 `@yai-loglayer/*` 包系列的 SLS 传输模块，专为阿里云 Simple Log Service 优化。
 
 ## 功能特性
 
@@ -153,6 +158,13 @@ checkSlsConfig(): boolean
 // 内部日志配置
 configureInternalLogger(config: InternalLoggerConfig): void
 ```
+
+## 相关包
+
+- [`@yai-loglayer/core`](../core/) - 核心类型定义和工具函数
+- [`@yai-loglayer/browser`](../browser/) - 浏览器端日志封装
+- [`@yai-loglayer/server`](../server/) - 服务端日志解决方案
+- [`@yai-loglayer/receiver`](../receiver/) - 日志接收器
 
 ## 类型定义
 

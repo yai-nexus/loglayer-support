@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/core",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "loglayer-support 的核心类型定义和工具函数",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

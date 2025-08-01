@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/eslint-config",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "统一的 ESLint 配置",
   "private": true,
   "main": "index.js",

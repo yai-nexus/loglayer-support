@@ -55,7 +55,7 @@ jobs:
         run: pnpm publish --recursive --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          
+
       - name: 发布到 NPM (beta)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'beta'
         run: pnpm publish --recursive --access public --no-git-checks --tag beta

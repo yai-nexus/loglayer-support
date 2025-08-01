@@ -1,6 +1,6 @@
 {
   "name": "nextjs-example",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "Next.js example demonstrating @yai-loglayer/browser and @yai-loglayer/server usage",
   "private": true,
   "scripts": {
