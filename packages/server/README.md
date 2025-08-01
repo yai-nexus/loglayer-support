@@ -24,20 +24,25 @@ pnpm add @yai-loglayer/server
 ## 快速开始
 
 ```typescript
-import { createServerLoggerSync } from '@yai-loglayer/server'
+import { createServerLogger } from '@yai-loglayer/server'
 
 // 开发环境默认配置
-const logger = createServerLoggerSync()
+const logger = await createServerLogger('my-app')
 
 // 自定义配置
-const logger = createServerLoggerSync({
-  level: 'info',
-  outputs: {
-    console: { colorized: true },
-    file: { 
-      filePath: './logs/app.log',
-      enableRotation: true 
-    }
+const logger = await createServerLogger('my-app', {
+  level: { default: 'info' },
+  server: {
+    outputs: [
+      { type: 'stdout' },
+      {
+        type: 'file',
+        config: {
+          dir: './logs',
+          filename: 'app.log'
+        }
+      }
+    ]
   }
 })
 
@@ -65,30 +70,45 @@ export const serverLogger = await createNextjsServerLogger({
 ### 文件日志轮转
 
 ```typescript
-const logger = createServerLoggerSync({
-  outputs: {
-    file: {
-      filePath: './logs/app.log',
-      enableRotation: true,
-      maxFileSize: '10MB',
-      maxFiles: 5
-    }
+const logger = await createServerLogger('my-app', {
+  level: { default: 'info' },
+  server: {
+    outputs: [
+      {
+        type: 'file',
+        config: {
+          dir: './logs',
+          filename: 'app.log',
+          rotation: {
+            maxSize: '10MB',
+            maxFiles: 5
+          }
+        }
+      }
+    ]
   }
 })
 ```
 
-### 多传输器支持
+### SLS (阿里云日志服务) 支持
 
 ```typescript
-const logger = createServerLoggerSync({
-  outputs: {
-    pino: {
-      transport: { target: 'pino-pretty' }
-    },
-    winston: {
-      format: 'json',
-      transports: ['console', 'file']
-    }
+const logger = await createServerLogger('my-app', {
+  level: { default: 'info' },
+  server: {
+    outputs: [
+      { type: 'stdout' },
+      {
+        type: 'sls',
+        config: {
+          accessKeyId: 'your-access-key-id',
+          accessKeySecret: 'your-access-key-secret',
+          endpoint: 'your-sls-endpoint',
+          project: 'your-project',
+          logstore: 'your-logstore'
+        }
+      }
+    ]
   }
 })
 ```
