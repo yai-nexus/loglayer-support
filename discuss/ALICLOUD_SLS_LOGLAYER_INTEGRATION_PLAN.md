@@ -18,9 +18,9 @@
 
 **关键组件:**
 
-*   **LogLayer Core:** 核心日志库，负责捕获和格式化应用日志。
-*   **`@yai-loglayer/sls-transport` (新包):** 一个新的 NPM 包，包含 `SlsTransport` 类。
-*   **`@alicloud/sls20201230`:** 用于与 SLS API 交互的阿里巴巴云官方 SDK。
+- **LogLayer Core:** 核心日志库，负责捕获和格式化应用日志。
+- **`@yai-loglayer/sls-transport` (新包):** 一个新的 NPM 包，包含 `SlsTransport` 类。
+- **`@alicloud/sls20201230`:** 用于与 SLS API 交互的阿里巴巴云官方 SDK。
 
 ## 4. 实施步骤
 
@@ -29,6 +29,7 @@
 我们将在 `packages/` 目录下创建一个新包。该包将存放 SLS transport 的所有逻辑。
 
 **包结构:**
+
 ```
 packages/
 └── sls-transport/
@@ -76,7 +77,7 @@ export class SlsTransport implements Transport {
   async log(log: Log): Promise<void> {
     const logItem = {
       // SLS 使用 Unix 时间戳（秒）
-      time: Math.floor(log.time.getTime() / 1000), 
+      time: Math.floor(log.time.getTime() / 1000),
       contents: this.formatLogContents(log),
     };
 
@@ -113,7 +114,7 @@ export class SlsTransport implements Transport {
     }
 
     // 添加上下文元数据
-    Object.keys(log.context).forEach(key => {
+    Object.keys(log.context).forEach((key) => {
       contents.push({ key, value: JSON.stringify(log.context[key]) });
     });
 
@@ -124,9 +125,9 @@ export class SlsTransport implements Transport {
 
 **关键考量:**
 
-*   **批处理 (Batching):** 在生产环境中，逐条发送日志是低效的。应增强 `log` 方法以缓冲日志并分批发送，以减少网络开销和 API 调用。可以通过计时器和大小阈值来触发批量发送。
-*   **错误处理:** 健壮的错误处理至关重要。这包括网络故障、身份验证问题和来自 SLS 的 API 错误。可以实现带指数退避的重试机制。
-*   **配置:** `SlsTransportConfig` 应清晰地定义所有必需的参数。
+- **批处理 (Batching):** 在生产环境中，逐条发送日志是低效的。应增强 `log` 方法以缓冲日志并分批发送，以减少网络开销和 API 调用。可以通过计时器和大小阈值来触发批量发送。
+- **错误处理:** 健壮的错误处理至关重要。这包括网络故障、身份验证问题和来自 SLS 的 API 错误。可以实现带指数退避的重试机制。
+- **配置:** `SlsTransportConfig` 应清晰地定义所有必需的参数。
 
 ### 第 3 步: 文档和用法示例
 
@@ -159,4 +160,4 @@ logger.error(new Error('数据库连接失败。'), { component: 'Database' });
 
 ## 5. 结论
 
-为 LogLayer 创建一个原生的 `SlsTransport` 是一个明确且可实现的目标，它将为在阿里云上部署应用的开发者提供巨大价值。该方案简化了日志记录体系，减少了依赖，并提高了性能和可维护性。此项目与 LogLayer 提供灵活强大日志解决方案的使命完美契合。 
+为 LogLayer 创建一个原生的 `SlsTransport` 是一个明确且可实现的目标，它将为在阿里云上部署应用的开发者提供巨大价值。该方案简化了日志记录体系，减少了依赖，并提高了性能和可维护性。此项目与 LogLayer 提供灵活强大日志解决方案的使命完美契合。

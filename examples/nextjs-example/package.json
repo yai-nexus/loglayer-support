@@ -1,7 +1,7 @@
 {
   "name": "nextjs-example",
   "version": "0.8.0",
-  "description": "Next.js example demonstrating @yai-loglayer/browser and @yai-loglayer/server usage",
+  "description": "Next.js example demonstrating @yai-loglayer/next unified logging solution",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
@@ -13,24 +13,21 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@yai-loglayer/browser": "workspace:*",
-    "@yai-loglayer/core": "workspace:*",
-    "@yai-loglayer/receiver": "workspace:*",
-    "@yai-loglayer/server": "workspace:*",
-    "@yai-loglayer/sls-transport": "workspace:*",
-    "dotenv": "^16.6.1",
-    "loglayer": "^6.6.0",
+    "@yai-loglayer/next": "workspace:*",
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "eslint": "^8.0.0",
     "eslint-config-next": "^14.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
     "typescript": "^5.0.0"
   },
   "engines": {

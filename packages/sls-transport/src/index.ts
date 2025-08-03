@@ -10,7 +10,7 @@ export {
   checkSlsConfig,
   getEnvDiagnosticInfo,
   compareEnvConfigs,
-  type EnvDiagnosticInfo
+  type EnvDiagnosticInfo,
 } from './config';
 
 export { configureInternalLogger } from './logger';
@@ -22,7 +22,7 @@ export type {
   SlsLogContent,
   SlsLogGroup,
   RetryConfig,
-  TransportStats
+  TransportStats,
 } from './types';
 
 export {
@@ -33,5 +33,5 @@ export {
   extractErrorMessage,
   isRetriableError,
   getCurrentTimestamp,
-  formatBytes
+  formatBytes,
 } from './utils';

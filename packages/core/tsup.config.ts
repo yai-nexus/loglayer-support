@@ -1,3 +1,3 @@
-import { createTsupConfig } from '@yai-loglayer/build-config/tsup.config.js'
+import { createTsupConfig } from '@yai-loglayer/build-config/tsup.config.js';
 
-export default createTsupConfig()
+export default createTsupConfig();

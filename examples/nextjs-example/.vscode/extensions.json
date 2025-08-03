@@ -1,0 +1,67 @@
+{
+  "recommendations": [
+    // Next.js 开发必备
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+
+    // React 开发
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+
+    // 代码格式化和质量
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-json",
+
+    // 测试
+    "orta.vscode-jest",
+    "ms-playwright.playwright",
+
+    // Git 和版本控制
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // 调试和开发工具
+    "ms-vscode.vscode-js-debug",
+    "firefox-devtools.vscode-firefox-debug",
+    "ms-vscode.vscode-chrome-debug-core",
+
+    // 文件和项目管理
+    "christian-kohler.npm-intellisense",
+    "eg2.vscode-npm-script",
+    "ms-vscode.vscode-node-azure-pack",
+
+    // 代码片段和生产力
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    "wayou.vscode-todo-highlight",
+
+    // 主题和界面
+    "pkief.material-icon-theme",
+    "zhuangtongfa.material-theme",
+
+    // 日志和监控
+    "emilast.logfilehighlighter",
+    "ibm.output-colorizer",
+
+    // TypeScript 增强
+    "ms-vscode.typescript-hero",
+    "usernamehw.errorlens",
+
+    // 文档和注释
+    "yzane.markdown-pdf",
+    "shd101wyy.markdown-preview-enhanced",
+
+    // 环境变量
+    "mikestead.dotenv",
+
+    // REST API 测试
+    "humao.rest-client"
+  ],
+  "unwantedRecommendations": [
+    // 避免冲突的扩展
+    "hookyqr.beautify",
+    "ms-vscode.vscode-typescript"
+  ]
+}

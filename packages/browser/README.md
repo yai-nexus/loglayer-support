@@ -24,21 +24,21 @@ pnpm add @yai-loglayer/browser
 ## 快速开始
 
 ```typescript
-import { createBrowserLoggerSync } from '@yai-loglayer/browser'
+import { createBrowserLoggerSync } from '@yai-loglayer/browser';
 
 // 开发环境默认配置
-const logger = createBrowserLoggerSync()
+const logger = createBrowserLoggerSync();
 
 // 自定义配置
 const logger = createBrowserLoggerSync({
   level: 'info',
   outputs: {
     console: { colorized: true, groupCollapsed: true },
-    localStorage: { key: 'app-logs', maxEntries: 200 }
-  }
-})
+    localStorage: { key: 'app-logs', maxEntries: 200 },
+  },
+});
 
-logger.info('Hello from browser!')
+logger.info('Hello from browser!');
 ```
 
 ## 高级用法
@@ -46,7 +46,7 @@ logger.info('Hello from browser!')
 ### 批量上报
 
 ```typescript
-import { createBrowserLoggerSync } from '@yai-loglayer/browser'
+import { createBrowserLoggerSync } from '@yai-loglayer/browser';
 
 const logger = createBrowserLoggerSync({
   outputs: {
@@ -54,10 +54,10 @@ const logger = createBrowserLoggerSync({
       url: '/api/logs',
       method: 'POST',
       batchSize: 10,
-      flushInterval: 5000
-    }
-  }
-})
+      flushInterval: 5000,
+    },
+  },
+});
 ```
 
 ### 本地存储
@@ -68,10 +68,10 @@ const logger = createBrowserLoggerSync({
     localStorage: {
       key: 'my-app-logs',
       maxEntries: 500,
-      serialize: true
-    }
-  }
-})
+      serialize: true,
+    },
+  },
+});
 ```
 
 ## 相关包

@@ -20,8 +20,8 @@ export interface EnvDiagnosticInfo {
     nextRuntimeValue?: string;
   };
   envVars: {
-    required: Record<string, { exists: boolean; length?: number; preview?: string; }>;
-    optional: Record<string, { exists: boolean; value?: string; }>;
+    required: Record<string, { exists: boolean; length?: number; preview?: string }>;
+    optional: Record<string, { exists: boolean; value?: string }>;
     all_sls_vars: string[];
   };
   config?: SlsTransportConfig;
@@ -33,10 +33,10 @@ export interface EnvDiagnosticInfo {
 export function getEnvDiagnosticInfo(): EnvDiagnosticInfo {
   const requiredVars = [
     'SLS_ENDPOINT',
-    'SLS_PROJECT', 
+    'SLS_PROJECT',
     'SLS_LOGSTORE',
     'SLS_ACCESS_KEY_ID',
-    'SLS_ACCESS_KEY_SECRET'
+    'SLS_ACCESS_KEY_SECRET',
   ];
 
   const optionalVars = [
@@ -45,12 +45,12 @@ export function getEnvDiagnosticInfo(): EnvDiagnosticInfo {
     'SLS_BATCH_SIZE',
     'SLS_FLUSH_INTERVAL',
     'SLS_MAX_RETRIES',
-    'SLS_RETRY_BASE_DELAY'
+    'SLS_RETRY_BASE_DELAY',
   ];
 
   // 收集所有 SLS 相关的环境变量
   const allSlsVars = Object.keys(process.env)
-    .filter(key => key.startsWith('SLS_'))
+    .filter((key) => key.startsWith('SLS_'))
     .sort();
 
   const diagnosticInfo: EnvDiagnosticInfo = {
@@ -62,38 +62,40 @@ export function getEnvDiagnosticInfo(): EnvDiagnosticInfo {
       pid: process.pid,
       isNextjs: typeof window === 'undefined' && process.env.NEXT_RUNTIME !== undefined,
       hasNextRuntime: process.env.NEXT_RUNTIME !== undefined,
-      nextRuntimeValue: process.env.NEXT_RUNTIME
+      nextRuntimeValue: process.env.NEXT_RUNTIME,
     },
     envVars: {
       required: {},
       optional: {},
-      all_sls_vars: allSlsVars
-    }
+      all_sls_vars: allSlsVars,
+    },
   };
 
   // 检查必需的环境变量
-  requiredVars.forEach(varName => {
+  requiredVars.forEach((varName) => {
     const value = process.env[varName];
     diagnosticInfo.envVars.required[varName] = {
       exists: !!value,
       length: value?.length,
-      preview: value ? (varName.includes('SECRET') || varName.includes('KEY') 
-        ? value.substring(0, 6) + '***' 
-        : value.substring(0, 20) + (value.length > 20 ? '...' : '')) : undefined
+      preview: value
+        ? varName.includes('SECRET') || varName.includes('KEY')
+          ? value.substring(0, 6) + '***'
+          : value.substring(0, 20) + (value.length > 20 ? '...' : '')
+        : undefined,
     };
   });
 
   // 检查可选的环境变量
-  optionalVars.forEach(varName => {
+  optionalVars.forEach((varName) => {
     const value = process.env[varName];
     diagnosticInfo.envVars.optional[varName] = {
       exists: !!value,
-      value: value
+      value: value,
     };
   });
 
   // 如果所有必需变量都存在，生成配置
-  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  const missingVars = requiredVars.filter((varName) => !process.env[varName]);
   if (missingVars.length === 0) {
     diagnosticInfo.config = {
       endpoint: process.env.SLS_ENDPOINT!,
@@ -119,18 +121,18 @@ export function getEnvDiagnosticInfo(): EnvDiagnosticInfo {
 export function createSlsConfigFromEnv(): SlsTransportConfig | null {
   // 【调试增强】获取详细的环境诊断信息
   const diagnosticInfo = getEnvDiagnosticInfo();
-  
+
   internalLogger.debug('=== 环境变量诊断 ===', diagnosticInfo);
 
   const requiredVars = [
     'SLS_ENDPOINT',
-    'SLS_PROJECT', 
+    'SLS_PROJECT',
     'SLS_LOGSTORE',
     'SLS_ACCESS_KEY_ID',
-    'SLS_ACCESS_KEY_SECRET'
+    'SLS_ACCESS_KEY_SECRET',
   ];
 
-  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  const missingVars = requiredVars.filter((varName) => !process.env[varName]);
 
   if (missingVars.length > 0) {
     // 对于配置错误，使用 console.warn 而非内部日志器，因为这是用户配置问题
@@ -157,7 +159,7 @@ export function createSlsConfigFromEnv(): SlsTransportConfig | null {
   internalLogger.debug('生成的 SLS 配置', {
     ...config,
     accessKeyId: config.accessKeyId.substring(0, 6) + '***',
-    accessKeySecret: config.accessKeySecret.substring(0, 6) + '***'
+    accessKeySecret: config.accessKeySecret.substring(0, 6) + '***',
   });
 
   return config;
@@ -173,7 +175,10 @@ export function checkSlsConfig(): boolean {
 /**
  * 对比两个环境的配置差异
  */
-export function compareEnvConfigs(env1: EnvDiagnosticInfo, env2: EnvDiagnosticInfo): {
+export function compareEnvConfigs(
+  env1: EnvDiagnosticInfo,
+  env2: EnvDiagnosticInfo
+): {
   environmentDiffs: Record<string, { env1: any; env2: any; different: boolean }>;
   configDiffs: Record<string, { env1: any; env2: any; different: boolean }>;
   summary: {
@@ -187,7 +192,7 @@ export function compareEnvConfigs(env1: EnvDiagnosticInfo, env2: EnvDiagnosticIn
 
   // 对比环境信息
   const envKeys = Object.keys(env1.environment);
-  envKeys.forEach(key => {
+  envKeys.forEach((key) => {
     const val1 = (env1.environment as any)[key];
     const val2 = (env2.environment as any)[key];
     const different = val1 !== val2;
@@ -197,7 +202,7 @@ export function compareEnvConfigs(env1: EnvDiagnosticInfo, env2: EnvDiagnosticIn
   // 对比配置（如果两个环境都有配置）
   if (env1.config && env2.config) {
     const configKeys = Object.keys(env1.config);
-    configKeys.forEach(key => {
+    configKeys.forEach((key) => {
       const val1 = (env1.config as any)[key];
       const val2 = (env2.config as any)[key];
       const different = val1 !== val2;
@@ -206,17 +211,17 @@ export function compareEnvConfigs(env1: EnvDiagnosticInfo, env2: EnvDiagnosticIn
   }
 
   const allDifferentKeys = [
-    ...Object.keys(environmentDiffs).filter(k => environmentDiffs[k].different),
-    ...Object.keys(configDiffs).filter(k => configDiffs[k].different)
+    ...Object.keys(environmentDiffs).filter((k) => environmentDiffs[k].different),
+    ...Object.keys(configDiffs).filter((k) => configDiffs[k].different),
   ];
 
   return {
     environmentDiffs,
     configDiffs,
     summary: {
-      hasEnvironmentDiffs: Object.values(environmentDiffs).some(d => d.different),
-      hasConfigDiffs: Object.values(configDiffs).some(d => d.different),
-      differentKeys: allDifferentKeys
-    }
+      hasEnvironmentDiffs: Object.values(environmentDiffs).some((d) => d.different),
+      hasConfigDiffs: Object.values(configDiffs).some((d) => d.different),
+      differentKeys: allDifferentKeys,
+    },
   };
 }

@@ -1,6 +1,6 @@
 /**
  * 共享工具函数
- * 
+ *
  * 提供所有示例共用的工具函数和配置
  */
 
@@ -34,7 +34,7 @@ export function getSLSConfig(): Record<string, string> {
     logstore: process.env.SLS_LOGSTORE!,
     accessKeyId: process.env.SLS_ACCESS_KEY_ID!,
     accessKeySecret: process.env.SLS_ACCESS_KEY_SECRET!,
-    appName: process.env.SLS_APP_NAME!
+    appName: process.env.SLS_APP_NAME!,
   };
 }
 
@@ -53,7 +53,7 @@ export function createFileLogConfig(filename: string): any {
     dir: getLogsDir(),
     filename,
     maxSize: '10MB',
-    maxFiles: 5
+    maxFiles: 5,
   };
 }
 
@@ -61,13 +61,16 @@ export function createFileLogConfig(filename: string): any {
  * 模拟异步操作
  */
 export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
  * 创建示例运行函数
  */
-export function createExampleRunner(exampleFn: () => Promise<void>, title: string): () => Promise<void> {
+export function createExampleRunner(
+  exampleFn: () => Promise<void>,
+  title: string
+): () => Promise<void> {
   return async () => {
     try {
       printExampleTitle(title);

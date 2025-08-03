@@ -1,63 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createNextjsLogReceiver } from '@yai-loglayer/receiver'
-import { getServerInstance } from '../../../lib/server-logger'
+import { createNextjsLogReceiver, createNextjsServerLogger } from '@yai-loglayer/next/server-only';
+import { NextRequest } from 'next/server';
 
 /**
- * 客户端日志接收端点 - 使用新的框架预设 API
- * 接收并处理来自浏览器的日志数据
+ * 客户端日志接收端点 - 使用@yai-loglayer/next统一组件
+ * 接收并处理来自浏览器的日志数据，输出到browser.log文件
  */
 
-// 创建日志接收器
-const createLogReceiver = async () => {
-  const serverLogger = await getServerInstance();
-  return createNextjsLogReceiver(serverLogger, {
-    validation: {
-      requireLevel: true,
-      requireMessage: true,
-      allowedLevels: ['debug', 'info', 'warn', 'error'],
-      maxMessageLength: 2000
-    },
-    processing: {
-      supportBatch: true,
-      maxBatchSize: 50,
-      enableFiltering: true,
-      enableFormatting: true,
-      preserveMetadata: true
-    },
-    adapter: 'nextjs'
-  });
-};
+// 创建专门用于浏览器日志的logger实例
+let browserLogger: any = null;
+let logReceiver: any = null;
 
-// 创建接收器实例
-const logReceiverPromise = createLogReceiver();
+async function getBrowserLogger() {
+  if (!browserLogger) {
+    browserLogger = await createNextjsServerLogger({
+      appName: 'browser',
+      environment: (process.env.NODE_ENV as any) || 'development',
+      level: 'debug',
+      enableFileLogging: true,
+      logDir: './logs',
+      outputs: {
+        console: { enabled: true },
+        file: { enabled: true, path: './logs/browser.log' },
+      },
+    });
+  }
+  return browserLogger;
+}
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  const logReceiver = await logReceiverPromise;
-  const result = await logReceiver(request);
-  const data = await result.json();
-  return NextResponse.json(data, { status: result.status });
+async function getLogReceiver() {
+  if (!logReceiver) {
+    // 使用专门的浏览器日志器
+    const logger = await getBrowserLogger();
+    const serverLogger = await logger.withContext({ module: 'browser-logs', source: 'client' });
+
+    logReceiver = createNextjsLogReceiver(serverLogger, {
+      validation: {
+        requireLevel: true,
+        maxMessageLength: 2000,
+        allowedLevels: ['debug', 'info', 'warn', 'error'],
+      },
+      processing: {
+        supportBatch: true,
+        maxBatchSize: 50,
+      },
+    });
+  }
+  return logReceiver;
+}
+
+// API路由处理函数
+export async function POST(request: NextRequest) {
+  const receiver = await getLogReceiver();
+  return receiver(request);
 }
 
 /**
  * GET 请求 - 返回客户端日志接收服务的状态
  */
 export async function GET() {
-  try {
-    const logReceiver = await logReceiverPromise;
-    // 简化状态返回，因为 logReceiver 可能不再有 getStatus 方法
-    const status = {
-      service: 'client-logs-receiver',
-      status: 'active',
-      timestamp: new Date().toISOString(),
-      message: '日志接收服务运行正常'
-    };
-    return NextResponse.json(status);
-  } catch (error) {
-    return NextResponse.json({
-      service: 'client-logs-receiver',
-      status: 'error',
-      timestamp: new Date().toISOString(),
-      error: (error as Error).message
-    }, { status: 500 });
-  }
+  return Response.json({
+    service: 'client-logs-receiver',
+    status: 'active',
+    timestamp: new Date().toISOString(),
+    message: '日志接收服务运行正常 - 使用@yai-loglayer/next',
+    features: {
+      batchSupport: true,
+      rateLimiting: true,
+      validation: true,
+      enrichment: true,
+    },
+  });
+}
+
+// 支持OPTIONS请求（CORS预检）
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

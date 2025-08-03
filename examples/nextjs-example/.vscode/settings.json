@@ -1,0 +1,100 @@
+{
+  // TypeScript 配置
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "relative",
+
+  // Next.js 特定配置
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+
+  // 搜索配置
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.nyc_output": true
+  },
+
+  // 文件关联
+  "files.associations": {
+    "*.css": "css",
+    "*.scss": "scss",
+    "*.json": "jsonc"
+  },
+
+  // 编辑器配置
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ESLint 配置
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": ["."],
+
+  // Jest 配置
+  "jest.jestCommandLine": "npm test --",
+  "jest.autoRun": "off",
+  "jest.showCoverageOnLoad": false,
+
+  // 终端配置
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.env.osx": {
+    "NODE_ENV": "development"
+  },
+
+  // 调试配置
+  "debug.node.autoAttach": "disabled",
+  "debug.javascript.autoAttachFilter": "smart",
+
+  // 扩展推荐
+  "extensions.showRecommendationsOnlyOnDemand": false,
+
+  // 工作区特定配置
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+
+  // 日志文件语法高亮
+  "files.associations": {
+    "*.log": "log"
+  },
+
+  // 自动保存
+  "files.autoSave": "onFocusChange",
+
+  // 代码折叠
+  "editor.foldingStrategy": "indentation",
+  "editor.showFoldingControls": "always",
+
+  // 智能感知
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+
+  // Git 配置
+  "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+
+  // 性能优化
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true
+  }
+}

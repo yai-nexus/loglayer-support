@@ -95,20 +95,23 @@ export interface ServerOutputConfig {
  * 客户端输出配置
  */
 export interface ClientOutput {
-  type: 'console' | 'http' | 'localstorage';
+  type: 'console' | 'http' | 'localstorage' | 'sls';
   level?: LogLevel; // 可选：这个输出的专用级别
   config?: ClientOutputConfig;
   // 格式自动绑定：
   // console → pretty (开发者工具友好)
   // http → json (服务器接口)
   // localstorage → json (结构化存储)
+  // sls → structured (阿里云SLS格式)
 }
 
 /**
  * 客户端输出配置选项
  */
 export interface ClientOutputConfig {
-  // console 类型：无需配置位置（固定输出到浏览器开发者工具）
+  // console 类型配置
+  colorized?: boolean; // 是否启用彩色输出
+  groupCollapsed?: boolean; // 是否折叠日志组
 
   // http 类型：需要配置服务器端点
   endpoint?: string; // 服务器接收日志的端点
@@ -120,6 +123,13 @@ export interface ClientOutputConfig {
   key?: string; // localStorage 的 key
   maxEntries?: number; // 最大存储条数
   ttl?: number; // 过期时间（毫秒）
+
+  // sls 类型配置
+  project?: string; // SLS 项目名
+  logstore?: string; // SLS 日志库名
+  region?: string; // SLS 区域
+  accessKeyId?: string; // SLS 访问密钥ID
+  accessKeySecret?: string; // SLS 访问密钥密码
 }
 
 // 内部实现类型已移至 internal-types.ts，不再从此文件导出

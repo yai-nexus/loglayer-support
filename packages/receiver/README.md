@@ -24,7 +24,7 @@ pnpm add @yai-loglayer/receiver
 ## 快速开始
 
 ```typescript
-import { createLogReceiverSync } from '@yai-loglayer/receiver'
+import { createLogReceiverSync } from '@yai-loglayer/receiver';
 
 // 创建日志接收器
 const receiver = createLogReceiverSync({
@@ -32,20 +32,20 @@ const receiver = createLogReceiverSync({
   endpoints: {
     '/api/logs': {
       method: 'POST',
-      maxBatchSize: 100
-    }
+      maxBatchSize: 100,
+    },
   },
   storage: {
     type: 'alicloud',
     config: {
       project: 'your-project',
-      logstore: 'your-logstore'
-    }
-  }
-})
+      logstore: 'your-logstore',
+    },
+  },
+});
 
 // 启动接收器
-receiver.start()
+receiver.start();
 ```
 
 ## 高级用法
@@ -54,24 +54,24 @@ receiver.start()
 
 ```typescript
 // app/api/logs/route.ts
-import { createNextjsLogReceiver } from '@yai-loglayer/receiver'
-import { serverLogger } from '../../../lib/server-logger'
+import { createNextjsLogReceiver } from '@yai-loglayer/receiver';
+import { serverLogger } from '../../../lib/server-logger';
 
 export const POST = createNextjsLogReceiver(serverLogger, {
   validation: {
     requireLevel: true,
-    maxMessageLength: 2000
+    maxMessageLength: 2000,
   },
   processing: {
     supportBatch: true,
-    maxBatchSize: 50
+    maxBatchSize: 50,
   },
   security: {
     rateLimiting: {
-      maxRequestsPerMinute: 100
-    }
-  }
-})
+      maxRequestsPerMinute: 100,
+    },
+  },
+});
 ```
 
 ### 自定义存储后端
@@ -82,10 +82,10 @@ const receiver = createLogReceiverSync({
     type: 'custom',
     handler: async (logs) => {
       // 自定义存储逻辑
-      await saveToDatabase(logs)
-    }
-  }
-})
+      await saveToDatabase(logs);
+    },
+  },
+});
 ```
 
 ### 数据验证和清洗
@@ -96,12 +96,12 @@ const receiver = createLogReceiverSync({
     schema: {
       level: { required: true, type: 'string' },
       message: { required: true, maxLength: 1000 },
-      timestamp: { required: true, type: 'number' }
+      timestamp: { required: true, type: 'number' },
     },
     sanitize: true,
-    dropInvalid: false
-  }
-})
+    dropInvalid: false,
+  },
+});
 ```
 
 ## 相关包

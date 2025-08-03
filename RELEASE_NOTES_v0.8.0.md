@@ -1,4 +1,4 @@
-# 🚀 @yai-loglayer/* v0.8.0 发布说明
+# 🚀 @yai-loglayer/\* v0.8.0 发布说明
 
 ## 📅 发布日期: 2025-01-31
 
@@ -15,29 +15,34 @@
 ### 📦 可用模块
 
 #### 🔧 [@yai-loglayer/core@0.8.0](https://www.npmjs.com/package/@yai-loglayer/core)
+
 - 核心类型定义和工具函数
 - 配置验证工具
 - 环境检测功能
 
 #### 🌐 [@yai-loglayer/browser@0.8.0](https://www.npmjs.com/package/@yai-loglayer/browser)
+
 - 浏览器端日志封装
 - 本地存储支持
 - 批量上报功能
 - Console 彩色输出
 
 #### 🖥️ [@yai-loglayer/server@0.8.0](https://www.npmjs.com/package/@yai-loglayer/server)
+
 - Node.js 环境日志解决方案
 - 文件日志输出和轮转
 - Next.js 集成支持
 - 多传输器支持
 
 #### 📨 [@yai-loglayer/receiver@0.8.0](https://www.npmjs.com/package/@yai-loglayer/receiver)
+
 - 日志接收和处理
 - 批量日志处理
 - 数据验证和清洗
 - Next.js API 路由集成
 
 #### ☁️ [@yai-loglayer/sls-transport@0.8.0](https://www.npmjs.com/package/@yai-loglayer/sls-transport)
+
 - 阿里云 SLS 传输组件
 - 批量发送和重试机制
 - 企业级错误处理
@@ -93,4 +98,4 @@ MIT License - 可自由用于商业和开源项目
 
 ---
 
-**感谢使用 @yai-loglayer/* 包系列！** 🎉
+**感谢使用 @yai-loglayer/\* 包系列！** 🎉

@@ -6,13 +6,13 @@
 
 ### 🔄 包名映射
 
-| 旧包 | 新包 | 说明 |
-|------|------|------|
-| `@yai-nexus/loglayer-support` | `@yai-loglayer/browser` | 浏览器端功能 |
-| `@yai-nexus/loglayer-support` | `@yai-loglayer/server` | 服务端功能 |
-| `@yai-nexus/loglayer-support` | `@yai-loglayer/receiver` | 日志接收器功能 |
-| `@yai-nexus/loglayer-support` | `@yai-loglayer/core` | 核心类型和工具 |
-| `@yai-nexus/loglayer-support` | `@yai-loglayer/sls-transport` | SLS 传输功能 |
+| 旧包                          | 新包                          | 说明           |
+| ----------------------------- | ----------------------------- | -------------- |
+| `@yai-nexus/loglayer-support` | `@yai-loglayer/browser`       | 浏览器端功能   |
+| `@yai-nexus/loglayer-support` | `@yai-loglayer/server`        | 服务端功能     |
+| `@yai-nexus/loglayer-support` | `@yai-loglayer/receiver`      | 日志接收器功能 |
+| `@yai-nexus/loglayer-support` | `@yai-loglayer/core`          | 核心类型和工具 |
+| `@yai-nexus/loglayer-support` | `@yai-loglayer/sls-transport` | SLS 传输功能   |
 
 ### 📦 安装新包
 
@@ -33,11 +33,13 @@ npm install @yai-loglayer/sls-transport  # SLS 传输
 #### 浏览器端代码
 
 **旧代码:**
+
 ```typescript
 import { createBrowserLogger } from '@yai-nexus/loglayer-support';
 ```
 
 **新代码:**
+
 ```typescript
 import { createBrowserLogger } from '@yai-loglayer/browser';
 ```
@@ -45,11 +47,13 @@ import { createBrowserLogger } from '@yai-loglayer/browser';
 #### 服务端代码
 
 **旧代码:**
+
 ```typescript
 import { createNextjsServerLogger } from '@yai-nexus/loglayer-support';
 ```
 
 **新代码:**
+
 ```typescript
 import { createNextjsServerLogger } from '@yai-loglayer/server';
 ```
@@ -57,11 +61,13 @@ import { createNextjsServerLogger } from '@yai-loglayer/server';
 #### 日志接收器代码
 
 **旧代码:**
+
 ```typescript
 import { createNextjsLogReceiver } from '@yai-nexus/loglayer-support';
 ```
 
 **新代码:**
+
 ```typescript
 import { createNextjsLogReceiver } from '@yai-loglayer/receiver';
 ```
@@ -69,11 +75,13 @@ import { createNextjsLogReceiver } from '@yai-loglayer/receiver';
 #### SLS 传输代码
 
 **旧代码:**
+
 ```typescript
 import { SlsTransport } from '@yai-nexus/loglayer-support';
 ```
 
 **新代码:**
+
 ```typescript
 import { SlsTransport } from '@yai-loglayer/sls-transport';
 ```

@@ -11,6 +11,7 @@
 ## 🔒 安全配置重要提醒
 
 **⚠️ 敏感信息保护**
+
 - 所有的访问密钥、密码等敏感信息都应该通过环境变量配置
 - **绝对不要**将真实的凭据硬编码在代码中
 - **绝对不要**将包含敏感信息的 `.env` 文件提交到版本控制系统
@@ -18,20 +19,26 @@
 ## 📁 示例目录
 
 ### basic/
+
 基础使用示例，展示 v0.7.0-alpha.2 的各种配置和功能特性。这是一个独立的模块化包，包含：
+
 - **适配新 API**：所有示例都已更新为 v0.7.0-alpha.2 的 LogLayer API
 - **5个核心示例**：预设配置、自定义配置、增强功能、生产环境、多输出配置
 - **API 迁移示例**：展示如何从旧 API 迁移到新 API
 - **类型安全**：完整的 TypeScript 支持
 
 ### nextjs/
+
 Next.js 项目集成示例，展示 v0.7.0-alpha.2 下的前后端日志配置。
+
 - **服务端适配**：使用新的 `createLogger` API
 - **浏览器端适配**：使用新的 `createBrowserLoggerSync` API
 - **日志接收器**：适配新的接收器 API
 
 ### react/
+
 React 应用示例，展示在 React 环境中使用 v0.7.0-alpha.2。
+
 - **React Hook 适配**：展示在 React 组件中的最佳实践
 - **性能监控**：展示如何记录组件性能数据
 - **错误处理**：新的错误记录方式
@@ -54,6 +61,7 @@ cp ../.env.example ../.env
 ```
 
 **必需的环境变量：**
+
 - `SLS_ENDPOINT` - SLS 服务端点（如：cn-beijing.log.aliyuncs.com）
 - `SLS_PROJECT` - SLS 项目名称
 - `SLS_LOGSTORE` - SLS 日志库名称
@@ -62,6 +70,7 @@ cp ../.env.example ../.env
 - `SLS_APP_NAME` - 应用名称（用于标识日志来源）
 
 **可选的环境变量：**
+
 - `SLS_TOPIC` - 日志主题（默认：loglayer）
 - `SLS_SOURCE` - 日志源（默认：nodejs）
 
@@ -170,44 +179,44 @@ npm run dev
 
 ```typescript
 // 老 API (v0.6.x)
-import { createNextjsServerLogger } from 'loglayer-support'
-const serverInstance = await createNextjsServerLogger(config)
-const logger = serverInstance.logger
+import { createNextjsServerLogger } from 'loglayer-support';
+const serverInstance = await createNextjsServerLogger(config);
+const logger = serverInstance.logger;
 
 // 新 API (v0.7.0-alpha.2)
-import { createLogger } from 'loglayer-support'
-const logger = await createLogger('app-name', config)
+import { createLogger } from 'loglayer-support';
+const logger = await createLogger('app-name', config);
 
 // 错误记录变更
 // 老 API
-logger.logError(error, metadata, message)
+logger.logError(error, metadata, message);
 
 // 新 API
-logger.error(message, { ...metadata, error, errorName: error.name, errorStack: error.stack })
+logger.error(message, { ...metadata, error, errorName: error.name, errorStack: error.stack });
 ```
 
 ### 浏览器端 API 变更
 
 ```typescript
 // 老 API
-import type { IBrowserLogger } from 'loglayer-support'
-const logger: IBrowserLogger = createBrowserLoggerSync(config)
+import type { IBrowserLogger } from 'loglayer-support';
+const logger: IBrowserLogger = createBrowserLoggerSync(config);
 
 // 新 API
-import type { LogLayer } from 'loglayer'
-const logger: LogLayer = createBrowserLoggerSync(config)
+import type { LogLayer } from 'loglayer';
+const logger: LogLayer = createBrowserLoggerSync(config);
 
 // 性能日志变更
 // 老 API
-logger.logPerformance(operation, duration, metadata)
+logger.logPerformance(operation, duration, metadata);
 
 // 新 API
 logger.info(`Performance: ${operation}`, {
   operation,
   duration,
   performanceType: 'measurement',
-  ...metadata
-})
+  ...metadata,
+});
 ```
 
 ## 🔍 故障排除
@@ -215,11 +224,13 @@ logger.info(`Performance: ${operation}`, {
 ### SLS 配置问题
 
 如果看到以下警告信息：
+
 ```
 [LogLayer SLS] 缺少必需的 SLS 配置，请检查环境变量
 ```
 
 请检查：
+
 1. 环境变量是否正确设置
 2. `.env` 文件是否在正确位置
 3. 环境变量名称是否正确拼写
@@ -227,6 +238,7 @@ logger.info(`Performance: ${operation}`, {
 ### 权限问题
 
 如果 SLS 发送失败，请检查：
+
 1. 访问密钥是否有效
 2. 密钥是否有写入指定 logstore 的权限
 3. 网络连接是否正常

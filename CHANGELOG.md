@@ -92,6 +92,7 @@
 详细的迁移指南请参考 `docs/architecture-simplification-guide.md`
 
 **主要变更**:
+
 ```typescript
 // 旧版本
 const logger: CompatibleLogger = await createServerLogger('app', config);
@@ -115,6 +116,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 修复了 alpha.1 版本中的 TypeScript 编译错误，确保 CI/CD 构建成功。
 
 #### 🐛 修复内容
+
 - 修复 `ServerLoggerConfig` 接口缺少必需的 `level` 字段
 - 修复 `ModuleLoggerManager` 类缺少的方法实现（`forUser`、`logPerformance`、`raw`）
 - 修复测试文件中的配置类型错误
@@ -132,6 +134,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ### ✨ 新增功能
 
 #### 🌐 浏览器端日志器 (createBrowserLogger)
+
 - **多输出支持**: Console、LocalStorage、HTTP、IndexedDB（规划中）
 - **智能采样**: 支持按级别的采样策略，优化性能
 - **批量处理**: HTTP 输出支持批量发送和重试机制
@@ -141,6 +144,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - **会话管理**: 自动生成和管理会话 ID
 
 #### 🖥️ 服务端日志器 (createServerLogger)
+
 - **模块化管理**: 为不同模块配置独立的日志级别和上下文
 - **健康检查**: 内置健康检查和性能监控
 - **优雅关闭**: 支持优雅关闭和资源清理
@@ -149,6 +153,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - **管理器模式**: 支持多实例管理和批量操作
 
 #### 📨 日志接收器 (createLogReceiver)
+
 - **框架无关**: 支持 Next.js、Express.js 和通用场景
 - **安全优先**: 内置验证、速率限制、内容过滤
 - **批量支持**: 高效处理单条和批量日志
@@ -158,12 +163,14 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ### 🔄 架构改进
 
 #### 消除 Proxy 模式
+
 - **类型安全**: 完整的 TypeScript 类型定义，无 `any` 类型
 - **调试友好**: 清晰的堆栈跟踪，优秀的 IDE 支持
 - **性能提升**: 移除 Proxy 开销，提升运行时性能
 - **异步优先**: 优雅处理异步初始化，提供同步访问方式
 
 #### 配置驱动设计
+
 - **消除硬编码**: 所有行为都可通过配置控制
 - **预设系统**: 提供框架特定的预设配置
 - **灵活扩展**: 支持插件和自定义扩展
@@ -171,12 +178,14 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ### 📚 文档和示例
 
 #### 完整文档体系
+
 - **[框架预设使用指南](./src/frameworks/USAGE.md)** - 新功能完整使用教程
 - **[API 参考文档](./docs/frameworks-api-reference.md)** - 所有预设函数的详细说明
 - **[迁移指南](./docs/migration-guide.md)** - 从旧版本迁移到新 API
 - **[第一阶段总结](./docs/phase-1-summary.md)** - 新功能开发总结
 
 #### 更新示例项目
+
 - **Next.js 示例**: 使用新框架预设的完整示例
 - **React 示例**: React 应用中的日志集成方案
 - **E2E 测试**: 浏览器环境的端到端测试
@@ -184,47 +193,54 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ### 🧪 测试覆盖
 
 #### 单元测试
+
 - **浏览器端日志器测试**: 完整的功能和配置测试
 - **服务端日志器测试**: 模块管理和生命周期测试
 - **日志接收器测试**: 验证、安全和批量处理测试
 
 #### E2E 测试
+
 - **浏览器环境测试**: 使用 Playwright 的真实浏览器测试
 - **多框架兼容性**: 测试不同框架的集成效果
 
 ### ⚠️ 破坏性变更
 
 #### API 变更
+
 - **移除 Proxy 模式**: 不再使用 Proxy 包装的日志器导出
 - **配置格式变更**: 新的配置结构，更加清晰和强大
 - **导入路径变更**: 新的预设函数有专门的导入路径
 
 #### 迁移指南
+
 详细的迁移步骤请参考 [迁移指南](./docs/migration-guide.md)。
 
 ### 📊 性能提升
 
-| 维度 | 提升幅度 |
-|------|----------|
-| 可配置性 | +400% |
-| 框架支持 | +200% |
-| 安全性 | +125% |
-| 性能优化 | +167% |
-| 错误处理 | +80% |
-| 类型安全 | +43% |
-| 可扩展性 | +125% |
+| 维度     | 提升幅度 |
+| -------- | -------- |
+| 可配置性 | +400%    |
+| 框架支持 | +200%    |
+| 安全性   | +125%    |
+| 性能优化 | +167%    |
+| 错误处理 | +80%     |
+| 类型安全 | +43%     |
+| 可扩展性 | +125%    |
 
 ## [0.5.2] - 2024-07-16
 
 ### 修复
+
 - 🔧 修复了 CI 中由于缺少测试文件而导致的构建失败问题。
 
 ### 新增
+
 - ✅ 添加了 `jest.config.js` 和一个简单的测试文件 `src/__tests__/factory.test.ts` 来验证 `createLogger` 函数。
 
 ## [0.5.1] - 2025-01-27
 
 ### 修复
+
 - 🔧 解决 TypeScript 类型检查错误
 - 🛠️ 修复 winston.format.printf 回调函数参数类型不兼容问题
 - 📦 添加缺失的 @types/pino 依赖
@@ -232,6 +248,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - ✅ 确保所有类型检查和 lint 检查通过
 
 ### 技术改进
+
 - 🔍 放宽部分 ESLint 规则以减少警告数量
 - 🏗️ 优化构建流程，确保 CI/CD 管道稳定运行
 - 📋 改进错误处理和类型安全性
@@ -239,6 +256,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ## [0.5.0] - 2025-07-22
 
 ### 版本发布
+
 - 🚀 发布 v0.5.0 版本
 - 📦 更新包版本到 0.5.0
 - 🏷️ 创建对应的 Git 标签
@@ -247,6 +265,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ## [0.4.9] - 2025-07-21
 
 ### 文档优化
+
 - 📝 重构 README.md，提升可读性和用户体验
 - 📚 创建详细的 API 参考文档 (`docs/api-reference.md`)
 - 💡 添加最佳实践指南 (`docs/best-practices.md`)
@@ -255,6 +274,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - 📖 改进文档结构，便于用户快速找到所需信息
 
 ### 架构改进
+
 - 🏗️ 优化文档组织结构，主 README 更加简洁
 - 📋 将详细内容分离到专门的文档文件中
 - 🎯 突出核心价值主张和快速开始指南
@@ -262,12 +282,14 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ## [0.4.0] - 2025-07-20
 
 ### 依赖更新
+
 - ⬆️ 更新 React 到 v19.1.0（从 v18.0.0）
 - ⬆️ 更新 React-DOM 到 v19.1.0（从 v18.0.0）
 - ⬆️ 更新 Next.js 到 v15.4.2（从 v14.0.0）
 - ⬆️ 更新相关 TypeScript 类型定义到最新版本
 
 ### 技术改进
+
 - 🔧 修正仓库 URL 为正确的 yai-nexus 组织地址
 - ✨ 支持 React 19 的新特性和性能优化
 - 🚀 兼容 Next.js 15 的最新功能和改进
@@ -276,9 +298,11 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ## [0.3.7] - 2025-07-20
 
 ### 发布说明
+
 这是第一个正式发布版本，将原有的 demo 项目迁移为完整的 npm 包。
 
 ### 新增
+
 - 🎉 基于 LogLayer 的统一日志解决方案
 - ✅ 完美兼容 Next.js（解决 Edge 和 Serverless 环境问题）
 - ✅ 架构解耦设计，支持在运行时切换日志实现
@@ -291,6 +315,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - 📚 完整的使用示例和文档
 
 ### 核心功能
+
 - `createNextjsLoggerSync()` - Next.js 专用同步创建函数
 - `createLoggerWithPreset()` - 基于预设的异步创建
 - `createEnhancedLogger()` - 自定义配置创建
@@ -299,6 +324,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - 完整的 TypeScript 类型支持
 
 ### 技术特性
+
 - TypeScript 编写，提供完整类型定义
 - 支持 CommonJS 和 ES Modules
 - 目标环境：Node.js 16+
@@ -306,6 +332,7 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 - 可选的对等依赖
 
 ### 示例和文档
+
 - Next.js 使用示例
 - Node.js 服务使用示例
 - 基础 API 使用示例
@@ -316,11 +343,13 @@ logger.withMetadata({ userId: '123' }).info('用户登录');
 ## 版本说明
 
 ### 版本号规则
+
 - **主版本号**：不兼容的 API 修改
 - **次版本号**：向下兼容的新增功能
 - **修订号**：向下兼容的问题修正
 
 ### 变更类型
+
 - `新增` - 新功能
 - `修改` - 现有功能的修改
 - `弃用` - 即将移除的功能

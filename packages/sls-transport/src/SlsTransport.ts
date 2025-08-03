@@ -1,17 +1,22 @@
 /**
  * 阿里云 SLS Transport 实现
- * 
+ *
  * 提供批量发送、重试机制、错误处理等企业级特性
  */
 
-import { LoggerlessTransport, type LoggerlessTransportConfig, type LogLayerTransportParams, type LogLevelType } from '@loglayer/transport';
+import {
+  LoggerlessTransport,
+  type LoggerlessTransportConfig,
+  type LogLayerTransportParams,
+  type LogLevelType,
+} from '@loglayer/transport';
 
 import type {
   SlsTransportConfig,
   SlsTransportInternalConfig,
   SlsLogItem,
   SlsLogGroup,
-  TransportStats
+  TransportStats,
 } from './types';
 
 import {
@@ -22,7 +27,7 @@ import {
   extractErrorMessage,
   isRetriableError,
   getCurrentTimestamp,
-  formatBytes
+  formatBytes,
 } from './utils';
 import { internalLogger } from './logger';
 import { SlsRestClient } from './SlsRestClient';
@@ -44,10 +49,10 @@ export class SlsTransport extends LoggerlessTransport {
 
   constructor(config: SlsTransportConfig) {
     super({ id: 'sls-transport' });
-    
+
     // 验证配置
     validateSlsConfig(config);
-    
+
     // 直接创建内部配置，无需额外函数
     this.config = {
       sdkConfig: {
@@ -64,18 +69,18 @@ export class SlsTransport extends LoggerlessTransport {
       maxRetries: config.maxRetries || 3,
       retryBaseDelay: config.retryBaseDelay || 1000,
     };
-    
+
     // 使用 REST 客户端替代 SDK，避免原生模块依赖
     this.restClient = new SlsRestClient(this.config);
     this.stats = this.initStats();
-    
+
     internalLogger.debug('SlsTransport 初始化完成 (REST API 模式)', {
       project: this.config.project,
       logstore: this.config.logstore,
       batchSize: this.config.batchSize,
-      flushInterval: this.config.flushInterval
+      flushInterval: this.config.flushInterval,
     });
-    
+
     this.setupFlushTimer();
     this.setupProcessHandlers();
   }
@@ -85,14 +90,14 @@ export class SlsTransport extends LoggerlessTransport {
    */
   shipToLogger(params: LogLayerTransportParams): any[] {
     const { messages, data } = params;
-    
+
     // 直接使用 LogLayer 参数，无需自定义 Log 对象
     const logData = {
       level: params.logLevel as LogLevelType,
       message: Array.isArray(messages) ? messages.join(' ') : String(messages),
       time: new Date(),
       context: data || {},
-      err: this.extractError(messages)
+      err: this.extractError(messages),
     };
 
     // 添加到批量缓冲区
@@ -153,17 +158,17 @@ export class SlsTransport extends LoggerlessTransport {
     for (let attempt = 0; attempt <= this.config.maxRetries; attempt++) {
       try {
         await this.sendLogs(logs);
-        
+
         // 发送成功
         this.stats.successCount++;
         this.stats.totalSent += logs.length;
         this.stats.batchCount++;
         this.stats.lastSentAt = new Date();
-        
+
         if (attempt > 0) {
           this.stats.retryCount += attempt;
         }
-        
+
         return;
       } catch (error) {
         lastError = error;
@@ -197,11 +202,11 @@ export class SlsTransport extends LoggerlessTransport {
   private async sendLogs(logs: SlsLogItem[]): Promise<void> {
     // 使用新的 REST 客户端发送日志
     await this.restClient.putLogs(logs);
-    
-    internalLogger.debug('成功发送日志到 SLS', { 
+
+    internalLogger.debug('成功发送日志到 SLS', {
       logsCount: logs.length,
       project: this.config.project,
-      logstore: this.config.logstore 
+      logstore: this.config.logstore,
     });
   }
 
@@ -211,7 +216,7 @@ export class SlsTransport extends LoggerlessTransport {
   private setupFlushTimer(): void {
     this.flushTimer = setInterval(() => {
       if (this.logBuffer.length > 0) {
-        this.flushBuffer().catch(error => {
+        this.flushBuffer().catch((error) => {
           const errorMsg = extractErrorMessage(error);
           internalLogger.warn(`定时刷新失败: ${errorMsg}`);
         });
@@ -232,9 +237,9 @@ export class SlsTransport extends LoggerlessTransport {
       if (this.isShuttingDown) {
         return;
       }
-      
+
       this.isShuttingDown = true;
-      
+
       try {
         // 清理定时器
         if (this.flushTimer) {
@@ -265,7 +270,7 @@ export class SlsTransport extends LoggerlessTransport {
       return messages instanceof Error ? messages : undefined;
     }
 
-    return messages.find(msg => msg instanceof Error);
+    return messages.find((msg) => msg instanceof Error);
   }
 
   /**

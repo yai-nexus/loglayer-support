@@ -36,12 +36,12 @@ const slsConfig = createSlsConfigFromEnv();
 if (slsConfig) {
   // 创建 SLS Transport
   const transport = new SlsTransport(slsConfig);
-  
+
   // 创建 LogLayer 实例
   const logger = new LogLayer({
-    transport
+    transport,
   });
-  
+
   // 使用日志
   logger.info('用户登录', { userId: '12345', ip: '192.168.1.1' });
 }
@@ -81,7 +81,7 @@ const transport = new SlsTransport({
   batchSize: 100,
   flushInterval: 5000,
   maxRetries: 3,
-  retryBaseDelay: 1000
+  retryBaseDelay: 1000,
 });
 ```
 
@@ -94,8 +94,8 @@ const transport = new SlsTransport({
 ```typescript
 const transport = new SlsTransport({
   // ... 其他配置
-  batchSize: 50,          // 每批发送50条日志
-  flushInterval: 3000,    // 3秒强制刷新一次
+  batchSize: 50, // 每批发送50条日志
+  flushInterval: 3000, // 3秒强制刷新一次
 });
 ```
 
@@ -106,8 +106,8 @@ const transport = new SlsTransport({
 ```typescript
 const transport = new SlsTransport({
   // ... 其他配置
-  maxRetries: 5,          // 最大重试5次
-  retryBaseDelay: 2000,   // 基础延迟2秒
+  maxRetries: 5, // 最大重试5次
+  retryBaseDelay: 2000, // 基础延迟2秒
 });
 ```
 
@@ -120,7 +120,7 @@ console.log('发送统计:', {
   成功: stats.successCount,
   失败: stats.failureCount,
   重试: stats.retryCount,
-  批次: stats.batchCount
+  批次: stats.batchCount,
 });
 ```
 

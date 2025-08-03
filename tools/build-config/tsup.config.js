@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsup';
 
 export const createTsupConfig = (options = {}) => {
   return defineConfig({
@@ -11,8 +11,8 @@ export const createTsupConfig = (options = {}) => {
     treeshake: true,
     minify: false,
     target: 'es2020',
-    ...options
-  })
-}
+    ...options,
+  });
+};
 
-export default createTsupConfig()
+export default createTsupConfig();

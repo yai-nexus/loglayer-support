@@ -32,21 +32,21 @@ import type { AutoLoggerConfig } from '@yai-loglayer/server';
 export const loggerConfig: AutoLoggerConfig = {
   app: {
     name: 'my-app',
-    environment: 'auto',        // 自动检测环境
-    version: 'auto'             // 自动从 package.json 读取
+    environment: 'auto', // 自动检测环境
+    version: 'auto', // 自动从 package.json 读取
   },
   outputs: {
-    console: { enabled: 'auto' },  // 开发环境自动启用
+    console: { enabled: 'auto' }, // 开发环境自动启用
     file: {
       enabled: true,
-      path: 'auto',              // 自动检测项目根目录
-      filename: 'app.log'
+      path: 'auto', // 自动检测项目根目录
+      filename: 'app.log',
     },
     sls: {
-      enabled: 'auto',           // 根据环境变量自动启用
-      config: 'env'              // 从环境变量自动读取
-    }
-  }
+      enabled: 'auto', // 根据环境变量自动启用
+      config: 'env', // 从环境变量自动读取
+    },
+  },
 };
 
 export default loggerConfig;
@@ -88,15 +88,15 @@ SLS_LOGSTORE=your-logstore
 
 ## 📊 新旧版本对比
 
-| 方面 | 旧版 | 新版 |
-|------|------|------|
-| 代码行数 | 100+ 行 | 10 行 |
-| 配置方式 | 手动处理 | 声明式配置 |
-| 环境变量 | 手动检查映射 | 自动检测映射 |
-| 路径解析 | 手动实现 | `'auto'` 自动解析 |
-| 错误处理 | 分散处理 | 统一处理和回退 |
-| 日志调用 | `await logger.info()` | `logger.info()` |
-| 配置验证 | 无 | 自动验证和提示 |
+| 方面     | 旧版                  | 新版              |
+| -------- | --------------------- | ----------------- |
+| 代码行数 | 100+ 行               | 10 行             |
+| 配置方式 | 手动处理              | 声明式配置        |
+| 环境变量 | 手动检查映射          | 自动检测映射      |
+| 路径解析 | 手动实现              | `'auto'` 自动解析 |
+| 错误处理 | 分散处理              | 统一处理和回退    |
+| 日志调用 | `await logger.info()` | `logger.info()`   |
+| 配置验证 | 无                    | 自动验证和提示    |
 
 ## 🔧 高级用法
 
@@ -110,8 +110,8 @@ const config: AutoLoggerConfig = {
   app: { name: 'my-app' },
   outputs: {
     console: { enabled: 'auto' },
-    file: { enabled: true, path: 'auto', filename: 'app.log' }
-  }
+    file: { enabled: true, path: 'auto', filename: 'app.log' },
+  },
 };
 
 const logger = createAutoLogger(config);
@@ -143,6 +143,7 @@ if (logger.isReady()) {
 #### 简化对比
 
 **旧版（复杂）**：
+
 ```typescript
 // 需要复杂的配置和异步初始化
 const logger = await createServerLogger('my-app', complexConfig);
@@ -150,6 +151,7 @@ await logger.info('message');
 ```
 
 **新版（简单）**：
+
 ```typescript
 // 一行创建，直接使用
 const logger = createAutoLogger({ app: { name: 'my-app' } });
@@ -183,19 +185,23 @@ logger.info('message');
 ### 核心组件
 
 #### 1. **配置解析层**
+
 - **ConfigResolver**: 智能解析配置，支持 `auto` 模式
 - **ConfigValidator**: 配置验证和友好错误提示
 - **AutoLoggerConfig**: 声明式配置接口
 
 #### 2. **日志处理层**
+
 - **AutoLoggerImpl**: 简化的日志器实现
 - **LogLayer**: 基于 loglayer 库的核心日志处理
 
 #### 3. **传输适配层**
+
 - **ServerTransport**: 服务端传输器适配
 - **ServerOutputEngine**: 多输出目标管理
 
 #### 4. **输出目标层**
+
 - **Console**: 控制台输出（开发环境）
 - **File System**: 文件输出（支持轮转）
 - **SLS**: 阿里云日志服务
@@ -288,21 +294,25 @@ NODE_ENV=production → {
 ## 🎯 设计原则
 
 ### 1. **配置驱动**
+
 - 声明式配置，避免命令式代码
 - 支持 `auto` 模式，智能检测环境
 - 环境变量优先，支持多种命名约定
 
 ### 2. **渐进式增强**
+
 - 零配置启动，开箱即用
 - 基础功能简单，高级功能可选
 - 向后兼容，平滑升级
 
 ### 3. **错误友好**
+
 - 自动配置验证，友好错误提示
 - 自动回退机制，确保日志不丢失
 - 内置诊断工具，便于问题排查
 
 ### 4. **性能优先**
+
 - 异步初始化，不阻塞主线程
 - 智能缓冲，批量处理日志
 - 内存优化，避免内存泄漏
@@ -338,12 +348,12 @@ detectProjectRoot() → {
 const ENV_MAPPINGS = {
   APP_NAME: ['NEXT_PUBLIC_SERVICE_NAME', 'SERVICE_NAME', 'APP_NAME'],
   SLS_ENDPOINT: ['NEXT_PUBLIC_SLS_ENDPOINT', 'SLS_ENDPOINT'],
-  LOG_LEVEL: ['LOG_LEVEL', 'LOGLEVEL']
+  LOG_LEVEL: ['LOG_LEVEL', 'LOGLEVEL'],
 };
 
 // 自动选择第一个可用的环境变量
 function getEnvValue(keys) {
-  return keys.find(key => process.env[key]) || undefined;
+  return keys.find((key) => process.env[key]) || undefined;
 }
 ```
 
@@ -391,10 +401,10 @@ ConfigValidator.validate(config) → {
 // 多层回退保障
 class AutoLoggerImpl {
   private fallbackChain = [
-    () => this.tryMainLogger(),      // 主日志器
-    () => this.tryFileLogger(),      // 文件回退
-    () => this.tryConsoleLogger(),   // 控制台回退
-    () => this.tryNoOpLogger()       // 静默回退
+    () => this.tryMainLogger(), // 主日志器
+    () => this.tryFileLogger(), // 文件回退
+    () => this.tryConsoleLogger(), // 控制台回退
+    () => this.tryNoOpLogger(), // 静默回退
   ];
 
   log(level, message, data) {
@@ -412,21 +422,25 @@ class AutoLoggerImpl {
 ## 🚀 性能优化
 
 ### 1. **延迟初始化**
+
 - 日志器创建时不立即初始化所有组件
 - 首次使用时才进行完整初始化
 - 减少应用启动时间
 
 ### 2. **智能缓冲**
+
 - 批量写入文件，减少 I/O 操作
 - 内存缓冲区自动管理
 - 进程退出时自动刷新缓冲区
 
 ### 3. **连接复用**
+
 - SLS 连接池管理
 - HTTP 连接复用
 - 减少网络开销
 
 ### 4. **内存优化**
+
 - 循环引用检测和清理
 - 大对象自动序列化
 - 内存使用监控和告警
@@ -434,13 +448,14 @@ class AutoLoggerImpl {
 ## 🔒 安全考虑
 
 ### 1. **敏感信息过滤**
+
 ```typescript
 // 自动过滤敏感字段
 const SENSITIVE_FIELDS = ['password', 'token', 'secret', 'key'];
 
 function sanitizeData(data) {
   return Object.keys(data).reduce((clean, key) => {
-    if (SENSITIVE_FIELDS.some(field => key.toLowerCase().includes(field))) {
+    if (SENSITIVE_FIELDS.some((field) => key.toLowerCase().includes(field))) {
       clean[key] = '[REDACTED]';
     } else {
       clean[key] = data[key];
@@ -451,11 +466,13 @@ function sanitizeData(data) {
 ```
 
 ### 2. **输出安全**
+
 - 文件路径验证，防止路径遍历攻击
 - SLS 传输加密
 - 日志内容转义，防止注入攻击
 
 ### 3. **权限控制**
+
 - 最小权限原则
 - 文件权限检查
 - 网络访问控制
@@ -481,9 +498,9 @@ const config: AutoLoggerConfig = {
   outputs: {
     custom: {
       enabled: true,
-      handler: new CustomOutput()
-    }
-  }
+      handler: new CustomOutput(),
+    },
+  },
 };
 ```
 
@@ -498,7 +515,7 @@ class LogMiddleware {
       ...logEntry,
       hostname: os.hostname(),
       pid: process.pid,
-      memory: process.memoryUsage()
+      memory: process.memoryUsage(),
     };
   }
 }
@@ -506,7 +523,7 @@ class LogMiddleware {
 // 应用中间件
 const logger = createAutoLogger({
   app: { name: 'my-app' },
-  middleware: [new LogMiddleware()]
+  middleware: [new LogMiddleware()],
 });
 ```
 
@@ -521,7 +538,7 @@ logger.info('用户登录', {
   email: 'user@example.com',
   ip: '192.168.1.1',
   userAgent: 'Mozilla/5.0...',
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 });
 
 // ❌ 不推荐：字符串拼接
@@ -539,7 +556,7 @@ try {
     operation: 'riskyOperation',
     error: error.message,
     stack: error.stack,
-    context: { userId, requestId }
+    context: { userId, requestId },
   });
 }
 
@@ -557,13 +574,13 @@ try {
   logger.info('数据库查询成功', {
     query: 'getUserById',
     duration: Date.now() - startTime,
-    resultCount: result.length
+    resultCount: result.length,
   });
 } catch (error) {
   logger.error('数据库查询失败', {
     query: 'getUserById',
     duration: Date.now() - startTime,
-    error: error.message
+    error: error.message,
   });
 }
 ```
@@ -592,10 +609,10 @@ const productionConfig: AutoLoggerConfig = {
   app: {
     name: process.env.SERVICE_NAME,
     environment: 'production',
-    version: process.env.APP_VERSION
+    version: process.env.APP_VERSION,
   },
   outputs: {
-    console: { enabled: false },  // 生产环境关闭控制台
+    console: { enabled: false }, // 生产环境关闭控制台
     file: {
       enabled: true,
       path: '/var/log/app',
@@ -603,15 +620,15 @@ const productionConfig: AutoLoggerConfig = {
       rotation: {
         maxSize: '100MB',
         maxFiles: 10,
-        datePattern: 'YYYY-MM-DD'
-      }
+        datePattern: 'YYYY-MM-DD',
+      },
     },
     sls: {
       enabled: true,
-      config: 'env'  // 从环境变量读取
-    }
+      config: 'env', // 从环境变量读取
+    },
   },
-  level: 'info'  // 生产环境使用 info 级别
+  level: 'info', // 生产环境使用 info 级别
 };
 ```
 
@@ -641,8 +658,8 @@ const productionConfig: AutoLoggerConfig = {
 const logger = createAutoLogger({
   app: { name: 'my-app' },
   features: {
-    debug: { enabled: true, verbose: true }
-  }
+    debug: { enabled: true, verbose: true },
+  },
 });
 
 // 查看内部状态

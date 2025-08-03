@@ -14,14 +14,11 @@ export {
   type LogReceiverConfig,
   type NextjsLogReceiver,
   createNextjsLogReceiver,
-  createExpressLogReceiver
+  createExpressLogReceiver,
 } from './receiver';
 
 // 客户端传输（与接收器配套的客户端实现）
-export {
-  type LogReceiverClientOptions,
-  LogReceiverClient
-} from './client';
+export { type LogReceiverClientOptions, LogReceiverClient } from './client';
 
 // =============================================================================
 // 内部实现 (Internal Implementation)

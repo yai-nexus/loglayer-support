@@ -4,7 +4,7 @@
  * 简化版本，提供基础的日志接收功能
  */
 
-import type { LogLayer } from 'loglayer'
+import type { LogLayer } from 'loglayer';
 
 // ==================== 核心类型定义 ====================
 
@@ -15,42 +15,42 @@ export interface LogReceiverConfig {
   /** 验证配置 */
   validation?: {
     /** 是否要求日志级别 */
-    requireLevel?: boolean
+    requireLevel?: boolean;
     /** 是否要求消息内容 */
-    requireMessage?: boolean
+    requireMessage?: boolean;
     /** 是否要求时间戳 */
-    requireTimestamp?: boolean
+    requireTimestamp?: boolean;
     /** 最大消息长度 */
-    maxMessageLength?: number
+    maxMessageLength?: number;
     /** 允许的日志级别 */
-    allowedLevels?: string[]
+    allowedLevels?: string[];
     /** 严格模式 */
-    strictMode?: boolean
-  }
+    strictMode?: boolean;
+  };
   /** 处理配置 */
   processing?: {
     /** 是否支持批量处理 */
-    supportBatch?: boolean
+    supportBatch?: boolean;
     /** 最大批量大小 */
-    maxBatchSize?: number
+    maxBatchSize?: number;
     /** 是否启用过滤 */
-    enableFiltering?: boolean
+    enableFiltering?: boolean;
     /** 是否启用格式化 */
-    enableFormatting?: boolean
+    enableFormatting?: boolean;
     /** 是否保留元数据 */
-    preserveMetadata?: boolean
-  }
+    preserveMetadata?: boolean;
+  };
   /** 适配器类型 */
-  adapter?: 'nextjs' | 'express' | 'fastify' | 'generic'
+  adapter?: 'nextjs' | 'express' | 'fastify' | 'generic';
 }
 
 /**
  * Next.js 日志接收器函数类型
  */
 export type NextjsLogReceiver = (request: any) => Promise<{
-  status: number
-  json: () => Promise<any>
-}>
+  status: number;
+  json: () => Promise<any>;
+}>;
 
 // ==================== 工厂函数 ====================
 
@@ -68,36 +68,38 @@ export function createNextjsLogReceiver(
   // 简化实现
   return async (request: any) => {
     try {
-      const data = await request.json()
-      
+      const data = await request.json();
+
       // 处理批量日志
       if (Array.isArray(data)) {
-        data.forEach(log => {
-          logger.info(log.message || 'Log from client', log.metadata || {})
-        })
+        data.forEach((log) => {
+          logger.info(log.message || 'Log from client', log.metadata || {});
+        });
         return {
           status: 200,
-          json: async () => ({ success: true, processed: data.length })
-        }
+          json: async () => ({ success: true, processed: data.length }),
+        };
       } else {
-        logger.info(data.message || 'Log from client', data.metadata || {})
+        logger.info(data.message || 'Log from client', data.metadata || {});
         return {
           status: 200,
-          json: async () => ({ success: true, processed: 1 })
-        }
+          json: async () => ({ success: true, processed: 1 }),
+        };
       }
     } catch (error) {
-      logger.error('Next.js log receiver error: ' + (error instanceof Error ? error.message : String(error)))
+      logger.error(
+        'Next.js log receiver error: ' + (error instanceof Error ? error.message : String(error))
+      );
 
       return {
         status: 500,
-        json: async () => ({ 
-          success: false, 
-          error: 'Internal server error' 
-        })
-      }
+        json: async () => ({
+          success: false,
+          error: 'Internal server error',
+        }),
+      };
     }
-  }
+  };
 }
 
 /**
@@ -113,20 +115,22 @@ export function createExpressLogReceiver(
 ): (req: any, res: any, next?: any) => Promise<void> {
   return async (req: any, res: any, next?: any) => {
     try {
-      const data = req.body
-      
+      const data = req.body;
+
       if (Array.isArray(data)) {
-        data.forEach(log => {
-          logger.info(log.message || 'Log from client', log.metadata || {})
-        })
-        res.json({ success: true, processed: data.length })
+        data.forEach((log) => {
+          logger.info(log.message || 'Log from client', log.metadata || {});
+        });
+        res.json({ success: true, processed: data.length });
       } else {
-        logger.info(data.message || 'Log from client', data.metadata || {})
-        res.json({ success: true, processed: 1 })
+        logger.info(data.message || 'Log from client', data.metadata || {});
+        res.json({ success: true, processed: 1 });
       }
     } catch (error) {
-      logger.error('Express log receiver error: ' + (error instanceof Error ? error.message : String(error)))
-      res.status(500).json({ success: false, error: 'Internal server error' })
+      logger.error(
+        'Express log receiver error: ' + (error instanceof Error ? error.message : String(error))
+      );
+      res.status(500).json({ success: false, error: 'Internal server error' });
     }
-  }
+  };
 }

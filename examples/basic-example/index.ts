@@ -1,6 +1,6 @@
 /**
  * LogLayer 基础使用示例 - 主入口
- * 
+ *
  * 这个文件是所有示例的统一入口点，按顺序运行所有示例
  */
 
@@ -21,7 +21,7 @@ async function runAllExamples() {
     await enhancedFeaturesExample();
     await productionConfigExample();
     await multipleOutputsExample();
-    
+
     console.log('\n✅ 所有示例执行完成');
   } catch (error) {
     console.error('❌ 示例执行失败:', error);
@@ -41,5 +41,5 @@ export {
   enhancedFeaturesExample,
   productionConfigExample,
   multipleOutputsExample,
-  runAllExamples
+  runAllExamples,
 };

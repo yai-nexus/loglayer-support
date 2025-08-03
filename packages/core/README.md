@@ -22,16 +22,16 @@ pnpm add @yai-loglayer/core
 ## 使用
 
 ```typescript
-import { LoggerConfig, validateConfig } from '@yai-loglayer/core'
+import { LoggerConfig, validateConfig } from '@yai-loglayer/core';
 
 const config: LoggerConfig = {
   level: 'info',
   outputs: {
-    console: { colorized: true }
-  }
-}
+    console: { colorized: true },
+  },
+};
 
-validateConfig(config)
+validateConfig(config);
 ```
 
 ## 相关包

@@ -1,6 +1,6 @@
 /**
  * 示例5: 多输出手段配置
- * 
+ *
  * 展示如何配置多种输出方式
  */
 
@@ -16,58 +16,58 @@ async function runMultipleOutputsExample(): Promise<void> {
     level: { default: 'debug' },
     server: {
       outputs: [
-        { type: 'stdout' },                                   // 控制台实时查看
-        { 
-          type: 'file', 
-          config: { dir: getLogsDir(), filename: 'multi.log' }
-        },
-        { 
+        { type: 'stdout' }, // 控制台实时查看
+        {
           type: 'file',
-          level: 'error',                                     // 只记录错误的文件
-          config: { dir: getLogsDir(), filename: 'errors.log' }
+          config: { dir: getLogsDir(), filename: 'multi.log' },
+        },
+        {
+          type: 'file',
+          level: 'error', // 只记录错误的文件
+          config: { dir: getLogsDir(), filename: 'errors.log' },
         },
         {
           type: 'http',
-          level: 'warn',                                      // 警告及以上发送到监控系统
-          config: { 
+          level: 'warn', // 警告及以上发送到监控系统
+          config: {
             url: 'http://monitoring.example.com/logs',
-            headers: { 'Authorization': 'Bearer token123' }
-          }
+            headers: { Authorization: 'Bearer token123' },
+          },
         },
         {
-          type: 'sls',                                        // 阿里云日志服务
-          level: 'info',                                      // 信息及以上发送到 SLS
-          config: getSLSConfig()
-        }
-      ]
+          type: 'sls', // 阿里云日志服务
+          level: 'info', // 信息及以上发送到 SLS
+          config: getSLSConfig(),
+        },
+      ],
     },
     client: {
       outputs: [
-        { type: 'console' },                                  // 开发者工具
-        { 
+        { type: 'console' }, // 开发者工具
+        {
           type: 'localstorage',
-          config: { 
+          config: {
             key: 'app-logs',
             maxEntries: 50,
-            ttl: 24 * 60 * 60 * 1000  // 24小时
-          }
+            ttl: 24 * 60 * 60 * 1000, // 24小时
+          },
         },
         {
           type: 'http',
           level: 'error',
-          config: { endpoint: '/api/client-errors' }
-        }
-      ]
-    }
+          config: { endpoint: '/api/client-errors' },
+        },
+      ],
+    },
   };
 
   const multiLogger = await createServerLogger('multi-output', multiOutputConfig);
-  
-  multiLogger.debug('调试信息');           // 只输出到 stdout 和 all.log
-  multiLogger.info('普通信息');            // 输出到 stdout 和 all.log  
-  multiLogger.warn('警告信息');            // 输出到 stdout、all.log 和 HTTP
-  multiLogger.error('错误信息');           // 输出到所有地方
-  
+
+  multiLogger.debug('调试信息'); // 只输出到 stdout 和 all.log
+  multiLogger.info('普通信息'); // 输出到 stdout 和 all.log
+  multiLogger.warn('警告信息'); // 输出到 stdout、all.log 和 HTTP
+  multiLogger.error('错误信息'); // 输出到所有地方
+
   console.log('✅ 多输出配置示例完成');
 }
 

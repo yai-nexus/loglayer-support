@@ -1,6 +1,6 @@
 /**
  * 统一配置验证系统
- * 
+ *
  * 提供全面的配置验证功能，包括：
  * - 类型验证
  * - 值范围验证
@@ -8,20 +8,20 @@
  * - 详细的错误提示
  */
 
-import { ErrorCategory, ErrorSeverity, ERROR_CODES } from './error-handling'
+import { ErrorCategory, ErrorSeverity, ERROR_CODES } from './error-handling';
 
 /**
  * 验证结果
  */
 export interface ValidationResult {
   /** 是否验证通过 */
-  valid: boolean
+  valid: boolean;
   /** 错误列表 */
-  errors: ValidationError[]
+  errors: ValidationError[];
   /** 警告列表 */
-  warnings: ValidationWarning[]
+  warnings: ValidationWarning[];
   /** 建议列表 */
-  suggestions: ValidationSuggestion[]
+  suggestions: ValidationSuggestion[];
 }
 
 /**
@@ -29,17 +29,17 @@ export interface ValidationResult {
  */
 export interface ValidationError {
   /** 错误码 */
-  code: string
+  code: string;
   /** 错误消息 */
-  message: string
+  message: string;
   /** 字段路径 */
-  path: string
+  path: string;
   /** 当前值 */
-  value: any
+  value: any;
   /** 期望值或类型 */
-  expected?: any
+  expected?: any;
   /** 严重程度 */
-  severity: ErrorSeverity
+  severity: ErrorSeverity;
 }
 
 /**
@@ -47,13 +47,13 @@ export interface ValidationError {
  */
 export interface ValidationWarning {
   /** 警告消息 */
-  message: string
+  message: string;
   /** 字段路径 */
-  path: string
+  path: string;
   /** 当前值 */
-  value: any
+  value: any;
   /** 建议值 */
-  suggested?: any
+  suggested?: any;
 }
 
 /**
@@ -61,11 +61,11 @@ export interface ValidationWarning {
  */
 export interface ValidationSuggestion {
   /** 建议消息 */
-  message: string
+  message: string;
   /** 字段路径 */
-  path: string
+  path: string;
   /** 建议的配置 */
-  suggestedConfig: any
+  suggestedConfig: any;
 }
 
 /**
@@ -73,27 +73,27 @@ export interface ValidationSuggestion {
  */
 export interface ValidationRule {
   /** 规则名称 */
-  name: string
+  name: string;
   /** 验证函数 */
-  validate: (value: any, path: string, fullConfig: any) => ValidationResult
+  validate: (value: any, path: string, fullConfig: any) => ValidationResult;
   /** 是否为必需验证 */
-  required?: boolean
+  required?: boolean;
   /** 依赖的其他字段 */
-  dependencies?: string[]
+  dependencies?: string[];
 }
 
 /**
  * 字段验证器
  */
 export class FieldValidator {
-  private rules: ValidationRule[] = []
+  private rules: ValidationRule[] = [];
 
   /**
    * 添加验证规则
    */
   addRule(rule: ValidationRule): this {
-    this.rules.push(rule)
-    return this
+    this.rules.push(rule);
+    return this;
   }
 
   /**
@@ -104,19 +104,19 @@ export class FieldValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
-    }
+      suggestions: [],
+    };
 
     for (const rule of this.rules) {
-      const ruleResult = rule.validate(value, path, fullConfig)
-      
-      result.errors.push(...ruleResult.errors)
-      result.warnings.push(...ruleResult.warnings)
-      result.suggestions.push(...ruleResult.suggestions)
+      const ruleResult = rule.validate(value, path, fullConfig);
+
+      result.errors.push(...ruleResult.errors);
+      result.warnings.push(...ruleResult.warnings);
+      result.suggestions.push(...ruleResult.suggestions);
     }
 
-    result.valid = result.errors.length === 0
-    return result
+    result.valid = result.errors.length === 0;
+    return result;
   }
 }
 
@@ -124,23 +124,23 @@ export class FieldValidator {
  * 配置验证器
  */
 export class ConfigValidator {
-  private fieldValidators = new Map<string, FieldValidator>()
-  private globalRules: ValidationRule[] = []
+  private fieldValidators = new Map<string, FieldValidator>();
+  private globalRules: ValidationRule[] = [];
 
   /**
    * 添加字段验证器
    */
   addField(path: string, validator: FieldValidator): this {
-    this.fieldValidators.set(path, validator)
-    return this
+    this.fieldValidators.set(path, validator);
+    return this;
   }
 
   /**
    * 添加全局验证规则
    */
   addGlobalRule(rule: ValidationRule): this {
-    this.globalRules.push(rule)
-    return this
+    this.globalRules.push(rule);
+    return this;
   }
 
   /**
@@ -151,49 +151,49 @@ export class ConfigValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
-    }
+      suggestions: [],
+    };
 
     // 验证各个字段
     for (const [path, validator] of this.fieldValidators) {
-      const value = this.getValueByPath(config, path)
-      const fieldResult = validator.validate(value, path, config)
-      
-      result.errors.push(...fieldResult.errors)
-      result.warnings.push(...fieldResult.warnings)
-      result.suggestions.push(...fieldResult.suggestions)
+      const value = this.getValueByPath(config, path);
+      const fieldResult = validator.validate(value, path, config);
+
+      result.errors.push(...fieldResult.errors);
+      result.warnings.push(...fieldResult.warnings);
+      result.suggestions.push(...fieldResult.suggestions);
     }
 
     // 执行全局验证规则
     for (const rule of this.globalRules) {
-      const ruleResult = rule.validate(config, '', config)
-      
-      result.errors.push(...ruleResult.errors)
-      result.warnings.push(...ruleResult.warnings)
-      result.suggestions.push(...ruleResult.suggestions)
+      const ruleResult = rule.validate(config, '', config);
+
+      result.errors.push(...ruleResult.errors);
+      result.warnings.push(...ruleResult.warnings);
+      result.suggestions.push(...ruleResult.suggestions);
     }
 
-    result.valid = result.errors.length === 0
-    return result
+    result.valid = result.errors.length === 0;
+    return result;
   }
 
   /**
    * 根据路径获取值
    */
   private getValueByPath(obj: any, path: string): any {
-    if (!path) return obj
-    
-    const keys = path.split('.')
-    let current = obj
-    
+    if (!path) return obj;
+
+    const keys = path.split('.');
+    let current = obj;
+
     for (const key of keys) {
       if (current === null || current === undefined) {
-        return undefined
+        return undefined;
       }
-      current = current[key]
+      current = current[key];
     }
-    
-    return current
+
+    return current;
   }
 }
 
@@ -212,8 +212,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (value === undefined || value === null) {
           result.errors.push({
@@ -221,15 +221,15 @@ export const ValidationRules = {
             message: `Required field "${fieldName}" is missing`,
             path,
             value,
-            severity: ErrorSeverity.HIGH
-          })
+            severity: ErrorSeverity.HIGH,
+          });
         }
 
-        result.valid = result.errors.length === 0
-        return result
+        result.valid = result.errors.length === 0;
+        return result;
       },
-      required: true
-    }
+      required: true,
+    };
   },
 
   /**
@@ -243,8 +243,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (value !== undefined && typeof value !== expectedType) {
           result.errors.push({
@@ -253,14 +253,14 @@ export const ValidationRules = {
             path,
             value,
             expected: expectedType,
-            severity: ErrorSeverity.HIGH
-          })
+            severity: ErrorSeverity.HIGH,
+          });
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
@@ -274,8 +274,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (value !== undefined && !allowedValues.includes(value)) {
           result.errors.push({
@@ -284,28 +284,30 @@ export const ValidationRules = {
             path,
             value,
             expected: allowedValues,
-            severity: ErrorSeverity.MEDIUM
-          })
+            severity: ErrorSeverity.MEDIUM,
+          });
 
           // 提供建议
-          const suggestion = allowedValues.find(v => 
-            typeof v === 'string' && typeof value === 'string' && 
-            v.toLowerCase().includes(value.toLowerCase())
-          )
-          
+          const suggestion = allowedValues.find(
+            (v) =>
+              typeof v === 'string' &&
+              typeof value === 'string' &&
+              v.toLowerCase().includes(value.toLowerCase())
+          );
+
           if (suggestion) {
             result.suggestions.push({
               message: `Did you mean "${suggestion}"?`,
               path,
-              suggestedConfig: suggestion
-            })
+              suggestedConfig: suggestion,
+            });
           }
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
@@ -319,8 +321,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (typeof value === 'number') {
           if (min !== undefined && value < min) {
@@ -330,8 +332,8 @@ export const ValidationRules = {
               path,
               value,
               expected: `>= ${min}`,
-              severity: ErrorSeverity.MEDIUM
-            })
+              severity: ErrorSeverity.MEDIUM,
+            });
           }
 
           if (max !== undefined && value > max) {
@@ -341,15 +343,15 @@ export const ValidationRules = {
               path,
               value,
               expected: `<= ${max}`,
-              severity: ErrorSeverity.MEDIUM
-            })
+              severity: ErrorSeverity.MEDIUM,
+            });
           }
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
@@ -363,8 +365,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (typeof value === 'string') {
           if (min !== undefined && value.length < min) {
@@ -374,8 +376,8 @@ export const ValidationRules = {
               path,
               value,
               expected: `>= ${min} characters`,
-              severity: ErrorSeverity.MEDIUM
-            })
+              severity: ErrorSeverity.MEDIUM,
+            });
           }
 
           if (max !== undefined && value.length > max) {
@@ -385,15 +387,15 @@ export const ValidationRules = {
               path,
               value,
               expected: `<= ${max} characters`,
-              severity: ErrorSeverity.MEDIUM
-            })
+              severity: ErrorSeverity.MEDIUM,
+            });
           }
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
@@ -407,12 +409,12 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (typeof value === 'string' && value.length > 0) {
           try {
-            new URL(value)
+            new URL(value);
           } catch {
             result.errors.push({
               code: ERROR_CODES.VALIDATION_INVALID_FORMAT,
@@ -420,24 +422,26 @@ export const ValidationRules = {
               path,
               value,
               expected: 'Valid URL format',
-              severity: ErrorSeverity.MEDIUM
-            })
+              severity: ErrorSeverity.MEDIUM,
+            });
 
             // 提供建议
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
               result.suggestions.push({
                 message: 'URL should start with http:// or https://',
                 path,
-                suggestedConfig: value.startsWith('/') ? `http://localhost${value}` : `https://${value}`
-              })
+                suggestedConfig: value.startsWith('/')
+                  ? `http://localhost${value}`
+                  : `https://${value}`,
+              });
             }
           }
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
@@ -451,8 +455,8 @@ export const ValidationRules = {
           valid: true,
           errors: [],
           warnings: [],
-          suggestions: []
-        }
+          suggestions: [],
+        };
 
         if (value !== undefined && !Array.isArray(value)) {
           result.errors.push({
@@ -461,77 +465,79 @@ export const ValidationRules = {
             path,
             value,
             expected: 'Array',
-            severity: ErrorSeverity.HIGH
-          })
+            severity: ErrorSeverity.HIGH,
+          });
         } else if (Array.isArray(value) && itemValidator) {
           // 验证数组项
           value.forEach((item, index) => {
-            const itemPath = `${path}[${index}]`
-            const itemResult = itemValidator.validate(item, itemPath, fullConfig)
-            
-            result.errors.push(...itemResult.errors)
-            result.warnings.push(...itemResult.warnings)
-            result.suggestions.push(...itemResult.suggestions)
-          })
+            const itemPath = `${path}[${index}]`;
+            const itemResult = itemValidator.validate(item, itemPath, fullConfig);
+
+            result.errors.push(...itemResult.errors);
+            result.warnings.push(...itemResult.warnings);
+            result.suggestions.push(...itemResult.suggestions);
+          });
         }
 
-        result.valid = result.errors.length === 0
-        return result
-      }
-    }
+        result.valid = result.errors.length === 0;
+        return result;
+      },
+    };
   },
 
   /**
    * 自定义验证
    */
-  custom(validator: (value: any, path: string, fullConfig: any) => ValidationResult): ValidationRule {
+  custom(
+    validator: (value: any, path: string, fullConfig: any) => ValidationResult
+  ): ValidationRule {
     return {
       name: 'custom',
-      validate: validator
-    }
-  }
-}
+      validate: validator,
+    };
+  },
+};
 
 /**
  * 创建配置验证器
  */
 export function createConfigValidator(): ConfigValidator {
-  return new ConfigValidator()
+  return new ConfigValidator();
 }
 
 /**
  * 创建字段验证器
  */
 export function createFieldValidator(): FieldValidator {
-  return new FieldValidator()
+  return new FieldValidator();
 }
 
 /**
  * 格式化验证结果为用户友好的消息
  */
 export function formatValidationResult(result: ValidationResult): string {
-  const messages: string[] = []
+  const messages: string[] = [];
 
   if (result.errors.length > 0) {
-    messages.push('❌ Configuration Errors:')
-    result.errors.forEach(error => {
-      messages.push(`  • ${error.message} (${error.code})`)
-    })
+    messages.push('❌ Configuration Errors:');
+    result.errors.forEach((error) => {
+      messages.push(`  • ${error.message} (${error.code})`);
+    });
   }
 
   if (result.warnings.length > 0) {
-    messages.push('⚠️  Configuration Warnings:')
-    result.warnings.forEach(warning => {
-      messages.push(`  • ${warning.message}`)
-    })
+    messages.push('⚠️  Configuration Warnings:');
+    result.warnings.forEach((warning) => {
+      messages.push(`  • ${warning.message}`);
+    });
   }
 
   if (result.suggestions.length > 0) {
-    messages.push('💡 Suggestions:')
-    result.suggestions.forEach(suggestion => {
-      messages.push(`  • ${suggestion.message}`)
-    })
+    messages.push('💡 Suggestions:');
+    result.suggestions.forEach((suggestion) => {
+      messages.push(`  • ${suggestion.message}`);
+    });
   }
 
-  return messages.join('\n')
+  return messages.join('\n');
 }

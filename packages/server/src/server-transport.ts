@@ -4,12 +4,15 @@
  * 使用原生 Node.js API 的零依赖日志传输实现
  */
 
-import { LoggerlessTransport, type LoggerlessTransportConfig, type LogLayerTransportParams, type LogLevelType } from '@loglayer/transport'
+import {
+  LoggerlessTransport,
+  type LoggerlessTransportConfig,
+  type LogLayerTransportParams,
+  type LogLevelType,
+} from '@loglayer/transport';
 import type { LogLevel, LogMetadata, ServerOutput } from '@yai-loglayer/core';
 import { isBrowserEnvironment, serializeMessages } from '@yai-loglayer/core';
 // import { getLocalTimestamp } from './utils'; // 暂时移除，使用内联实现
-
-
 
 /**
  * 获取本地时间戳
@@ -149,7 +152,12 @@ class ServerOutputEngine {
     }
   }
 
-  private async sendToSls(message: string, meta: LogMetadata, level: string, config: any = {}): Promise<void> {
+  private async sendToSls(
+    message: string,
+    meta: LogMetadata,
+    level: string,
+    config: any = {}
+  ): Promise<void> {
     // 检查必需的配置参数
     if (
       !config?.endpoint ||
@@ -204,13 +212,16 @@ class ServerOutputEngine {
         source: config.source || 'nodejs',
       };
 
-      client.postLogStoreLogs(config.project, config.logstore, logGroup).then(() => {
-        // SLS 发送成功，静默处理
-      }).catch((error: any) => {
-        if (process.env.NODE_ENV !== 'production') {
-          console.error('[LogLayer SLS] 发送失败:', error?.message || error);
-        }
-      });
+      client
+        .postLogStoreLogs(config.project, config.logstore, logGroup)
+        .then(() => {
+          // SLS 发送成功，静默处理
+        })
+        .catch((error: any) => {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('[LogLayer SLS] 发送失败:', error?.message || error);
+          }
+        });
     } catch (error: any) {
       if (process.env.NODE_ENV !== 'production') {
         console.error('[LogLayer SLS] 发送过程中出现错误:', error?.message || error);
@@ -235,54 +246,58 @@ class ServerOutputEngine {
  * LogLayer 兼容的服务端 Transport
  */
 export interface ServerTransportConfig extends LoggerlessTransportConfig {
-  outputs: ServerOutput[]
+  outputs: ServerOutput[];
 }
 
 export class ServerTransport extends LoggerlessTransport {
-  private outputEngine: ServerOutputEngine
+  private outputEngine: ServerOutputEngine;
 
   constructor(outputs: ServerOutput[]) {
-    super({ id: 'server-transport' })
-    this.outputEngine = new ServerOutputEngine(outputs)
+    super({ id: 'server-transport' });
+    this.outputEngine = new ServerOutputEngine(outputs);
   }
 
   /**
    * LogLayer 调用此方法发送日志
    */
   shipToLogger(params: LogLayerTransportParams): any[] {
-    const { logLevel, messages, data } = params
+    const { logLevel, messages, data } = params;
 
     // 将 LogLayer 的日志级别映射到我们的类型
-    const level = logLevel as LogLevel
+    const level = logLevel as LogLevel;
 
     // 使用统一的消息序列化工具
-    const message = serializeMessages(messages)
-    const meta = data || {}
+    const message = serializeMessages(messages);
+    const meta = data || {};
 
     // 使用输出引擎处理日志
-    this.outputEngine.debug = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('debug', msg, metadata)
-    this.outputEngine.info = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('info', msg, metadata)
-    this.outputEngine.warn = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('warn', msg, metadata)
-    this.outputEngine.error = (msg: string, metadata: LogMetadata = {}) => this.outputEngine['log']('error', msg, metadata)
+    this.outputEngine.debug = (msg: string, metadata: LogMetadata = {}) =>
+      this.outputEngine['log']('debug', msg, metadata);
+    this.outputEngine.info = (msg: string, metadata: LogMetadata = {}) =>
+      this.outputEngine['log']('info', msg, metadata);
+    this.outputEngine.warn = (msg: string, metadata: LogMetadata = {}) =>
+      this.outputEngine['log']('warn', msg, metadata);
+    this.outputEngine.error = (msg: string, metadata: LogMetadata = {}) =>
+      this.outputEngine['log']('error', msg, metadata);
 
     // 调用对应的日志方法
     switch (level) {
       case 'debug':
-        this.outputEngine.debug(message, meta)
-        break
+        this.outputEngine.debug(message, meta);
+        break;
       case 'info':
-        this.outputEngine.info(message, meta)
-        break
+        this.outputEngine.info(message, meta);
+        break;
       case 'warn':
-        this.outputEngine.warn(message, meta)
-        break
+        this.outputEngine.warn(message, meta);
+        break;
       case 'error':
-        this.outputEngine.error(message, meta)
-        break
+        this.outputEngine.error(message, meta);
+        break;
       default:
-        this.outputEngine.info(message, meta)
+        this.outputEngine.info(message, meta);
     }
 
-    return messages
+    return messages;
   }
 }

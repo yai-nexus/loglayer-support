@@ -11,7 +11,7 @@ import { createLogger, createDefaultConfig } from 'loglayer-support';
 async function setupLogger() {
   const config = createDefaultConfig();
   const logger = await createLogger('my-app', config);
-  
+
   logger.info('应用启动', { version: '1.0.0' });
   return logger;
 }
@@ -43,9 +43,9 @@ logger.info('页面访问', { page: '/dashboard' });
 
 ```typescript
 // ❌ 不再提供 - 代理模式容易导致日志丢失
-createLoggerProxy('app')
-initGlobalLogger('app', config)
-getGlobalLogger()
+createLoggerProxy('app');
+initGlobalLogger('app', config);
+getGlobalLogger();
 ```
 
 ### ✅ 推荐做法
@@ -81,7 +81,7 @@ proxy.info('完成'); // 这时才输出到正确位置
 // 解决方案：显式创建
 const logger = await createLogger('app', config);
 logger.info('启动中...'); // 直接输出到所有配置的位置
-logger.info('完成');      // 行为完全一致
+logger.info('完成'); // 行为完全一致
 ```
 
 ## 配置示例
@@ -92,14 +92,11 @@ logger.info('完成');      // 行为完全一致
 const config = {
   level: { default: 'debug' },
   server: {
-    outputs: [
-      { type: 'stdout' },
-      { type: 'file', config: { dir: './logs', filename: 'dev.log' } }
-    ]
+    outputs: [{ type: 'stdout' }, { type: 'file', config: { dir: './logs', filename: 'dev.log' } }],
   },
   client: {
-    outputs: [{ type: 'console' }]
-  }
+    outputs: [{ type: 'console' }],
+  },
 };
 ```
 
@@ -111,14 +108,18 @@ const config = {
   server: {
     outputs: [
       { type: 'stdout' },
-      { type: 'sls', level: 'warn', config: { /* SLS 配置 */ } }
-    ]
+      {
+        type: 'sls',
+        level: 'warn',
+        config: {
+          /* SLS 配置 */
+        },
+      },
+    ],
   },
   client: {
-    outputs: [
-      { type: 'http', level: 'error', config: { endpoint: '/api/logs' } }
-    ]
-  }
+    outputs: [{ type: 'http', level: 'error', config: { endpoint: '/api/logs' } }],
+  },
 };
 ```
 
@@ -150,6 +151,7 @@ logger.info('基础输出'); // 输出到标准位置
 ```
 
 选择标准：
+
 - 需要文件、HTTP、SLS 等高级输出 → 使用异步版本
 - 只需要控制台输出 → 可以使用同步版本
 - Next.js 项目 → 使用 `createNextjsLoggerSync`

@@ -1,0 +1,235 @@
+{
+  "Next.js Logger Hook": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "useLogger",
+    "body": [
+      "const logger = useComponentLogger('${1:ComponentName}')",
+      "logger.${2|info,debug,warn,error|}('${3:message}', { ${4:data} })"
+    ],
+    "description": "使用 @yai-loglayer/next 的 useComponentLogger Hook"
+  },
+  
+  "Next.js Performance Logger": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "usePerformance",
+    "body": [
+      "const { measurePerformance } = usePerformanceLogger()",
+      "measurePerformance('${1:operation-name}', () => {",
+      "  ${2:// 需要测量的代码}",
+      "})"
+    ],
+    "description": "使用 @yai-loglayer/next 的性能测量"
+  },
+  
+  "Next.js Server Logger": {
+    "scope": "typescript",
+    "prefix": "serverLogger",
+    "body": [
+      "import { createNextjsServerLogger } from '@yai-loglayer/next'",
+      "",
+      "const serverLogger = createNextjsServerLogger({",
+      "  appName: '${1:app-name}',",
+      "  environment: process.env.NODE_ENV as any || 'development',",
+      "  enableFileLogging: ${2:true}",
+      "})"
+    ],
+    "description": "创建 Next.js 服务端日志器"
+  },
+  
+  "Next.js Browser Logger": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "browserLogger",
+    "body": [
+      "import { createNextjsBrowserLogger } from '@yai-loglayer/next'",
+      "",
+      "const browserLogger = createNextjsBrowserLogger({",
+      "  appName: '${1:app-name}',",
+      "  environment: process.env.NODE_ENV as any || 'development',",
+      "  enableConsole: ${2:true},",
+      "  enableHttp: ${3:true}",
+      "})"
+    ],
+    "description": "创建 Next.js 浏览器端日志器"
+  },
+  
+  "Next.js Log Receiver": {
+    "scope": "typescript",
+    "prefix": "logReceiver",
+    "body": [
+      "import { createNextjsLogReceiver } from '@yai-loglayer/next'",
+      "import { NextRequest } from 'next/server'",
+      "",
+      "const serverLogger = createNextjsServerLogger({ appName: '${1:app-name}' })",
+      "const logReceiver = createNextjsLogReceiver(serverLogger, {",
+      "  validation: {",
+      "    maxMessageLength: ${2:2000},",
+      "    allowedLevels: ['debug', 'info', 'warn', 'error']",
+      "  },",
+      "  security: {",
+      "    rateLimiting: {",
+      "      maxRequestsPerMinute: ${3:200}",
+      "    }",
+      "  }",
+      "})",
+      "",
+      "export async function POST(request: NextRequest) {",
+      "  return logReceiver(request)",
+      "}"
+    ],
+    "description": "创建 Next.js 日志接收器 API 路由"
+  },
+  
+  "Next.js Server Action with Logging": {
+    "scope": "typescript",
+    "prefix": "serverAction",
+    "body": [
+      "'use server'",
+      "",
+      "import { createNextjsServerLogger } from '@yai-loglayer/next'",
+      "",
+      "const serverLogger = createNextjsServerLogger({",
+      "  appName: '${1:app-name}',",
+      "  enableFileLogging: true",
+      "})",
+      "",
+      "export async function ${2:actionName}(formData: FormData) {",
+      "  const startTime = Date.now()",
+      "  ",
+      "  serverLogger.info('开始执行 ${2:actionName}', {",
+      "    action: '${2:actionName}',",
+      "    timestamp: new Date().toISOString()",
+      "  })",
+      "  ",
+      "  try {",
+      "    ${3:// 业务逻辑}",
+      "    ",
+      "    const duration = Date.now() - startTime",
+      "    serverLogger.info('${2:actionName} 执行成功', {",
+      "      action: '${2:actionName}',",
+      "      duration: `${duration}ms`,",
+      "      success: true",
+      "    })",
+      "    ",
+      "    return { success: true }",
+      "  } catch (error) {",
+      "    const duration = Date.now() - startTime",
+      "    serverLogger.error('${2:actionName} 执行失败', {",
+      "      action: '${2:actionName}',",
+      "      duration: `${duration}ms`,",
+      "      error: (error as Error).message,",
+      "      stack: (error as Error).stack",
+      "    })",
+      "    ",
+      "    return { success: false, error: (error as Error).message }",
+      "  }",
+      "}"
+    ],
+    "description": "创建带日志记录的 Next.js Server Action"
+  },
+  
+  "React Component with Logger": {
+    "scope": "typescriptreact",
+    "prefix": "componentLogger",
+    "body": [
+      "'use client'",
+      "",
+      "import { useComponentLogger } from '@yai-loglayer/next'",
+      "",
+      "export default function ${1:ComponentName}() {",
+      "  const logger = useComponentLogger('${1:ComponentName}')",
+      "  ",
+      "  const handleAction = () => {",
+      "    logger.info('用户操作', {",
+      "      action: '${2:action-name}',",
+      "      timestamp: new Date().toISOString()",
+      "    })",
+      "    ${3:// 处理逻辑}",
+      "  }",
+      "  ",
+      "  return (",
+      "    <div>",
+      "      <button onClick={handleAction}>",
+      "        ${4:按钮文本}",
+      "      </button>",
+      "    </div>",
+      "  )",
+      "}"
+    ],
+    "description": "创建带日志记录的 React 组件"
+  },
+  
+  "Logger Provider Setup": {
+    "scope": "typescriptreact",
+    "prefix": "loggerProvider",
+    "body": [
+      "import { LoggerProvider } from '@yai-loglayer/next'",
+      "",
+      "export default function RootLayout({ children }: { children: React.ReactNode }) {",
+      "  return (",
+      "    <LoggerProvider",
+      "      config={{",
+      "        appName: '${1:app-name}',",
+      "        shared: {",
+      "          environment: process.env.NODE_ENV as any || 'development',",
+      "          level: '${2|debug,info,warn,error|}',",
+      "          enableSls: process.env.NODE_ENV === 'production'",
+      "        }",
+      "      }}",
+      "    >",
+      "      {children}",
+      "    </LoggerProvider>",
+      "  )",
+      "}"
+    ],
+    "description": "设置 LoggerProvider"
+  },
+  
+  "Error Boundary with Logging": {
+    "scope": "typescriptreact",
+    "prefix": "errorBoundary",
+    "body": [
+      "'use client'",
+      "",
+      "import React from 'react'",
+      "import { useComponentLogger } from '@yai-loglayer/next'",
+      "",
+      "interface ErrorBoundaryState {",
+      "  hasError: boolean",
+      "  error?: Error",
+      "}",
+      "",
+      "export class ${1:ComponentName}ErrorBoundary extends React.Component<",
+      "  React.PropsWithChildren<{}>,",
+      "  ErrorBoundaryState",
+      "> {",
+      "  constructor(props: React.PropsWithChildren<{}>) {",
+      "    super(props)",
+      "    this.state = { hasError: false }",
+      "  }",
+      "",
+      "  static getDerivedStateFromError(error: Error): ErrorBoundaryState {",
+      "    return { hasError: true, error }",
+      "  }",
+      "",
+      "  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {",
+      "    // 这里需要在类组件外部记录日志",
+      "    console.error('${1:ComponentName} Error Boundary caught an error:', error, errorInfo)",
+      "  }",
+      "",
+      "  render() {",
+      "    if (this.state.hasError) {",
+      "      return (",
+      "        <div className=\"error-boundary\">",
+      "          <h2>出现了错误</h2>",
+      "          <p>组件渲染时发生了错误，请刷新页面重试。</p>",
+      "        </div>",
+      "      )",
+      "    }",
+      "",
+      "    return this.props.children",
+      "  }",
+      "}"
+    ],
+    "description": "创建带日志记录的错误边界组件"
+  }
+}

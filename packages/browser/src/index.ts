@@ -21,21 +21,21 @@ export {
 
   // 主要工厂函数
   createBrowserLogger,
-  createBrowserLoggerSync
+  createBrowserLoggerSync,
 } from './browser';
 
 // 预设工厂函数
 export {
   createDevelopmentBrowserLogger,
   createProductionBrowserLogger,
-  createCustomBrowserLogger
+  createCustomBrowserLogger,
 } from './browser-factory';
 
 // 底层传输器（供高级用户使用）
 export {
   type BrowserOutputConfig,
   type LoglayerBrowserTransportConfig,
-  LoglayerBrowserTransport
+  LoglayerBrowserTransport,
 } from './browser-transport';
 
 // =============================================================================

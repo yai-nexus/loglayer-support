@@ -1,28 +1,32 @@
 /**
  * 浏览器 Transport 工厂函数
- * 
+ *
  * 提供便捷的方法来创建和配置 LoglayerBrowserTransport
  */
 
-import { LogLayer } from 'loglayer'
-import { LoglayerBrowserTransport, type BrowserOutputConfig, type LoglayerBrowserTransportConfig } from './browser-transport'
-import type { ClientOutput } from '@yai-loglayer/core'
+import { LogLayer } from 'loglayer';
+import {
+  LoglayerBrowserTransport,
+  type BrowserOutputConfig,
+  type LoglayerBrowserTransportConfig,
+} from './browser-transport';
+import type { ClientOutput } from '@yai-loglayer/core';
 
 /**
  * 从旧的配置格式转换为新的 BrowserOutputConfig
  * 内部函数，不对外暴露
  */
 function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
-  const config: BrowserOutputConfig = {}
+  const config: BrowserOutputConfig = {};
 
   for (const output of outputs) {
     switch (output.type) {
       case 'console':
         config.console = {
           enabled: true,
-          colors: true
-        }
-        break
+          colors: true,
+        };
+        break;
 
       case 'http':
         config.http = {
@@ -33,22 +37,22 @@ function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
           batchSize: output.config?.bufferSize || 10,
           flushInterval: output.config?.flushInterval || 5000,
           retryAttempts: 3,
-          onlyErrors: output.level === 'error'
-        }
-        break
+          onlyErrors: output.level === 'error',
+        };
+        break;
 
       case 'localstorage':
         config.localStorage = {
           enabled: true,
           key: output.config?.key || 'app-logs',
           maxEntries: output.config?.maxEntries || 100,
-          ttl: output.config?.ttl || 24 * 60 * 60 * 1000
-        }
-        break
+          ttl: output.config?.ttl || 24 * 60 * 60 * 1000,
+        };
+        break;
     }
   }
 
-  return config
+  return config;
 }
 
 /**
@@ -57,16 +61,16 @@ function convertLegacyOutputs(outputs: ClientOutput[]): BrowserOutputConfig {
  * @internal
  */
 export function createBrowserLogLayer(outputs: ClientOutput[]): LogLayer {
-  const browserOutputs = convertLegacyOutputs(outputs)
-  
+  const browserOutputs = convertLegacyOutputs(outputs);
+
   const transport = new LoglayerBrowserTransport({
     id: 'browser-transport',
-    outputs: browserOutputs
-  })
+    outputs: browserOutputs,
+  });
 
   return new LogLayer({
-    transport
-  })
+    transport,
+  });
 }
 
 /**
@@ -78,19 +82,19 @@ export function createDevelopmentBrowserLogger(): LogLayer {
     outputs: {
       console: {
         enabled: true,
-        colors: true
+        colors: true,
       },
       localStorage: {
         enabled: true,
         key: 'dev-app-logs',
-        maxEntries: 50
-      }
-    }
-  })
+        maxEntries: 50,
+      },
+    },
+  });
 
   return new LogLayer({
-    transport
-  })
+    transport,
+  });
 }
 
 /**
@@ -101,7 +105,7 @@ export function createProductionBrowserLogger(httpEndpoint = '/api/logs'): LogLa
     id: 'prod-browser-transport',
     outputs: {
       console: {
-        enabled: false // 生产环境关闭控制台输出
+        enabled: false, // 生产环境关闭控制台输出
       },
       http: {
         enabled: true,
@@ -110,20 +114,20 @@ export function createProductionBrowserLogger(httpEndpoint = '/api/logs'): LogLa
         batchSize: 20,
         flushInterval: 10000,
         retryAttempts: 3,
-        onlyErrors: true // 生产环境只发送错误
+        onlyErrors: true, // 生产环境只发送错误
       },
       localStorage: {
         enabled: true,
         key: 'prod-app-logs',
         maxEntries: 20,
-        ttl: 60 * 60 * 1000 // 1小时
-      }
-    }
-  })
+        ttl: 60 * 60 * 1000, // 1小时
+      },
+    },
+  });
 
   return new LogLayer({
-    transport
-  })
+    transport,
+  });
 }
 
 /**
@@ -132,10 +136,10 @@ export function createProductionBrowserLogger(httpEndpoint = '/api/logs'): LogLa
 export function createCustomBrowserLogger(config: BrowserOutputConfig): LogLayer {
   const transport = new LoglayerBrowserTransport({
     id: 'custom-browser-transport',
-    outputs: config
-  })
+    outputs: config,
+  });
 
   return new LogLayer({
-    transport
-  })
+    transport,
+  });
 }

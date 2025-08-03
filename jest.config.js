@@ -10,8 +10,8 @@ module.exports = {
       testMatch: ['**/__tests__/**/*.test.ts'],
       testPathIgnorePatterns: [
         '.*integration/browser-integration\\.test\\.ts$',
-        '.*integration/end-to-end\\.test\\.ts$'
-      ]
+        '.*integration/end-to-end\\.test\\.ts$',
+      ],
     },
     {
       displayName: 'jsdom',
@@ -19,15 +19,15 @@ module.exports = {
       testEnvironment: 'jsdom',
       testMatch: [
         '**/__tests__/integration/browser-integration.test.ts',
-        '**/__tests__/integration/end-to-end.test.ts'
+        '**/__tests__/integration/end-to-end.test.ts',
       ],
-      setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup/browser-setup.ts']
+      setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup/browser-setup.ts'],
     },
     {
       displayName: 'server',
       preset: 'ts-jest',
       testEnvironment: 'node',
-      testMatch: ['**/__tests__/integration/server-integration.test.ts']
-    }
-  ]
+      testMatch: ['**/__tests__/integration/server-integration.test.ts'],
+    },
+  ],
 };

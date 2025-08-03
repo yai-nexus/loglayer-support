@@ -53,32 +53,42 @@ npm start
 ## 📚 示例说明
 
 ### 示例1: 预设配置 (config-presets.ts)
+
 展示如何使用 LogLayer 提供的预设配置：
+
 - `createDefaultConfig()` - 默认配置
 - `createDevelopmentConfig()` - 开发环境配置
 
 ### 示例2: 自定义配置 (custom-config.ts)
+
 展示如何创建自定义的日志配置：
+
 - 不同模块的日志级别设置
 - 多种输出方式配置
 - 服务端和客户端分别配置
 
 ### 示例3: 增强功能 (enhanced-features.ts)
+
 展示 LogLayer 的高级功能：
+
 - 上下文绑定 (`forRequest`, `forUser`, `forModule`)
 - 错误记录 (`logError`)
 - 性能记录 (`logPerformance`)
 - 链式调用
 
 ### 示例4: 生产环境配置 (production-config.ts)
+
 展示适合生产环境的配置：
+
 - 安全的日志级别设置
 - 文件日志轮转
 - 云端日志收集 (SLS)
 - 性能优化配置
 
 ### 示例5: 多输出配置 (multiple-outputs.ts)
+
 展示如何配置多种输出方式：
+
 - 控制台输出
 - 文件输出（全量和错误分离）
 - HTTP 远程输出
@@ -111,6 +121,7 @@ npm test         # 构建并测试
 ### 日志输出
 
 日志文件默认输出到项目根目录的 `logs/` 目录：
+
 - `logs/basic.log` - 基础示例日志
 - `logs/all.log` - 完整日志
 - `logs/errors.log` - 错误日志

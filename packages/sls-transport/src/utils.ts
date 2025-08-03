@@ -4,12 +4,12 @@
 
 // 使用 LogLayer 原生类型，无需自定义 Log 接口
 import type { LogLevelType } from '@loglayer/transport';
-import type { 
-  SlsTransportConfig, 
-  SlsTransportInternalConfig, 
-  SlsLogItem, 
+import type {
+  SlsTransportConfig,
+  SlsTransportInternalConfig,
+  SlsLogItem,
   SlsLogContent,
-  RetryConfig 
+  RetryConfig,
 } from './types';
 
 /**
@@ -18,10 +18,10 @@ import type {
 export function validateSlsConfig(config: SlsTransportConfig): void {
   const requiredFields: (keyof SlsTransportConfig)[] = [
     'endpoint',
-    'accessKeyId', 
+    'accessKeyId',
     'accessKeySecret',
     'project',
-    'logstore'
+    'logstore',
   ];
 
   for (const field of requiredFields) {
@@ -32,7 +32,9 @@ export function validateSlsConfig(config: SlsTransportConfig): void {
 
   // 验证 endpoint 格式（支持完整 URL 或域名格式）
   if (!config.endpoint.startsWith('http') && !config.endpoint.includes('.log.aliyuncs.com')) {
-    throw new Error(`SLS Transport endpoint 必须是完整的 HTTP(S) URL 或阿里云 SLS 域名: ${config.endpoint}`);
+    throw new Error(
+      `SLS Transport endpoint 必须是完整的 HTTP(S) URL 或阿里云 SLS 域名: ${config.endpoint}`
+    );
   }
 
   // 验证数值参数
@@ -41,14 +43,15 @@ export function validateSlsConfig(config: SlsTransportConfig): void {
   }
 
   if (config.flushInterval && (config.flushInterval < 1000 || config.flushInterval > 300000)) {
-    throw new Error(`SLS Transport flushInterval 必须在 1000-300000ms 之间: ${config.flushInterval}`);
+    throw new Error(
+      `SLS Transport flushInterval 必须在 1000-300000ms 之间: ${config.flushInterval}`
+    );
   }
 
   if (config.maxRetries && (config.maxRetries < 0 || config.maxRetries > 10)) {
     throw new Error(`SLS Transport maxRetries 必须在 0-10 之间: ${config.maxRetries}`);
   }
 }
-
 
 /**
  * 将日志数据转换为 SLS 日志条目
@@ -82,13 +85,13 @@ export function convertLogToSlsItem(logData: {
       // 确保键名安全
       const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, '_');
       let stringValue: string;
-      
+
       try {
         stringValue = typeof value === 'string' ? value : JSON.stringify(value);
       } catch (error) {
         stringValue = String(value);
       }
-      
+
       contents.push({ key: safeKey, value: stringValue });
     });
   }
@@ -103,8 +106,8 @@ export function convertLogToSlsItem(logData: {
  * 实现指数退避延迟
  */
 export function calculateRetryDelay(
-  attempt: number, 
-  baseDelay: number, 
+  attempt: number,
+  baseDelay: number,
   maxDelay: number = 30000
 ): number {
   const delay = baseDelay * Math.pow(2, attempt);
@@ -115,7 +118,7 @@ export function calculateRetryDelay(
  * 异步延迟函数
  */
 export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -139,7 +142,7 @@ export function extractErrorMessage(error: unknown): string {
  */
 export function isRetriableError(error: unknown): boolean {
   const message = extractErrorMessage(error);
-  
+
   // 网络相关错误通常可以重试
   const retriablePatterns = [
     /network/i,
@@ -154,7 +157,7 @@ export function isRetriableError(error: unknown): boolean {
     /504/,
   ];
 
-  return retriablePatterns.some(pattern => pattern.test(message));
+  return retriablePatterns.some((pattern) => pattern.test(message));
 }
 
 /**
@@ -169,10 +172,10 @@ export function getCurrentTimestamp(): string {
  */
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
