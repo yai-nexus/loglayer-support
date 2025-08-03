@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/next",
-  "version": "0.8.0-alpha.1",
+  "version": "0.8.1",
   "description": "Next.js 统一日志组件 - 集成server和browser优化方案",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
