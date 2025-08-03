@@ -33,7 +33,7 @@
   - 准备发布到npm公共仓库
 
 - Updated dependencies []:
-  - @yai-loglayer/core@0.9.1
+  - @yai-loglayer/core@0.8.1
 
 ## 0.8.0
 
@@ -70,7 +70,7 @@
 ### Patch Changes
 
 - Updated dependencies []:
-  - @yai-loglayer/core@0.9.0
+  - @yai-loglayer/core@0.8.0
 
 ## 🎯 项目目标
 

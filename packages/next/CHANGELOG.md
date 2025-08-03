@@ -33,10 +33,10 @@
   - 准备发布到npm公共仓库
 
 - Updated dependencies []:
-  - @yai-loglayer/core@0.9.1
-  - @yai-loglayer/browser@0.9.1
-  - @yai-loglayer/server@0.9.1
-  - @yai-loglayer/receiver@0.9.1
+  - @yai-loglayer/core@0.8.1
+  - @yai-loglayer/browser@0.8.1
+  - @yai-loglayer/server@0.8.1
+  - @yai-loglayer/receiver@0.8.1
 
 ## 0.8.0
 
@@ -73,7 +73,7 @@
 ### Patch Changes
 
 - Updated dependencies []:
-  - @yai-loglayer/core@0.9.0
-  - @yai-loglayer/browser@0.9.0
-  - @yai-loglayer/server@0.9.0
-  - @yai-loglayer/receiver@0.9.0
+  - @yai-loglayer/core@0.8.0
+  - @yai-loglayer/browser@0.8.0
+  - @yai-loglayer/server@0.8.0
+  - @yai-loglayer/receiver@0.8.0
