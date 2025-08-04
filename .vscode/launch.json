@@ -2,12 +2,30 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Simple Demo",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/simple-demo/node_modules/.bin/next",
+      "args": ["dev", "-p", "3002"],
+      "cwd": "${workspaceFolder}/examples/simple-demo",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "serverReadyAction": {
+        "pattern": "ready - started server on .+, url: (https?://.+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
       "name": "Next.js: debug server-side",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "program": "${workspaceFolder}/examples/nextjs-example/node_modules/.bin/next",
       "args": ["dev", "-p", "3001"],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/examples/nextjs-example",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "env": {
@@ -40,9 +58,9 @@
       "name": "Next.js: debug full stack",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "program": "${workspaceFolder}/examples/nextjs-example/node_modules/.bin/next",
       "args": ["dev", "-p", "3001"],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/examples/nextjs-example",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "env": {

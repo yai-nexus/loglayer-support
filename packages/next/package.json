@@ -1,6 +1,6 @@
 {
   "name": "@yai-loglayer/next",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Next.js 统一日志组件 - 集成server和browser优化方案",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,14 +11,14 @@
       "require": "./dist/index.js"
     },
     "./client": {
-      "types": "./dist/browser/client.d.ts",
-      "import": "./dist/browser/client.js",
-      "require": "./dist/browser/client.js"
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.js"
     },
-    "./server-only": {
-      "types": "./dist/server/server-only.d.ts",
-      "import": "./dist/server/server-only.js",
-      "require": "./dist/server/server-only.js"
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.js"
     }
   },
   "scripts": {
@@ -40,14 +40,7 @@
   "author": "YAI Team",
   "license": "MIT",
   "dependencies": {
-    "loglayer": "^6.6.0",
-    "@loglayer/transport": "^2.2.1",
-    "@yai-loglayer/core": "workspace:*",
-    "@yai-loglayer/browser": "workspace:*",
-    "@yai-loglayer/server": "workspace:*",
-    "@yai-loglayer/receiver": "workspace:*",
-    "next": "^14.0.0",
-    "react": "^18.0.0"
+    "loglayer": "^6.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -64,6 +57,8 @@
   },
   "files": [
     "dist",
+    "client.ts",
+    "server.ts",
     "README.md"
   ],
   "repository": {
